@@ -16,7 +16,7 @@ const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { getAuth } = require('firebase-admin/auth');
 
-initializeApp({ projectId: 'earnwave-prod' });
+initializeApp({ projectId: 'moneywave-2f651' });
 const db = getFirestore();
 
 async function seed() {

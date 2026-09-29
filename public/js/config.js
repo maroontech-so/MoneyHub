@@ -1,19 +1,22 @@
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCI3P7jPtGuQMzUAc57XddCLl1VfegfwGA",
+  authDomain: "moneywave-2f651.firebaseapp.com",
+  databaseURL: "https://moneywave-2f651-default-rtdb.firebaseio.com",
+  projectId: "moneywave-2f651",
+  storageBucket: "moneywave-2f651.firebasestorage.app",
+  messagingSenderId: "1056208942079",
+  appId: "1:1056208942079:web:3ba32a59817b1a3f55edca",
+  measurementId: "G-LVEZD927PE"
+};
+
 // EARNWAVE Application Configuration
 const APP_CONFIG = {
   name: 'EARNWAVE',
   currency: 'KES',
   currencySymbol: 'KES',
   version: '1.0.0',
-  // Firebase config - replace with actual values
-  firebase: {
-    apiKey: '__FIREBASE_API_KEY__',
-    authDomain: '__FIREBASE_AUTH_DOMAIN__',
-    projectId: '__FIREBASE_PROJECT_ID__',
-    storageBucket: '__FIREBASE_STORAGE_BUCKET__',
-    messagingSenderId: '__FIREBASE_MESSAGING_SENDER_ID__',
-    appId: '__FIREBASE_APP_ID__',
-    measurementId: '__FIREBASE_MEASUREMENT_ID__'
-  }
+  firebase: firebaseConfig
 };
 
 // Utilities
@@ -49,4 +52,4 @@ const normalizePhone = (phone) => {
   return cleaned;
 };
 
-export { APP_CONFIG, formatCurrency, formatDate, normalizePhone };
+export { APP_CONFIG, firebaseConfig, formatCurrency, formatDate, normalizePhone };

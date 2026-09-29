@@ -1,6 +1,5 @@
-import { getFirestore, doc, getDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, startAfter } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-const db = getFirestore();
+import { doc, getDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, startAfter } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { db } from './firebase-init.js';
 
 export async function loadWalletBalance(userId) {
     try {

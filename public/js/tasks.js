@@ -1,8 +1,6 @@
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit, startAfter, orderBy } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
-
-const db = getFirestore();
-const functions = getFunctions();
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit, startAfter, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+import { db, functions } from './firebase-init.js';
 
 export async function loadTasks(options = {}) {
     const tasksRef = collection(db, 'tasks');
