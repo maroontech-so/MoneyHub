@@ -132,9 +132,93 @@ class StateStore {
           }
         }
       }
+
+      // Check Unlocked Tasks
+      await this.syncUnlockedTasks();
     } catch (e) {
       console.warn('Server sync deferred, using local cached store:', e.message);
     }
+  }
+
+  // --- Task Unlocking Methods ---
+  getUnlockedTasks() {
+    const raw = this.get('unlocked_tasks') || [];
+    return raw.map(item => (typeof item === 'string' ? item : item.taskId));
+  }
+
+  isTaskUnlocked(taskId) {
+    if (!taskId) return false;
+    const unlocked = this.getUnlockedTasks();
+    return unlocked.includes(taskId);
+  }
+
+  markTaskUnlockedLocally(taskId, details = {}) {
+    const unlocked = this.get('unlocked_tasks') || [];
+    const exists = unlocked.some(item => (typeof item === 'string' ? item === taskId : item.taskId === taskId));
+    if (!exists) {
+      unlocked.push({ taskId, ...details, unlockedAt: new Date().toISOString() });
+      this.set('unlocked_tasks', unlocked);
+    }
+  }
+
+  async syncUnlockedTasks() {
+    try {
+      const uid = this.getUserId();
+      const res = await fetch('/api/tasks/unlocked', {
+        headers: uid ? { 'x-user-id': uid } : {}
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.unlocked)) {
+          this.set('unlocked_tasks', data.unlocked);
+        }
+      }
+    } catch(e) {
+      console.warn('Sync unlocked tasks deferred:', e.message);
+    }
+  }
+
+  async unlockTaskWithWallet(taskId, taskTitle, unlockFee) {
+    const uid = this.getUserId();
+    const res = await fetch(`/api/tasks/${taskId}/unlock-wallet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': uid
+      },
+      body: JSON.stringify({ taskTitle, unlockFee: Number(unlockFee) })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to unlock task with wallet balance');
+    }
+
+    this.markTaskUnlockedLocally(taskId, { fee: unlockFee, method: 'WALLET' });
+    await this.syncWithServer();
+    return data;
+  }
+
+  async initiateTaskUnlockMpesa(taskId, taskTitle, unlockFee, phone) {
+    const uid = this.getUserId();
+    const res = await fetch(`/api/tasks/${taskId}/unlock-mpesa`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': uid
+      },
+      body: JSON.stringify({
+        taskTitle,
+        unlockFee: Number(unlockFee),
+        phone
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Could not send M-Pesa unlock prompt');
+    }
+    return data;
   }
 
   // --- Storage Primitive Helpers ---

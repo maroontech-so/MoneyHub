@@ -1067,6 +1067,11 @@ function generateCatalog() {
     }
   });
 
+  // Set unlock fee for every single task in the marketplace
+  tasks.forEach(t => {
+    t.unlockFee = Math.max(5, Math.round(((t.reward || 100) * 0.1) / 5) * 5);
+  });
+
   return tasks;
 }
 

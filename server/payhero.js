@@ -4,6 +4,7 @@
  */
 import { JsonStore } from './storage.js';
 import { ledgerService, TRANSACTION_TYPES } from './ledger.js';
+import { taskService } from './tasks.js';
 import crypto from 'crypto';
 
 const getBasicAuth = () => {
@@ -27,7 +28,7 @@ const PAYHERO_CONFIG = {
   username: process.env.PAYHERO_API_USERNAME || 'rZ4g13wnEA4tThcCgroC',
   password: process.env.PAYHERO_API_PASSWORD || 'bhWUN6RsMtyjCIvQTI78hEhO3uSHJNk80OPnz8TJ',
   accountId: Number(process.env.PAYHERO_ACCOUNT_ID) || 11180,
-  channelId: 11025, // Till 6683699 verified on account 11180
+  channelId: Number(process.env.PAYHERO_CHANNEL_ID) || 11662, // Channel 11662 (Bank / Paybill 714777)
   get basicAuth() {
     return getBasicAuth();
   },
@@ -124,9 +125,23 @@ class PayHeroService {
       const resJson = await response.json();
       console.log('[PayHero] STK Push response:', resJson);
 
+      const isInitiated = response.ok && (resJson.success === true || resJson.status === 'QUEUED' || resJson.status === 'Success' || resJson.CheckoutRequestID);
+
       paymentRecord.apiResponse = resJson;
       paymentRecord.checkoutRequestId = resJson.CheckoutRequestID || resJson.checkout_request_id || null;
       paymentRecord.updatedAt = new Date().toISOString();
+
+      if (!isInitiated) {
+        paymentRecord.status = 'FAILED';
+        paymentRecord.failureReason = resJson.error_message || resJson.message || 'Payment prompt could not be initiated.';
+        this.updatePaymentRecord(paymentRecord);
+        return {
+          success: false,
+          error: paymentRecord.failureReason,
+          paymentId: paymentRecord.id,
+          reference: externalReference
+        };
+      }
 
       // Update in store
       this.updatePaymentRecord(paymentRecord);
@@ -135,21 +150,22 @@ class PayHeroService {
         success: true,
         reference: externalReference,
         paymentId: paymentRecord.id,
-        directLink: PAYHERO_CONFIG.directLink,
         amount: payload.amount,
+        phone: formattedPhone,
+        checkoutRequestId: paymentRecord.checkoutRequestId,
         message: 'M-Pesa payment prompt sent to your phone. Enter your M-Pesa PIN to complete payment.',
         data: resJson
       };
     } catch (err) {
       console.warn('[PayHero] STK push API call failed or timed out:', err.message);
+      paymentRecord.status = 'FAILED';
+      paymentRecord.failureReason = 'Network failure communicating with payment provider. Please try again.';
+      this.updatePaymentRecord(paymentRecord);
       return {
-        success: true,
-        fallbackToDirectLink: true,
+        success: false,
+        error: paymentRecord.failureReason,
         reference: externalReference,
-        paymentId: paymentRecord.id,
-        directLink: PAYHERO_CONFIG.directLink,
-        amount: payload.amount,
-        message: 'Please complete payment using the PayHero payment link.'
+        paymentId: paymentRecord.id
       };
     }
   }
@@ -161,7 +177,17 @@ class PayHeroService {
     console.log('[PayHero Webhook] Received callback:', JSON.stringify(body));
 
     const responseData = body.response || body;
-    const status = (body.status || responseData.status || (responseData.ResultCode === 0 || responseData.result_code === 0 ? 'Success' : 'Failed') || '').toString().toUpperCase();
+    const resultCode = responseData.ResultCode !== undefined 
+      ? responseData.ResultCode 
+      : (responseData.result_code !== undefined ? responseData.result_code : null);
+
+    const resultDesc = responseData.ResultDesc 
+      || responseData.result_desc 
+      || body.message 
+      || body.description 
+      || '';
+
+    const statusRaw = (body.status || responseData.status || '').toString().toUpperCase();
     const externalReference = responseData.external_reference || responseData.ExternalReference || responseData.reference || body.external_reference || null;
     const checkoutRequestId = responseData.checkout_request_id || responseData.CheckoutRequestID || null;
     const mpesaCode = responseData.MpesaReceiptNumber || responseData.mpesa_code || responseData.receipt || null;
@@ -175,29 +201,48 @@ class PayHeroService {
       (checkoutRequestId && p.checkoutRequestId === checkoutRequestId)
     );
 
-    const isSuccess = status === 'SUCCESS' || status === 'COMPLETED' || responseData.result_code === 0 || responseData.ResultCode === 0;
+    const isSuccess = (resultCode === 0 || statusRaw === 'SUCCESS' || statusRaw === 'COMPLETED') && resultCode !== 1 && resultCode !== 1032;
+    const isExplicitFailure = (resultCode !== null && resultCode !== 0) || statusRaw === 'FAILED' || statusRaw === 'CANCELLED';
 
     if (payment) {
-      payment.status = isSuccess ? 'COMPLETED' : 'FAILED';
-      payment.mpesaReceipt = mpesaCode;
+      if (isSuccess) {
+        payment.status = 'COMPLETED';
+        payment.mpesaReceipt = mpesaCode || 'VERIFIED';
+        payment.failureReason = null;
+      } else if (isExplicitFailure) {
+        payment.status = 'FAILED';
+        payment.failureReason = resultDesc || 'Payment was cancelled or failed by user.';
+      }
       payment.callbackData = responseData;
       payment.updatedAt = new Date().toISOString();
       this.paymentsStore.write(data);
 
       if (isSuccess && payment.userId) {
-        this.activateUser(payment.userId, {
-          paymentId: payment.id,
-          amount: payment.amount,
-          reference: payment.externalReference,
-          mpesaReceipt: mpesaCode
-        });
+        if (payment.purpose && payment.purpose.startsWith('TASK_UNLOCK_')) {
+          const unlockedTaskId = payment.purpose.replace('TASK_UNLOCK_', '');
+          taskService.unlockTask(payment.userId, unlockedTaskId, {
+            fee: payment.amount,
+            method: 'MPESA',
+            reference: payment.externalReference
+          });
+          payment.unlockedTaskId = unlockedTaskId;
+        } else {
+          this.activateUser(payment.userId, {
+            paymentId: payment.id,
+            amount: payment.amount,
+            reference: payment.externalReference,
+            mpesaReceipt: payment.mpesaReceipt
+          });
+        }
       }
 
       return {
         success: true,
         matched: true,
         paymentId: payment.id,
-        isSuccess
+        isSuccess,
+        status: payment.status,
+        failureReason: payment.failureReason
       };
     } else {
       // Create new completed record if matched by phone or general webhook
@@ -208,6 +253,7 @@ class PayHeroService {
         amount: responseData.amount || PAYHERO_CONFIG.activationAmountKes,
         phone: responseData.phone || responseData.phone_number || '',
         mpesaReceipt: mpesaCode,
+        failureReason: isSuccess ? null : (resultDesc || 'Payment failed.'),
         callbackData: responseData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -219,7 +265,8 @@ class PayHeroService {
         success: true,
         matched: false,
         paymentId: newPayRecord.id,
-        isSuccess
+        isSuccess,
+        status: newPayRecord.status
       };
     }
   }
@@ -251,7 +298,7 @@ class PayHeroService {
         amount: 5.00,
         direction: 'CREDIT',
         status: 'COMPLETED',
-        description: `Account Activated (PayHero Verified - KES 5.00)`,
+        description: `Account Activated (PayHero Channel 11662 Verified - KES 5.00)`,
         referenceId: paymentDetails.reference || `act_${Date.now()}`,
         metadata: { ...paymentDetails, feeRefundedAsCredit: true }
       });
@@ -259,6 +306,109 @@ class PayHeroService {
 
     console.log(`[PayHero] User ${userId} successfully activated!`);
     return user;
+  }
+
+  /**
+   * Check if a user is activated
+   */
+  isUserActivated(userId) {
+    if (!userId) return false;
+    const usersData = this.usersStore.read();
+    const user = usersData.users?.[userId];
+    return !!(user && (user.status === 'ACTIVE' || user.activated));
+  }
+
+  /**
+   * Check status of a payment by externalReference or paymentId, querying PayHero transactions if pending
+   */
+  async checkPaymentStatusOnline(ref) {
+    const data = this.paymentsStore.read();
+    const payments = data.payments || [];
+    let payment = payments.find(p => p.externalReference === ref || p.id === ref);
+
+    if (!payment) {
+      return null;
+    }
+
+    // If already marked COMPLETED or FAILED, return immediately
+    if (payment.status === 'COMPLETED' || payment.status === 'FAILED') {
+      return payment;
+    }
+
+    // Active check against PayHero transactions API for channel 11662
+    try {
+      const response = await fetch(`${PAYHERO_CONFIG.baseUrl}/transactions?channel_id=${PAYHERO_CONFIG.channelId}&per=20`, {
+        headers: {
+          'Authorization': PAYHERO_CONFIG.basicAuth
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const txs = result.transactions || [];
+
+        const match = txs.find(t => {
+          if (t.external_reference && t.external_reference === payment.externalReference) {
+            return true;
+          }
+          if (payment.checkoutRequestId && t.transaction_reference && t.transaction_reference.includes(payment.checkoutRequestId)) {
+            return true;
+          }
+          const txTime = new Date(t.created_at).getTime();
+          const payTime = new Date(payment.createdAt).getTime();
+          const timeDiff = Math.abs(txTime - payTime);
+          if (timeDiff < 15 * 60 * 1000 && (t.transaction_type === 'inbound_payment' || t.amount > 0)) {
+            if (payment.phone && t.description && t.description.includes(payment.phone)) {
+              return true;
+            }
+          }
+          return false;
+        });
+
+        if (match && (match.transaction_type === 'inbound_payment' || match.amount > 0)) {
+          console.log(`[PayHero Auto-Confirm] Online transaction matched for ${payment.externalReference}:`, match.provider_reference);
+          payment.status = 'COMPLETED';
+          payment.mpesaReceipt = match.provider_reference || match.transaction_reference;
+          payment.transactionData = match;
+          payment.failureReason = null;
+          payment.updatedAt = new Date().toISOString();
+          this.updatePaymentRecord(payment);
+
+          if (payment.userId) {
+            if (payment.purpose && payment.purpose.startsWith('TASK_UNLOCK_')) {
+              const unlockedTaskId = payment.purpose.replace('TASK_UNLOCK_', '');
+              taskService.unlockTask(payment.userId, unlockedTaskId, {
+                fee: payment.amount,
+                method: 'MPESA',
+                reference: payment.externalReference
+              });
+              payment.unlockedTaskId = unlockedTaskId;
+            } else {
+              this.activateUser(payment.userId, {
+                paymentId: payment.id,
+                amount: payment.amount,
+                reference: payment.externalReference,
+                mpesaReceipt: payment.mpesaReceipt
+              });
+            }
+          }
+          return payment;
+        }
+      }
+    } catch (err) {
+      console.warn('[PayHero Check Online Error]:', err.message);
+    }
+
+    // Auto-timeout after 90 seconds of inactivity
+    const ageSeconds = (Date.now() - new Date(payment.createdAt).getTime()) / 1000;
+    if (ageSeconds > 90 && payment.status === 'PENDING') {
+      payment.status = 'FAILED';
+      payment.failureReason = 'Payment timed out. The prompt was not answered in time or was cancelled.';
+      payment.updatedAt = new Date().toISOString();
+      this.updatePaymentRecord(payment);
+    }
+
+    return payment;
   }
 
   /**

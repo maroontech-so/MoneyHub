@@ -5,11 +5,11 @@ let currentDiff = 'all';
 let allLoadedTasks = [];
 
 const sampleTasks = [
-  { id: '1', title: 'Code & Logic: Debug a Snippet', type: 'MICROTASK', description: 'Analyze a short code snippet, identify the bug, and explain the fix.', reward: 650, unlockFee: 0, difficulty: 'hard', status: 'PUBLISHED' },
-  { id: '2', title: 'Fact Verification Task', type: 'MICROTASK', description: 'Verify the accuracy of a set of statements using reliable sources.', reward: 500, unlockFee: 0, difficulty: 'medium', status: 'PUBLISHED' },
-  { id: '3', title: 'AI Response Evaluation', type: 'MICROTASK', description: 'Evaluate two AI-generated responses and select the more accurate one.', reward: 300, unlockFee: 0, difficulty: 'easy', status: 'PUBLISHED' },
-  { id: '4', title: 'Write a Product Review', type: 'WRITING', description: 'Write an honest, detailed review of a consumer product.', reward: 400, unlockFee: 0, difficulty: 'medium', status: 'PUBLISHED' },
-  { id: '5', title: 'Consumer Habits Survey', type: 'SURVEY', description: 'Answer questions about your shopping preferences.', reward: 150, unlockFee: 0, difficulty: 'easy', status: 'PUBLISHED' }
+  { id: '1', title: 'Code & Logic: Debug a Snippet', type: 'MICROTASK', description: 'Analyze a short code snippet, identify the bug, and explain the fix.', reward: 650, unlockFee: 65, difficulty: 'hard', status: 'PUBLISHED' },
+  { id: '2', title: 'Fact Verification Task', type: 'MICROTASK', description: 'Verify the accuracy of a set of statements using reliable sources.', reward: 500, unlockFee: 50, difficulty: 'medium', status: 'PUBLISHED' },
+  { id: '3', title: 'AI Response Evaluation', type: 'MICROTASK', description: 'Evaluate two AI-generated responses and select the more accurate one.', reward: 300, unlockFee: 30, difficulty: 'easy', status: 'PUBLISHED' },
+  { id: '4', title: 'Write a Product Review', type: 'WRITING', description: 'Write an honest, detailed review of a consumer product.', reward: 400, unlockFee: 40, difficulty: 'medium', status: 'PUBLISHED' },
+  { id: '5', title: 'Consumer Habits Survey', type: 'SURVEY', description: 'Answer questions about your shopping preferences.', reward: 150, unlockFee: 15, difficulty: 'easy', status: 'PUBLISHED' }
 ];
 
 async function init() {

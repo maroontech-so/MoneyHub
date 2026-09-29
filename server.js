@@ -87,9 +87,29 @@ const handlePayHeroWebhook = (req, res) => {
 app.post('/api/payhero/webhook', handlePayHeroWebhook);
 app.post('/api/payments/payhero-callback', handlePayHeroWebhook);
 
-app.get('/api/payhero/status/:reference', (req, res) => {
-  const payment = payHeroService.getPaymentStatus(req.params.reference);
-  res.json({ success: true, payment });
+app.get('/api/payhero/status/:reference', async (req, res) => {
+  try {
+    const payment = await payHeroService.checkPaymentStatusOnline(req.params.reference);
+    if (!payment) {
+      return res.status(404).json({ success: false, error: 'Payment record not found' });
+    }
+    const isUserActivated = payment.userId ? payHeroService.isUserActivated(payment.userId) : false;
+    res.json({
+      success: true,
+      payment: {
+        id: payment.id,
+        reference: payment.externalReference,
+        status: payment.status, // 'PENDING', 'COMPLETED', 'FAILED'
+        failureReason: payment.failureReason || null,
+        mpesaReceipt: payment.mpesaReceipt || null,
+        amount: payment.amount,
+        phone: payment.phone,
+        activated: isUserActivated
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.post('/api/payhero/confirm-activation', (req, res) => {
@@ -198,6 +218,60 @@ app.get('/api/tasks/:id/draft', (req, res) => {
     res.json({ success: true, draft });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Task Unlock Endpoints
+app.get('/api/tasks/unlocked', (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || 'usr_default';
+    const unlocked = taskService.getUnlockedTasks(userId);
+    res.json({ success: true, unlocked });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/tasks/:id/unlock-wallet', (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || 'usr_default';
+    const taskId = req.params.id;
+    const { taskTitle, unlockFee } = req.body;
+    const result = taskService.unlockTaskWithWallet({
+      userId,
+      taskId,
+      taskTitle,
+      unlockFee: Number(unlockFee) || 0
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/tasks/:id/unlock-mpesa', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || 'usr_default';
+    const taskId = req.params.id;
+    const { phone, unlockFee, taskTitle } = req.body;
+    const fee = Number(unlockFee) || 5;
+
+    const result = await payHeroService.initiateStkPush({
+      userId,
+      phone,
+      amount: fee,
+      purpose: `TASK_UNLOCK_${taskId}`,
+      host: req.headers.host || 'localhost:3000'
+    });
+
+    res.json({
+      ...result,
+      taskId,
+      taskTitle,
+      fee
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 

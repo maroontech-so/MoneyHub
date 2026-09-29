@@ -35,6 +35,7 @@ class EarnWaveApp {
   init() {
     themeManager.init();
     this.initTaskRunner();
+    this.initTaskUnlockModal();
     this.bindNavigation();
     this.bindThemeEvents();
     this.bindMarketplaceControls();
@@ -116,6 +117,227 @@ class EarnWaveApp {
         this.renderMarketplace();
         this.renderDashboard();
       });
+    }
+  }
+
+  // --- Task Unlock Modal Controller ---
+  initTaskUnlockModal() {
+    const modal = document.getElementById('taskUnlockModal');
+    const closeBtn = document.getElementById('closeTaskUnlockModalBtn');
+    if (closeBtn) closeBtn.onclick = () => this.closeTaskUnlockModal();
+    if (modal) {
+      modal.onclick = (e) => {
+        if (e.target === modal) this.closeTaskUnlockModal();
+      };
+    }
+
+    const btnMpesa = document.getElementById('btnUnlockMpesa');
+    if (btnMpesa) {
+      btnMpesa.onclick = () => this.handleUnlockMpesa();
+    }
+
+    const btnWallet = document.getElementById('btnUnlockWallet');
+    if (btnWallet) {
+      btnWallet.onclick = () => this.handleUnlockWallet();
+    }
+  }
+
+  openTaskUnlockModal(task) {
+    this.pendingUnlockTask = task;
+    const modal = document.getElementById('taskUnlockModal');
+    if (!modal) return;
+
+    const catEl = document.getElementById('unlockModalCategory');
+    const titleEl = document.getElementById('unlockModalTitle');
+    const descEl = document.getElementById('unlockModalDesc');
+    const rewardEl = document.getElementById('unlockModalReward');
+    const feeEl = document.getElementById('unlockModalFee');
+
+    if (catEl) catEl.textContent = (task.category || 'TASK').toUpperCase();
+    if (titleEl) titleEl.textContent = task.title;
+    if (descEl) descEl.textContent = task.description || task.instructions || '';
+    if (rewardEl) rewardEl.textContent = `+KES ${task.reward.toFixed(2)}`;
+    if (feeEl) feeEl.textContent = `KES ${task.unlockFee.toFixed(2)}`;
+
+    // Autofill phone
+    const phoneInput = document.getElementById('unlockMpesaPhone');
+    if (phoneInput) {
+      const savedPhone = localStorage.getItem('earnwave_user_phone') || store.getUser()?.phone || '';
+      phoneInput.value = savedPhone;
+    }
+
+    // Show wallet balance
+    const wallet = store.getWallet();
+    const balanceText = document.getElementById('unlockWalletBalanceText');
+    if (balanceText) balanceText.textContent = `KES ${wallet.availableBalance.toFixed(2)}`;
+
+    const btnWallet = document.getElementById('btnUnlockWallet');
+    if (btnWallet) {
+      if (wallet.availableBalance >= task.unlockFee) {
+        btnWallet.disabled = false;
+        btnWallet.textContent = `Deduct KES ${task.unlockFee.toFixed(2)} & Unlock Instantly`;
+        btnWallet.style.opacity = '1';
+      } else {
+        btnWallet.disabled = true;
+        btnWallet.textContent = `Insufficient Balance (KES ${wallet.availableBalance.toFixed(2)})`;
+        btnWallet.style.opacity = '0.5';
+      }
+    }
+
+    const alertBox = document.getElementById('unlockAlert');
+    if (alertBox) alertBox.style.display = 'none';
+
+    const statusBox = document.getElementById('unlockMpesaStatus');
+    if (statusBox) statusBox.style.display = 'none';
+
+    const btnMpesa = document.getElementById('btnUnlockMpesa');
+    if (btnMpesa) {
+      btnMpesa.disabled = false;
+      btnMpesa.textContent = 'Send Prompt';
+    }
+
+    modal.classList.add('active');
+  }
+
+  closeTaskUnlockModal() {
+    const modal = document.getElementById('taskUnlockModal');
+    if (modal) modal.classList.remove('active');
+    if (this.unlockPollTimer) {
+      clearInterval(this.unlockPollTimer);
+      this.unlockPollTimer = null;
+    }
+    this.pendingUnlockTask = null;
+  }
+
+  async handleUnlockWallet() {
+    const task = this.pendingUnlockTask;
+    if (!task) return;
+
+    const alertBox = document.getElementById('unlockAlert');
+    const btnWallet = document.getElementById('btnUnlockWallet');
+    if (btnWallet) btnWallet.disabled = true;
+
+    try {
+      await store.unlockTaskWithWallet(task.id, task.title, task.unlockFee);
+      this.showToast(`Task Unlocked! KES ${task.unlockFee.toFixed(2)} deducted from wallet.`, 'success');
+      this.closeTaskUnlockModal();
+      this.renderTasks();
+      this.renderDashboard();
+      if (this.taskRunner) {
+        this.taskRunner.open(task);
+      }
+    } catch (err) {
+      if (alertBox) {
+        alertBox.className = 'alert-box alert-error';
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(248,81,73,0.1)';
+        alertBox.style.color = '#f85149';
+        alertBox.textContent = err.message;
+      }
+      if (btnWallet) btnWallet.disabled = false;
+    }
+  }
+
+  async handleUnlockMpesa() {
+    const task = this.pendingUnlockTask;
+    if (!task) return;
+
+    const phoneInput = document.getElementById('unlockMpesaPhone');
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const alertBox = document.getElementById('unlockAlert');
+    const statusBox = document.getElementById('unlockMpesaStatus');
+    const btnMpesa = document.getElementById('btnUnlockMpesa');
+
+    if (!phone) {
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(248,81,73,0.1)';
+        alertBox.style.color = '#f85149';
+        alertBox.textContent = 'Please enter your Safaricom M-Pesa phone number.';
+      }
+      return;
+    }
+
+    if (btnMpesa) {
+      btnMpesa.disabled = true;
+      btnMpesa.textContent = 'Sending...';
+    }
+
+    if (statusBox) {
+      statusBox.style.display = 'block';
+      statusBox.innerHTML = '<span class="loading-spinner"></span> Sending STK prompt for KES ' + task.unlockFee + ' to ' + phone + '...';
+    }
+
+    try {
+      const result = await store.initiateTaskUnlockMpesa(task.id, task.title, task.unlockFee, phone);
+      if (result.success && result.reference) {
+        if (statusBox) {
+          statusBox.innerHTML = '📲 Prompt sent! Enter M-Pesa PIN on your phone. Awaiting confirmation...';
+        }
+
+        const ref = result.reference;
+        if (this.unlockPollTimer) clearInterval(this.unlockPollTimer);
+
+        this.unlockPollTimer = setInterval(async () => {
+          try {
+            const checkRes = await fetch(`/api/payhero/status/${encodeURIComponent(ref)}`);
+            if (checkRes.ok) {
+              const resData = await checkRes.json();
+              const payment = resData.payment;
+              if (payment && payment.status === 'COMPLETED') {
+                clearInterval(this.unlockPollTimer);
+                this.unlockPollTimer = null;
+                store.markTaskUnlockedLocally(task.id, { fee: task.unlockFee, method: 'MPESA' });
+                this.showToast(`🎉 Task Unlocked via M-Pesa! Starting workspace...`, 'success');
+                this.closeTaskUnlockModal();
+                this.renderTasks();
+                this.renderDashboard();
+                if (this.taskRunner) {
+                  this.taskRunner.open(task);
+                }
+              } else if (payment && payment.status === 'FAILED') {
+                clearInterval(this.unlockPollTimer);
+                this.unlockPollTimer = null;
+                if (statusBox) statusBox.style.display = 'none';
+                if (alertBox) {
+                  alertBox.style.display = 'block';
+                  alertBox.style.background = 'rgba(248,81,73,0.1)';
+                  alertBox.style.color = '#f85149';
+                  alertBox.textContent = payment.failureReason || 'Payment was cancelled or timed out.';
+                }
+                if (btnMpesa) {
+                  btnMpesa.disabled = false;
+                  btnMpesa.textContent = 'Try Again';
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Unlock poll check:', e);
+          }
+        }, 2000);
+      } else {
+        if (btnMpesa) {
+          btnMpesa.disabled = false;
+          btnMpesa.textContent = 'Send Prompt';
+        }
+        if (alertBox) {
+          alertBox.style.display = 'block';
+          alertBox.style.background = 'rgba(248,81,73,0.1)';
+          alertBox.style.color = '#f85149';
+          alertBox.textContent = result.error || 'Could not initiate STK push.';
+        }
+      }
+    } catch (err) {
+      if (btnMpesa) {
+        btnMpesa.disabled = false;
+        btnMpesa.textContent = 'Send Prompt';
+      }
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(248,81,73,0.1)';
+        alertBox.style.color = '#f85149';
+        alertBox.textContent = err.message;
+      }
     }
   }
 
@@ -404,10 +626,11 @@ class EarnWaveApp {
 
     grid.innerHTML = pageTasks.map(t => {
       const isCompleted = !!userTasks[t.id];
-      const isLocked = t.unlockFee && t.unlockFee > 0 && !isCompleted;
+      const isUnlocked = store.isTaskUnlocked(t.id);
+      const isLocked = !isCompleted && !isUnlocked;
 
       return `
-        <div class="task-card">
+        <div class="task-card ${isLocked ? 'task-card-locked' : 'task-card-unlocked'}">
           <div class="task-card-header">
             <span class="task-card-type">${t.category.toUpperCase()}</span>
             <span class="task-card-reward">+KES ${t.reward.toFixed(2)}</span>
@@ -419,29 +642,37 @@ class EarnWaveApp {
             <span class="meta-dot">·</span>
             <span class="meta-item">${ICONS.bolt} ${(t.difficulty || 'medium').toUpperCase()}</span>
             <span class="meta-dot">·</span>
-            <span class="meta-item">${ICONS.users} ${t.slotsAvailable || 50} slots</span>
+            <span class="meta-item" style="color:var(--accent-cyan); font-weight:600;">🔒 Unlock: KES ${t.unlockFee}</span>
           </div>
 
           ${isCompleted ? `
             <button class="btn-task-action completed" disabled>
               ${ICONS.check} Completed & Verified
             </button>
+          ` : isUnlocked ? `
+            <button class="btn-task-action" data-task-id="${t.id}" style="background:var(--accent-green); color:#0d1117; font-weight:700;">
+              Start Task ${ICONS.arrowRight}
+            </button>
           ` : `
-            <button class="btn-task-action" data-task-id="${t.id}">
-              ${isLocked ? `Unlock (Deposit KES ${t.unlockFee})` : 'Start Task'} ${ICONS.arrowRight}
+            <button class="btn-task-action btn-task-locked" data-task-id="${t.id}" style="border:1px solid rgba(0,212,170,0.5); background:rgba(0,212,170,0.1); color:var(--accent-cyan);">
+              🔒 Unlock (KES ${t.unlockFee}) ${ICONS.arrowRight}
             </button>
           `}
         </div>
       `;
     }).join('');
 
-    // Bind Start Task buttons
+    // Bind action buttons
     grid.querySelectorAll('.btn-task-action:not(.completed)').forEach(btn => {
       btn.addEventListener('click', () => {
         const taskId = btn.dataset.taskId;
         const task = CATALOG.find(t => t.id === taskId);
-        if (task && this.taskRunner) {
-          this.taskRunner.open(task);
+        if (!task) return;
+
+        if (store.isTaskUnlocked(task.id)) {
+          if (this.taskRunner) this.taskRunner.open(task);
+        } else {
+          this.openTaskUnlockModal(task);
         }
       });
     });

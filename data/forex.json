@@ -5,8 +5,8 @@
       "currency": "USD",
       "initialBalance": 10000,
       "balance": 10000,
-      "equity": 10006,
-      "freeMargin": 9906,
+      "equity": 9993,
+      "freeMargin": 9893,
       "marginUsed": 100,
       "leverage": 100,
       "positions": [
@@ -16,10 +16,10 @@
           "type": "BUY",
           "lotSize": 0.1,
           "openPrice": 1.0845,
-          "currentPrice": 1.0851,
+          "currentPrice": 1.0838,
           "stopLoss": 20,
           "takeProfit": 40,
-          "pnl": 6,
+          "pnl": -7,
           "openedAt": "2026-09-29T18:43:32.003Z"
         }
       ],

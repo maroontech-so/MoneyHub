@@ -767,6 +767,69 @@
     <div class="modal-content-box" id="taskRunnerContent"></div>
   </div>
 
+  <!-- Task Unlock Modal Dialog -->
+  <div class="modal-overlay" id="taskUnlockModal">
+    <div class="modal-content-box" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-green);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Unlock Task to Earn
+        </h3>
+        <button class="modal-close-btn" id="closeTaskUnlockModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin-bottom:1.15rem;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-secondary); font-weight:600;" id="unlockModalCategory">TASK CATEGORY</div>
+          <h4 style="font-size:1.05rem; color:#fff; margin:0.35rem 0;" id="unlockModalTitle">Task Title</h4>
+          <p style="font-size:0.84rem; color:var(--text-secondary); margin:0;" id="unlockModalDesc">Description</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
+          <div style="background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.25); border-radius:var(--radius-sm); padding:0.85rem; text-align:center;">
+            <div style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase;">Reward on Finish</div>
+            <div style="font-size:1.35rem; font-weight:800; color:var(--accent-green);" id="unlockModalReward">+KES 0.00</div>
+          </div>
+          <div style="background:rgba(0,212,170,0.08); border:1px solid rgba(0,212,170,0.25); border-radius:var(--radius-sm); padding:0.85rem; text-align:center;">
+            <div style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase;">Unlock Fee</div>
+            <div style="font-size:1.35rem; font-weight:800; color:var(--accent-cyan);" id="unlockModalFee">KES 0.00</div>
+          </div>
+        </div>
+
+        <div id="unlockAlert" style="display:none; padding:0.75rem 1rem; border-radius:8px; font-size:0.85rem; margin-bottom:1rem;"></div>
+
+        <!-- Option 1: Pay via M-Pesa Prompt (Channel 11662) -->
+        <div style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin-bottom:1rem; background:var(--bg-secondary);">
+          <div style="font-weight:600; font-size:0.9rem; color:#fff; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>Option 1: Pay via M-Pesa STK (Channel 11662)</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.75rem;">Safaricom will send an instant payment prompt to your phone.</p>
+          <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+            <input type="tel" id="unlockMpesaPhone" placeholder="07XXXXXXXX" style="flex:1; padding:0.65rem 0.85rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:#fff; font-size:0.9rem;">
+            <button type="button" class="btn btn-primary" id="btnUnlockMpesa" style="white-space:nowrap; padding:0.65rem 1rem;">
+              Send Prompt
+            </button>
+          </div>
+          <div id="unlockMpesaStatus" style="display:none; font-size:0.82rem; color:var(--accent-cyan); margin-top:0.4rem;"></div>
+        </div>
+
+        <!-- Option 2: Pay from Wallet Balance -->
+        <div style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; background:var(--bg-secondary);">
+          <div style="font-weight:600; font-size:0.9rem; color:#fff; margin-bottom:0.25rem;">
+            Option 2: Pay from Wallet Balance
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.75rem;">
+            Available Balance: <strong id="unlockWalletBalanceText" style="color:#fff;">KES 0.00</strong>
+          </div>
+          <button type="button" class="btn btn-outline" id="btnUnlockWallet" style="width:100%;">
+            Deduct Fee & Unlock Instantly
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Withdrawal Modal Dialog -->
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal-content-box" style="max-width:480px;">

@@ -11,6 +11,70 @@ class TaskService {
     this.submissionsStore = new JsonStore('submissions.json', { submissions: [] });
     this.draftsStore = new JsonStore('drafts.json', { drafts: {} });
     this.customTasksStore = new JsonStore('custom_tasks.json', { tasks: [] });
+    this.unlockedTasksStore = new JsonStore('unlocked_tasks.json', { unlocked: {} });
+  }
+
+  // --- Task Unlock Management ---
+  getUnlockedTasks(userId = 'usr_default') {
+    const data = this.unlockedTasksStore.read();
+    return data.unlocked?.[userId] || [];
+  }
+
+  isTaskUnlocked(userId = 'usr_default', taskId) {
+    if (!taskId) return false;
+    const unlocked = this.getUnlockedTasks(userId);
+    return unlocked.some(item => (typeof item === 'string' ? item === taskId : item.taskId === taskId));
+  }
+
+  unlockTask(userId = 'usr_default', taskId, { fee = 0, method = 'WALLET', reference = '' } = {}) {
+    if (!taskId) throw new Error('Task ID is required');
+    const data = this.unlockedTasksStore.read();
+    data.unlocked = data.unlocked || {};
+    data.unlocked[userId] = data.unlocked[userId] || [];
+
+    const already = data.unlocked[userId].some(item => (typeof item === 'string' ? item === taskId : item.taskId === taskId));
+    if (!already) {
+      data.unlocked[userId].push({
+        taskId,
+        fee: Number(fee) || 0,
+        method,
+        reference,
+        unlockedAt: new Date().toISOString()
+      });
+      this.unlockedTasksStore.write(data);
+    }
+    return { success: true, taskId, unlockedAt: new Date().toISOString() };
+  }
+
+  unlockTaskWithWallet({ userId = 'usr_default', taskId, taskTitle, unlockFee }) {
+    if (!taskId) throw new Error('Task ID is required');
+    const fee = Number(unlockFee) || 0;
+    if (fee <= 0) {
+      return this.unlockTask(userId, taskId, { fee: 0, method: 'FREE' });
+    }
+
+    if (this.isTaskUnlocked(userId, taskId)) {
+      return { success: true, alreadyUnlocked: true, taskId };
+    }
+
+    const balance = ledgerService.getBalance(userId);
+    if (balance.availableBalance < fee) {
+      throw new Error(`Insufficient wallet balance (KES ${balance.availableBalance.toFixed(2)} available). Task requires KES ${fee.toFixed(2)} to unlock. Please unlock via M-Pesa.`);
+    }
+
+    // Deduct fee from wallet balance
+    ledgerService.recordTransaction({
+      userId,
+      type: TRANSACTION_TYPES.ADMIN_ADJUSTMENT || 'TASK_UNLOCK_FEE',
+      amount: fee,
+      direction: 'DEBIT',
+      status: 'COMPLETED',
+      description: `Task Unlock Fee: ${taskTitle || taskId}`,
+      referenceId: `unl_${taskId}_${Date.now().toString(36)}`,
+      metadata: { taskId, taskTitle, fee }
+    });
+
+    return this.unlockTask(userId, taskId, { fee, method: 'WALLET' });
   }
 
   // --- Autosave Draft Management ---
@@ -48,6 +112,11 @@ class TaskService {
   submitTask({ userId = 'usr_default', taskId, taskType, taskTitle, rewardKes, payload }) {
     if (!taskId) throw new Error('Task ID required');
     if (!payload) throw new Error('Submission payload required');
+
+    // Enforce task unlock requirement
+    if (!this.isTaskUnlocked(userId, taskId)) {
+      throw new Error(`This task is locked. Please unlock it at the required fee to submit and earn the reward.`);
+    }
 
     // 1. Run Server-Side Validation Rules
     const validationResult = this.validatePayload(taskType, payload);

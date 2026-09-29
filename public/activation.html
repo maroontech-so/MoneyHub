@@ -14,7 +14,8 @@
             min-height: 100vh;
             background-color: var(--bg-dark, #0d1117);
             color: var(--text-primary, #fff);
-            padding: 1rem;
+            padding: 1.5rem 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         .activation-card {
             background: var(--bg-card, #161b22);
@@ -27,159 +28,209 @@
             border: 1px solid var(--border, #30363d);
             position: relative;
         }
+        .brand-logo-wrap {
+            margin-bottom: 1.25rem;
+        }
+        .brand-logo-wrap img {
+            height: 52px;
+            width: auto;
+            max-width: 180px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
         .icon-circle {
-            width: 64px;
-            height: 64px;
-            background: rgba(0, 212, 170, 0.15);
+            width: 56px;
+            height: 56px;
+            background: rgba(0, 212, 170, 0.12);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.25rem;
+            margin: 0 auto 1rem;
             color: var(--accent-green, #00ff88);
         }
-        h1 { margin-bottom: 0.5rem; font-size: 1.6rem; color: #fff; }
-        .subtitle { color: #8b949e; font-size: 0.9rem; margin-bottom: 1.5rem; }
+        h1 { margin-bottom: 0.35rem; font-size: 1.5rem; color: #fff; font-weight: 700; }
+        .subtitle { color: #8b949e; font-size: 0.88rem; margin-bottom: 1.25rem; }
         
         .fee-badge {
-            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,212,170,0.15));
-            border: 1px solid rgba(0,255,136,0.3);
+            background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,212,170,0.12));
+            border: 1px solid rgba(0,255,136,0.25);
             border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
+            padding: 1.1rem;
+            margin-bottom: 1.25rem;
         }
         .fee-amount {
             font-size: 2.2rem;
             font-weight: 800;
             color: var(--accent-green, #00ff88);
             letter-spacing: -0.02em;
+            line-height: 1.1;
         }
         .fee-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #8b949e;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-top: 0.25rem;
+            margin-top: 0.3rem;
         }
 
         .benefits {
             text-align: left;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.06);
-            padding: 1.25rem;
+            padding: 1.1rem;
             border-radius: 10px;
             margin-bottom: 1.5rem;
         }
         .benefits ul { list-style: none; padding: 0; margin: 0; }
-        .benefits li { margin-bottom: 0.6rem; display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #c9d1d9; }
+        .benefits li { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #c9d1d9; }
+        .benefits li:last-child { margin-bottom: 0; }
         .benefits li::before { content: "✓"; color: #00ff88; font-weight: bold; }
 
-        .btn-payhero-direct {
+        .payment-form-section {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-size: 0.85rem;
+            color: #c9d1d9;
+            font-weight: 600;
             display: block;
+            margin-bottom: 0.4rem;
+        }
+        .input-phone-wrap {
+            position: relative;
+            margin-bottom: 0.85rem;
+        }
+        .input-phone-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b949e;
+        }
+        .phone-input {
             width: 100%;
-            padding: 1rem;
+            padding: 0.85rem 1rem 0.85rem 2.6rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 9px;
+            color: #fff;
+            font-size: 1rem;
+            letter-spacing: 0.03em;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
+        .phone-input:focus {
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0,212,170,0.15);
+        }
+
+        .btn-pay-mpesa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.95rem 1rem;
             background: linear-gradient(135deg, #00d4aa, #00b386);
             color: #0d1117;
             font-weight: 700;
             font-size: 1.05rem;
-            border-radius: 10px;
-            text-decoration: none;
-            margin-bottom: 1rem;
+            border-radius: 9px;
             cursor: pointer;
             border: none;
             transition: transform 0.15s ease, opacity 0.15s ease;
         }
-        .btn-payhero-direct:hover {
+        .btn-pay-mpesa:hover:not(:disabled) {
             opacity: 0.95;
             transform: translateY(-1px);
         }
+        .btn-pay-mpesa:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-        .stk-section {
-            border-top: 1px solid rgba(255,255,255,0.08);
-            padding-top: 1.25rem;
-            margin-top: 1.25rem;
-            text-align: left;
-        }
-        .stk-title {
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: #c9d1d9;
-            margin-bottom: 0.5rem;
-        }
-        .stk-input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
-        .stk-input {
-            flex: 1;
-            padding: 0.75rem;
-            background: #0d1117;
+        /* Status card */
+        .status-tracker-card {
+            display: none;
+            background: rgba(255,255,255,0.03);
             border: 1px solid #30363d;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.9rem;
-            font-family: monospace;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
         }
-        .btn-stk {
-            padding: 0.75rem 1rem;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.88rem;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-stk:hover {
-            background: rgba(255,255,255,0.15);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .verify-box {
-            margin-top: 1.25rem;
-            padding-top: 1.25rem;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            font-size: 0.85rem;
+        .status-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(0,212,170,0.2);
+            border-top-color: #00d4aa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0.5rem auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .status-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.35rem;
+            color: #fff;
+        }
+        .status-desc {
+            font-size: 0.84rem;
+            color: #8b949e;
+            line-height: 1.4;
+        }
+        .status-phone-highlight {
+            color: #00ff88;
+            font-weight: 600;
         }
 
         .alert-box {
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             margin-bottom: 1rem;
             display: none;
+            text-align: left;
+            line-height: 1.4;
         }
         .alert-info { background: rgba(0, 212, 170, 0.1); color: #00d4aa; border: 1px solid rgba(0, 212, 170, 0.3); }
-        .alert-error { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
-        .alert-success { background: rgba(48, 209, 88, 0.1); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.3); }
+        .alert-error { background: rgba(248, 81, 73, 0.12); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.35); }
+        .alert-success { background: rgba(48, 209, 88, 0.12); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.35); }
 
-        .loading-spinner {
+        .loading-spinner-inline {
             display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0,0,0,0.25);
+            border-top-color: #0d1117;
             border-radius: 50%;
-            border-top-color: #fff;
             animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 0.4rem;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="activation-card">
-        <div style="margin-bottom: 1.25rem;">
-            <img src="/logo.png" alt="PesaWave Logo" style="height:52px; width:auto; max-width:180px; object-fit:contain; border-radius:10px;">
+        <div class="brand-logo-wrap">
+            <img src="/logo.png" alt="PesaWave Logo">
         </div>
 
         <div class="icon-circle">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 9.5h20"/>
+            </svg>
         </div>
 
         <h1>Activate Your Account</h1>
-        <p class="subtitle" id="userGreeting">Complete one-time activation to unlock all earning tasks and payouts.</p>
+        <p class="subtitle" id="userGreeting">One-time KES 5.00 activation fee via Safaricom M-Pesa to unlock all earning tasks.</p>
 
         <div id="statusAlert" class="alert-box"></div>
 
@@ -190,44 +241,44 @@
 
         <div class="benefits">
             <ul>
-                <li>Instant access to Microtasks, Surveys & Hotel Audits</li>
-                <li>AI Training evaluations & Content writing jobs</li>
-                <li>Instant Safaricom M-Pesa automated payouts</li>
-                <li>Starts from zero balance (100% genuine earnings)</li>
+                <li>Instant access to Microtasks, Surveys & Hotel Reviews</li>
+                <li>AI Training evaluations & Content writing tasks</li>
+                <li>Instant automated Safaricom M-Pesa payouts</li>
+                <li>100% genuine earnings starting from zero balance</li>
             </ul>
         </div>
 
-        <!-- Primary Action: Direct PayHero Link -->
-        <a href="https://short.payhero.co.ke/s/Y8yixT9fZWwk7w2uUoiqHQ" target="_blank" class="btn-payhero-direct" id="payheroDirectLinkBtn">
-            Pay KES 5.00 via PayHero
-        </a>
-        <div style="font-size:0.78rem; color:#8b949e; margin-bottom:1.25rem;">
-            Click above to open PayHero secure M-Pesa checkout.
-        </div>
-
-        <!-- Alternative: STK Push -->
-        <div class="stk-section">
-            <div class="stk-title">Or trigger direct M-Pesa prompt on phone:</div>
-            <div class="stk-input-group">
-                <input type="tel" id="stkPhoneInput" class="stk-input" placeholder="07XXXXXXXX" value="">
-                <button type="button" class="btn-stk" id="btnTriggerStk">Send Prompt</button>
+        <!-- M-Pesa Direct STK Form -->
+        <div class="payment-form-section" id="paymentFormSection">
+            <label class="form-label" for="stkPhoneInput">M-Pesa Phone Number</label>
+            <div class="input-phone-wrap">
+                <svg class="input-phone-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+                <input type="tel" id="stkPhoneInput" class="phone-input" placeholder="07XXXXXXXX or 254XXXXXXXX" required>
             </div>
-            <small style="font-size:0.75rem; color:#8b949e; display:block;">PayHero will send an STK prompt of KES 5 to your phone.</small>
+
+            <button type="button" class="btn-pay-mpesa" id="btnPayMpesa">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <span id="btnPayText">Pay KES 5.00 via M-Pesa</span>
+            </button>
+            <small style="font-size:0.75rem; color:#8b949e; display:block; margin-top:0.5rem; text-align:center;">
+                Safaricom will send a prompt directly to your phone.
+            </small>
         </div>
 
-        <!-- Verification / Code Input -->
-        <div class="verify-box">
-            <div style="margin-bottom:0.6rem; color:#8b949e;">Already completed payment on PayHero?</div>
-            <div style="display:flex; gap:0.5rem; justify-content:center;">
-                <input type="text" id="receiptInput" class="stk-input" placeholder="M-Pesa code (optional)" style="max-width:180px; text-transform:uppercase;">
-                <button type="button" class="btn-stk" id="btnVerifyPayment" style="background:#00d4aa; color:#000; border:none;">
-                    Verify & Unlock
-                </button>
-            </div>
+        <!-- Real-Time Automated Status Tracker -->
+        <div class="status-tracker-card" id="statusTracker">
+            <div class="status-spinner" id="trackerSpinner"></div>
+            <div class="status-title" id="trackerTitle">Sending Prompt...</div>
+            <div class="status-desc" id="trackerDesc">Connecting to Safaricom Daraja...</div>
         </div>
 
-        <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#8b949e;">
-            <span id="checkingIndicator"><span class="loading-spinner"></span> Checking status...</span>
+        <!-- Footer Actions -->
+        <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#8b949e; border-top:1px solid rgba(255,255,255,0.06); padding-top:1rem;">
+            <span id="systemStatusText"><span style="display:inline-block; width:7px; height:7px; background:#00d4aa; border-radius:50%; margin-right:5px;"></span> Channel 11662 Ready</span>
             <button type="button" id="btnLogoutBtn" style="background:none; border:none; color:#f85149; cursor:pointer; font-size:0.8rem; text-decoration:underline;">
                 Log Out
             </button>
@@ -235,11 +286,12 @@
     </div>
 
     <script type="module">
-        import { auth } from '/js/firebase-init.js';
         import { setupAuthListener, logoutUser } from '/js/auth.js';
 
         let currentUid = localStorage.getItem('earnwave_user_uid') || '';
+        let activePaymentRef = null;
         let pollTimer = null;
+        let isProcessing = false;
 
         function showAlert(msg, type = 'info') {
             const el = document.getElementById('statusAlert');
@@ -249,7 +301,31 @@
             el.style.display = 'block';
         }
 
-        async function checkActivationStatus() {
+        function hideAlert() {
+            const el = document.getElementById('statusAlert');
+            if (el) el.style.display = 'none';
+        }
+
+        function showTracker(title, desc, isSpinning = true) {
+            const tracker = document.getElementById('statusTracker');
+            const spinner = document.getElementById('trackerSpinner');
+            const tTitle = document.getElementById('trackerTitle');
+            const tDesc = document.getElementById('trackerDesc');
+
+            if (!tracker) return;
+            tracker.style.display = 'block';
+            if (spinner) spinner.style.display = isSpinning ? 'block' : 'none';
+            if (tTitle) tTitle.innerHTML = title;
+            if (tDesc) tDesc.innerHTML = desc;
+        }
+
+        function hideTracker() {
+            const tracker = document.getElementById('statusTracker');
+            if (tracker) tracker.style.display = 'none';
+        }
+
+        // Check if user is already activated
+        async function checkInitialUserStatus() {
             if (!currentUid) return;
             try {
                 const res = await fetch('/api/auth/user-status', {
@@ -258,19 +334,88 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (data.activated || data.status === 'ACTIVE') {
-                        clearInterval(pollTimer);
-                        showAlert('🎉 Account Activated Successfully! Redirecting to marketplace...', 'success');
+                        showAlert('🎉 Account is Active! Proceeding to marketplace...', 'success');
                         setTimeout(() => {
                             window.location.href = '/index.html';
-                        }, 1200);
+                        }, 800);
                     }
                 }
             } catch(e) {
-                console.warn('Status poll error:', e.message);
+                console.warn('Initial user status check failed:', e.message);
             }
         }
 
-        // Initialize listener
+        // Automatic Status Polling for the active payment
+        async function pollPaymentStatus() {
+            if (!activePaymentRef) return;
+
+            try {
+                const res = await fetch(`/api/payhero/status/${encodeURIComponent(activePaymentRef)}`);
+                if (!res.ok) return;
+
+                const result = await res.json();
+                if (!result.success || !result.payment) return;
+
+                const payment = result.payment;
+                console.log('[Auto-Confirm Poll] Payment status:', payment.status);
+
+                if (payment.status === 'COMPLETED' || payment.activated) {
+                    // SUCCESS: Stop polling, show success and auto-proceed
+                    stopPolling();
+                    const receipt = payment.mpesaReceipt ? `(Ref: ${payment.mpesaReceipt})` : '';
+                    showTracker(
+                        '🎉 Payment Confirmed!',
+                        `M-Pesa payment received ${receipt}. Your account has been activated! Redirecting now...`,
+                        false
+                    );
+                    showAlert(`🎉 <strong>Payment Confirmed!</strong> Welcome to PesaWave! ${receipt}`, 'success');
+                    
+                    const btn = document.getElementById('btnPayMpesa');
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<span>Activated! Redirecting...</span>';
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1200);
+                } else if (payment.status === 'FAILED') {
+                    // FAILURE: Stop polling, show failure reason and allow retry
+                    stopPolling();
+                    const reason = payment.failureReason || 'Payment was cancelled or prompt timed out.';
+                    hideTracker();
+                    showAlert(`❌ <strong>Payment Denied:</strong> ${reason}`, 'error');
+                    resetPayButton('Try Again');
+                }
+            } catch (err) {
+                console.warn('[Auto-Confirm Poll Error]:', err.message);
+            }
+        }
+
+        function startPolling(ref) {
+            stopPolling();
+            activePaymentRef = ref;
+            // Poll every 2 seconds
+            pollTimer = setInterval(pollPaymentStatus, 2000);
+        }
+
+        function stopPolling() {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+            isProcessing = false;
+        }
+
+        function resetPayButton(text = 'Pay KES 5.00 via M-Pesa') {
+            const btn = document.getElementById('btnPayMpesa');
+            const btnText = document.getElementById('btnPayText');
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.textContent = text;
+            isProcessing = false;
+        }
+
+        // Initialize Authentication
         setupAuthListener((user) => {
             if (user) {
                 currentUid = user.uid;
@@ -278,38 +423,47 @@
                 
                 const greeting = document.getElementById('userGreeting');
                 if (greeting) {
-                    greeting.textContent = `Welcome ${user.displayName || user.email}! Pay the KES 5 activation fee to activate.`;
+                    greeting.textContent = `Welcome ${user.displayName || user.email}! Pay the one-time KES 5.00 activation fee to start earning.`;
                 }
 
+                // Autofill phone number if saved in registration
                 const savedPhone = localStorage.getItem('earnwave_user_phone');
-                if (savedPhone) {
-                    const phoneEl = document.getElementById('stkPhoneInput');
-                    if (phoneEl && !phoneEl.value) phoneEl.value = savedPhone;
+                const phoneInput = document.getElementById('stkPhoneInput');
+                if (savedPhone && phoneInput && !phoneInput.value) {
+                    phoneInput.value = savedPhone;
                 }
 
-                // Check immediate status
-                checkActivationStatus();
-                // Start polling every 3.5s
-                if (pollTimer) clearInterval(pollTimer);
-                pollTimer = setInterval(checkActivationStatus, 3500);
+                checkInitialUserStatus();
             } else {
-                // If not logged in, redirect to login
                 window.location.href = '/login.html';
             }
         });
 
-        // Trigger STK Push
-        document.getElementById('btnTriggerStk')?.addEventListener('click', async () => {
-            const phone = document.getElementById('stkPhoneInput')?.value.trim();
+        // Trigger STK Push Button
+        document.getElementById('btnPayMpesa')?.addEventListener('click', async () => {
+            if (isProcessing) return;
+
+            const phoneInput = document.getElementById('stkPhoneInput');
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+
             if (!phone) {
                 showAlert('Please enter your M-Pesa phone number.', 'error');
+                phoneInput?.focus();
                 return;
             }
 
-            const btn = document.getElementById('btnTriggerStk');
-            btn.disabled = true;
-            btn.textContent = 'Sending...';
-            showAlert('Sending KES 5 STK Prompt via PayHero...', 'info');
+            hideAlert();
+            isProcessing = true;
+
+            const btn = document.getElementById('btnPayMpesa');
+            const btnText = document.getElementById('btnPayText');
+            if (btn) btn.disabled = true;
+            if (btnText) btnText.innerHTML = '<span class="loading-spinner-inline"></span> Sending Prompt...';
+
+            showTracker(
+                'Sending M-Pesa Prompt...',
+                'Connecting to PayHero payment channel 11662...'
+            );
 
             try {
                 const res = await fetch('/api/payhero/stk-push', {
@@ -326,61 +480,35 @@
                 });
 
                 const data = await res.json();
-                if (data.success) {
-                    showAlert('📲 Payment prompt sent! Check your phone and enter your M-Pesa PIN. Waiting for confirmation...', 'success');
+
+                if (data.success && data.reference) {
+                    // STK Prompt sent to phone!
+                    showTracker(
+                        '📲 M-Pesa Prompt Sent!',
+                        `Please check your phone (<span class="status-phone-highlight">${phone}</span>) and enter your M-Pesa PIN.<br><br>Waiting for automated confirmation...`
+                    );
+                    showAlert('📲 <strong>M-Pesa Prompt Sent:</strong> Check your phone and enter your PIN to approve.', 'info');
+                    
+                    if (btnText) btnText.innerHTML = '<span class="loading-spinner-inline"></span> Awaiting PIN...';
+
+                    // Start auto-checking status
+                    startPolling(data.reference);
                 } else {
-                    showAlert(data.error || 'Could not send STK prompt. Please use the PayHero direct payment link above.', 'error');
+                    // STK Push failed immediately
+                    hideTracker();
+                    showAlert(`❌ Payment initiation failed: ${data.error || 'Please check your phone number and try again.'}`, 'error');
+                    resetPayButton('Try Again');
                 }
             } catch (err) {
-                showAlert('Network error sending STK prompt. Please click the direct PayHero link above.', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Send Prompt';
+                hideTracker();
+                showAlert(`❌ Connection error: ${err.message}. Please check your network and try again.`, 'error');
+                resetPayButton('Try Again');
             }
         });
 
-        // Manual Verify
-        document.getElementById('btnVerifyPayment')?.addEventListener('click', async () => {
-            const receipt = document.getElementById('receiptInput')?.value.trim();
-            const phone = document.getElementById('stkPhoneInput')?.value.trim();
-
-            const btn = document.getElementById('btnVerifyPayment');
-            btn.disabled = true;
-            btn.textContent = 'Verifying...';
-
-            try {
-                const res = await fetch('/api/payhero/confirm-activation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-user-id': currentUid
-                    },
-                    body: JSON.stringify({
-                        userId: currentUid,
-                        mpesaReceipt: receipt || null,
-                        phone: phone || null
-                    })
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    showAlert('🎉 Account Activated! Redirecting to dashboard...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/index.html';
-                    }, 1000);
-                } else {
-                    showAlert(data.error || 'Verification failed. Please complete the KES 5 payment.', 'error');
-                }
-            } catch (err) {
-                showAlert('Verification request failed. Please check your connection.', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Verify & Unlock';
-            }
-        });
-
+        // Logout action
         document.getElementById('btnLogoutBtn')?.addEventListener('click', () => {
-            if (pollTimer) clearInterval(pollTimer);
+            stopPolling();
             logoutUser();
         });
     </script>
