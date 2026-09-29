@@ -66,7 +66,8 @@ app.post('/api/payhero/stk-push', async (req, res) => {
       userId,
       phone,
       amount: amount || 5,
-      host: req.headers.host || 'localhost:3000'
+      host: req.headers.host || 'money-hub-mocha.vercel.app',
+      protocol: 'https'
     });
     res.json(result);
   } catch (err) {
@@ -99,7 +100,7 @@ app.get('/api/payhero/status/:reference', async (req, res) => {
       payment: {
         id: payment.id,
         reference: payment.externalReference,
-        status: payment.status, // 'PENDING', 'COMPLETED', 'FAILED'
+        status: payment.status,
         failureReason: payment.failureReason || null,
         mpesaReceipt: payment.mpesaReceipt || null,
         amount: payment.amount,
@@ -184,7 +185,7 @@ app.post('/api/wallet/withdraw', (req, res) => {
       return res.status(403).json({
         success: false,
         requiresActivation: true,
-        error: 'Account activation required. Please pay KES 5 activation fee via PayHero to enable withdrawals.'
+        error: 'Account activation required. Please pay KES 5 activation fee via M-Pesa to enable withdrawals.'
       });
     }
     const { phone, amount } = req.body;
@@ -221,7 +222,6 @@ app.get('/api/tasks/:id/draft', (req, res) => {
   }
 });
 
-// Task Unlock Endpoints
 app.get('/api/tasks/unlocked', (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || 'usr_default';
@@ -261,15 +261,11 @@ app.post('/api/tasks/:id/unlock-mpesa', async (req, res) => {
       phone,
       amount: fee,
       purpose: `TASK_UNLOCK_${taskId}`,
-      host: req.headers.host || 'localhost:3000'
+      host: req.headers.host || 'money-hub-mocha.vercel.app',
+      protocol: 'https'
     });
 
-    res.json({
-      ...result,
-      taskId,
-      taskTitle,
-      fee
-    });
+    res.json({ ...result, taskId, taskTitle, fee });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
@@ -283,7 +279,7 @@ app.post('/api/tasks/:id/submit', (req, res) => {
       return res.status(403).json({
         success: false,
         requiresActivation: true,
-        error: 'Account activation required. Please pay KES 5 activation fee via PayHero to unlock task submissions.'
+        error: 'Account activation required. Please pay KES 5 activation fee to unlock task submissions.'
       });
     }
     const taskId = req.params.id;
@@ -423,29 +419,34 @@ app.post('/api/chat/message', async (req, res) => {
 // ==========================================
 // 7. STATIC FILES & CLIENT ROUTING
 // ==========================================
-app.use(express.static(path.join(__dirname, 'public'), {
-  extensions: ['html']
-}));
+if (!process.env.VERCEL) {
+  app.use(express.static(path.join(__dirname, 'public'), {
+    extensions: ['html']
+  }));
 
-// Serve index.html for root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
 
-// Catch-all for HTML or direct files
-app.get('*', (req, res) => {
-  const cleanPath = req.path.replace(/\/$/, '');
-  const htmlFilePath = path.join(__dirname, 'public', cleanPath + '.html');
-  if (fs.existsSync(htmlFilePath)) {
-    return res.sendFile(htmlFilePath);
-  }
-  const directPath = path.join(__dirname, 'public', req.path);
-  if (fs.existsSync(directPath) && fs.statSync(directPath).isFile()) {
-    return res.sendFile(directPath);
-  }
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+  app.get('*', (req, res) => {
+    const cleanPath = req.path.replace(/\/$/, '');
+    const htmlFilePath = path.join(__dirname, 'public', cleanPath + '.html');
+    if (fs.existsSync(htmlFilePath)) {
+      return res.sendFile(htmlFilePath);
+    }
+    const directPath = path.join(__dirname, 'public', req.path);
+    if (fs.existsSync(directPath) && fs.statSync(directPath).isFile()) {
+      return res.sendFile(directPath);
+    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
 
-app.listen(PORT, HOST, () => {
-  console.log(`PesaWave server is running on http://${HOST}:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, HOST, () => {
+    console.log(`PesaWave server is running on http://${HOST}:${PORT}`);
+  });
+}
+
+export { app };
+export default app;
