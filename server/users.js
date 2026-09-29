@@ -96,6 +96,37 @@ class UsersService {
     this.store.write(data);
     return data.users[uid];
   }
+
+  /**
+   * Update user status with payment details (called after PayHero activation)
+   * Ensures activation from payment system is synced to main user store
+   */
+  updateUserStatus(uid, newStatus, paymentDetails = {}) {
+    if (!uid) throw new Error('User UID is required');
+    const data = this.store.read();
+    data.users = data.users || {};
+
+    if (!data.users[uid]) {
+      data.users[uid] = { uid };
+    }
+
+    const user = data.users[uid];
+    user.status = newStatus;
+    user.updatedAt = new Date().toISOString();
+
+    // If activating, set activation fields
+    if (newStatus === 'ACTIVE') {
+      user.activated = true;
+      user.activatedAt = paymentDetails.activatedAt || new Date().toISOString();
+      if (paymentDetails.paymentId) user.activationPaymentId = paymentDetails.paymentId;
+      if (paymentDetails.reference) user.activationReference = paymentDetails.reference;
+      if (paymentDetails.mpesaReceipt) user.activationMpesaReceipt = paymentDetails.mpesaReceipt;
+    }
+
+    this.store.write(data);
+    console.log(`[UsersService] User ${uid} status updated to ${newStatus}`);
+    return user;
+  }
 }
 
 export const usersService = new UsersService();
