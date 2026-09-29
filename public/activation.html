@@ -26,7 +26,6 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             border: 1px solid var(--border, #30363d);
-            position: relative;
         }
         .brand-logo-wrap {
             margin-bottom: 1.25rem;
@@ -153,47 +152,7 @@
             transform: none;
         }
 
-        /* Status card */
-        .status-tracker-card {
-            display: none;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 1.25rem;
-            margin-top: 1rem;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-        .status-spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(0,212,170,0.2);
-            border-top-color: #00d4aa;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0.5rem auto 1rem;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .status-title {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 0.35rem;
-            color: #fff;
-        }
-        .status-desc {
-            font-size: 0.84rem;
-            color: #8b949e;
-            line-height: 1.4;
-        }
-        .status-phone-highlight {
-            color: #00ff88;
-            font-weight: 600;
-        }
-
-        .alert-box {
+        .status-message {
             padding: 0.85rem 1rem;
             border-radius: 8px;
             font-size: 0.88rem;
@@ -202,18 +161,39 @@
             text-align: left;
             line-height: 1.4;
         }
-        .alert-info { background: rgba(0, 212, 170, 0.1); color: #00d4aa; border: 1px solid rgba(0, 212, 170, 0.3); }
-        .alert-error { background: rgba(248, 81, 73, 0.12); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.35); }
-        .alert-success { background: rgba(48, 209, 88, 0.12); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.35); }
+        .status-info { background: rgba(0, 212, 170, 0.1); color: #00d4aa; border: 1px solid rgba(0, 212, 170, 0.3); }
+        .status-error { background: rgba(248, 81, 73, 0.12); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.35); }
+        .status-success { background: rgba(48, 209, 88, 0.12); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.35); }
 
-        .loading-spinner-inline {
+        .footer-info {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #8b949e;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1rem;
+        }
+        .system-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-dot {
             display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(0,0,0,0.25);
-            border-top-color: #0d1117;
+            width: 7px;
+            height: 7px;
+            background: #00d4aa;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #f85149;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -230,27 +210,27 @@
         </div>
 
         <h1>Activate Your Account</h1>
-        <p class="subtitle" id="userGreeting">One-time KES 5.00 activation fee via Safaricom M-Pesa to unlock all earning tasks.</p>
+        <p class="subtitle" id="userGreeting">Pay KES 5.00 once to unlock all earning opportunities.</p>
 
-        <div id="statusAlert" class="alert-box"></div>
+        <div id="statusAlert" class="status-message"></div>
 
         <div class="fee-badge">
             <div class="fee-amount">KES 5.00</div>
-            <div class="fee-label">One-Time Activation Fee</div>
+            <div class="fee-label">One-Time Payment</div>
         </div>
 
         <div class="benefits">
             <ul>
                 <li>Instant access to Microtasks, Surveys & Hotel Reviews</li>
                 <li>AI Training evaluations & Content writing tasks</li>
-                <li>Instant automated Safaricom M-Pesa payouts</li>
-                <li>100% genuine earnings starting from zero balance</li>
+                <li>Instant M-Pesa payouts to your phone</li>
+                <li>100% genuine earnings from day one</li>
             </ul>
         </div>
 
-        <!-- M-Pesa Direct STK Form -->
+        <!-- Payment Form -->
         <div class="payment-form-section" id="paymentFormSection">
-            <label class="form-label" for="stkPhoneInput">M-Pesa Phone Number</label>
+            <label class="form-label" for="stkPhoneInput">Your M-Pesa Phone Number</label>
             <div class="input-phone-wrap">
                 <svg class="input-phone-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
@@ -262,26 +242,20 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                 </svg>
-                <span id="btnPayText">Pay KES 5.00 via M-Pesa</span>
+                <span id="btnPayText">Pay KES 5.00</span>
             </button>
             <small style="font-size:0.75rem; color:#8b949e; display:block; margin-top:0.5rem; text-align:center;">
-                Safaricom will send a prompt directly to your phone.
+                You'll receive a payment prompt on your phone.
             </small>
         </div>
 
-        <!-- Real-Time Automated Status Tracker -->
-        <div class="status-tracker-card" id="statusTracker">
-            <div class="status-spinner" id="trackerSpinner"></div>
-            <div class="status-title" id="trackerTitle">Sending Prompt...</div>
-            <div class="status-desc" id="trackerDesc">Connecting to Safaricom Daraja...</div>
-        </div>
-
-        <!-- Footer Actions -->
-        <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#8b949e; border-top:1px solid rgba(255,255,255,0.06); padding-top:1rem;">
-            <span id="systemStatusText"><span style="display:inline-block; width:7px; height:7px; background:#00d4aa; border-radius:50%; margin-right:5px;"></span> Channel 11662 Ready</span>
-            <button type="button" id="btnLogoutBtn" style="background:none; border:none; color:#f85149; cursor:pointer; font-size:0.8rem; text-decoration:underline;">
-                Log Out
-            </button>
+        <!-- Footer -->
+        <div class="footer-info">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>Ready</span>
+            </div>
+            <button type="button" id="btnLogoutBtn" class="logout-btn">Log Out</button>
         </div>
     </div>
 
@@ -293,38 +267,19 @@
         let pollTimer = null;
         let isProcessing = false;
 
-        function showAlert(msg, type = 'info') {
+        function showMessage(msg, type = 'info') {
             const el = document.getElementById('statusAlert');
             if (!el) return;
-            el.className = `alert-box alert-${type}`;
+            el.className = `status-message status-${type}`;
             el.innerHTML = msg;
             el.style.display = 'block';
         }
 
-        function hideAlert() {
+        function hideMessage() {
             const el = document.getElementById('statusAlert');
             if (el) el.style.display = 'none';
         }
 
-        function showTracker(title, desc, isSpinning = true) {
-            const tracker = document.getElementById('statusTracker');
-            const spinner = document.getElementById('trackerSpinner');
-            const tTitle = document.getElementById('trackerTitle');
-            const tDesc = document.getElementById('trackerDesc');
-
-            if (!tracker) return;
-            tracker.style.display = 'block';
-            if (spinner) spinner.style.display = isSpinning ? 'block' : 'none';
-            if (tTitle) tTitle.innerHTML = title;
-            if (tDesc) tDesc.innerHTML = desc;
-        }
-
-        function hideTracker() {
-            const tracker = document.getElementById('statusTracker');
-            if (tracker) tracker.style.display = 'none';
-        }
-
-        // Check if user is already activated
         async function checkInitialUserStatus() {
             if (!currentUid) return;
             try {
@@ -334,179 +289,123 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (data.activated || data.status === 'ACTIVE') {
-                        showAlert('🎉 Account is Active! Proceeding to marketplace...', 'success');
-                        setTimeout(() => {
-                            window.location.href = '/index.html';
-                        }, 800);
+                        showMessage('🎉 Account activated! Redirecting...', 'success');
+                        setTimeout(() => window.location.href = '/index.html', 800);
                     }
                 }
             } catch(e) {
-                console.warn('Initial user status check failed:', e.message);
+                console.warn('Status check failed:', e.message);
             }
         }
 
-        // Automatic Status Polling for the active payment
         async function pollPaymentStatus() {
             if (!activePaymentRef) return;
-
             try {
                 const res = await fetch(`/api/payhero/status/${encodeURIComponent(activePaymentRef)}`);
                 if (!res.ok) return;
-
                 const result = await res.json();
                 if (!result.success || !result.payment) return;
-
                 const payment = result.payment;
-                console.log('[Auto-Confirm Poll] Payment status:', payment.status);
 
                 if (payment.status === 'COMPLETED' || payment.activated) {
-                    // SUCCESS: Stop polling, show success and auto-proceed
                     stopPolling();
-                    const receipt = payment.mpesaReceipt ? `(Ref: ${payment.mpesaReceipt})` : '';
-                    showTracker(
-                        '🎉 Payment Confirmed!',
-                        `M-Pesa payment received ${receipt}. Your account has been activated! Redirecting now...`,
-                        false
-                    );
-                    showAlert(`🎉 <strong>Payment Confirmed!</strong> Welcome to PesaWave! ${receipt}`, 'success');
-                    
+                    showMessage('🎉 Payment confirmed! Activating your account...', 'success');
                     const btn = document.getElementById('btnPayMpesa');
                     if (btn) {
                         btn.disabled = true;
-                        btn.innerHTML = '<span>Activated! Redirecting...</span>';
+                        btn.textContent = 'Account Activated';
                     }
-
-                    setTimeout(() => {
-                        window.location.href = '/index.html';
-                    }, 1200);
+                    setTimeout(() => window.location.href = '/index.html', 1200);
                 } else if (payment.status === 'FAILED') {
-                    // FAILURE: Stop polling, show failure reason and allow retry
                     stopPolling();
-                    const reason = payment.failureReason || 'Payment was cancelled or prompt timed out.';
-                    hideTracker();
-                    showAlert(`❌ <strong>Payment Denied:</strong> ${reason}`, 'error');
-                    resetPayButton('Try Again');
+                    const reason = payment.failureReason || 'Payment was cancelled.';
+                    showMessage(`Payment failed: ${reason}`, 'error');
+                    resetPayButton();
                 }
             } catch (err) {
-                console.warn('[Auto-Confirm Poll Error]:', err.message);
+                console.warn('Poll error:', err.message);
             }
         }
 
         function startPolling(ref) {
             stopPolling();
             activePaymentRef = ref;
-            // Poll every 2 seconds
             pollTimer = setInterval(pollPaymentStatus, 2000);
         }
 
         function stopPolling() {
-            if (pollTimer) {
-                clearInterval(pollTimer);
-                pollTimer = null;
-            }
+            if (pollTimer) clearInterval(pollTimer);
+            pollTimer = null;
             isProcessing = false;
         }
 
-        function resetPayButton(text = 'Pay KES 5.00 via M-Pesa') {
+        function resetPayButton() {
             const btn = document.getElementById('btnPayMpesa');
             const btnText = document.getElementById('btnPayText');
             if (btn) btn.disabled = false;
-            if (btnText) btnText.textContent = text;
+            if (btnText) btnText.textContent = 'Pay KES 5.00';
             isProcessing = false;
         }
 
-        // Initialize Authentication
         setupAuthListener((user) => {
             if (user) {
                 currentUid = user.uid;
                 localStorage.setItem('earnwave_user_uid', user.uid);
-                
                 const greeting = document.getElementById('userGreeting');
                 if (greeting) {
-                    greeting.textContent = `Welcome ${user.displayName || user.email}! Pay the one-time KES 5.00 activation fee to start earning.`;
+                    greeting.textContent = `Welcome ${user.displayName || user.email}! Complete payment to start earning.`;
                 }
-
-                // Autofill phone number if saved in registration
                 const savedPhone = localStorage.getItem('earnwave_user_phone');
                 const phoneInput = document.getElementById('stkPhoneInput');
                 if (savedPhone && phoneInput && !phoneInput.value) {
                     phoneInput.value = savedPhone;
                 }
-
                 checkInitialUserStatus();
             } else {
                 window.location.href = '/login.html';
             }
         });
 
-        // Trigger STK Push Button
         document.getElementById('btnPayMpesa')?.addEventListener('click', async () => {
             if (isProcessing) return;
-
             const phoneInput = document.getElementById('stkPhoneInput');
             const phone = phoneInput ? phoneInput.value.trim() : '';
 
             if (!phone) {
-                showAlert('Please enter your M-Pesa phone number.', 'error');
+                showMessage('Please enter your phone number.', 'error');
                 phoneInput?.focus();
                 return;
             }
 
-            hideAlert();
+            hideMessage();
             isProcessing = true;
-
             const btn = document.getElementById('btnPayMpesa');
-            const btnText = document.getElementById('btnPayText');
-            if (btn) btn.disabled = true;
-            if (btnText) btnText.innerHTML = '<span class="loading-spinner-inline"></span> Sending Prompt...';
-
-            showTracker(
-                'Sending M-Pesa Prompt...',
-                'Connecting to PayHero payment channel 11662...'
-            );
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Sending payment prompt...';
+            }
 
             try {
                 const res = await fetch('/api/payhero/stk-push', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-user-id': currentUid
-                    },
-                    body: JSON.stringify({
-                        phone,
-                        amount: 5,
-                        userId: currentUid
-                    })
+                    headers: { 'Content-Type': 'application/json', 'x-user-id': currentUid },
+                    body: JSON.stringify({ phone, amount: 5, userId: currentUid })
                 });
 
                 const data = await res.json();
-
                 if (data.success && data.reference) {
-                    // STK Prompt sent to phone!
-                    showTracker(
-                        '📲 M-Pesa Prompt Sent!',
-                        `Please check your phone (<span class="status-phone-highlight">${phone}</span>) and enter your M-Pesa PIN.<br><br>Waiting for automated confirmation...`
-                    );
-                    showAlert('📲 <strong>M-Pesa Prompt Sent:</strong> Check your phone and enter your PIN to approve.', 'info');
-                    
-                    if (btnText) btnText.innerHTML = '<span class="loading-spinner-inline"></span> Awaiting PIN...';
-
-                    // Start auto-checking status
+                    showMessage(`📲 Payment prompt sent to ${phone}. Check your phone and enter your M-Pesa PIN.`, 'info');
                     startPolling(data.reference);
                 } else {
-                    // STK Push failed immediately
-                    hideTracker();
-                    showAlert(`❌ Payment initiation failed: ${data.error || 'Please check your phone number and try again.'}`, 'error');
-                    resetPayButton('Try Again');
+                    showMessage(`Payment failed: ${data.error || 'Please try again.'}`, 'error');
+                    resetPayButton();
                 }
             } catch (err) {
-                hideTracker();
-                showAlert(`❌ Connection error: ${err.message}. Please check your network and try again.`, 'error');
-                resetPayButton('Try Again');
+                showMessage(`Connection error: ${err.message}`, 'error');
+                resetPayButton();
             }
         });
 
-        // Logout action
         document.getElementById('btnLogoutBtn')?.addEventListener('click', () => {
             stopPolling();
             logoutUser();
