@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help Center - EARNWAVE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="container">
+    <h2 class="mb-4">Help & Support</h2>
+    
+    <div class="card mb-4">
+      <h3 class="mb-4">Frequently Asked Questions</h3>
+      
+      <div class="mb-4">
+        <h4 class="mb-2">How do rewards work?</h4>
+        <p class="text-secondary">Complete available tasks, surveys, or AI training modules. Once your submission is reviewed and approved by the system, the potential reward is credited to your available balance. This is subject to quality checks.</p>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="mb-2">How do withdrawals work?</h4>
+        <p class="text-secondary">You can withdraw your available balance directly to your M-Pesa number. Withdrawals are typically processed within a few minutes. Minimum withdrawal limits may apply based on your account level.</p>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="mb-2">M-Pesa Troubleshooting</h4>
+        <p class="text-secondary">Ensure the phone number provided in your profile matches the M-Pesa registered number. If a withdrawal fails, the funds will be returned to your EARNWAVE wallet automatically.</p>
+      </div>
+      
+      <div class="mb-2">
+        <h4 class="mb-2">Account Security</h4>
+        <p class="text-secondary">Never share your password or OTPs. EARNWAVE support will never ask for your password. Enable two-factor authentication if available in your region.</p>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="mb-4">Contact Support</h3>
+      <form id="supportForm">
+        <div class="form-group">
+          <label class="form-label" for="subject">Issue Subject</label>
+          <select id="subject" class="form-control" required>
+            <option value="">Select a topic...</option>
+            <option value="withdrawal">Withdrawal Issue</option>
+            <option value="task">Task/Reward Issue</option>
+            <option value="account">Account Access</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="message">Message</label>
+          <textarea id="message" class="form-control" rows="5" required placeholder="Describe your issue in detail..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+      </form>
+    </div>
+
+    <div class="card text-center text-secondary">
+      <a href="#terms" id="terms">Terms of Service</a> &nbsp;|&nbsp; 
+      <a href="#privacy" id="privacy">Privacy Policy</a>
+    </div>
+  </div>
+
+  <!-- Modules -->
+  <script type="module" src="js/firebase-init.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/navigation.js"></script>
+  
+  <script type="module">
+    import { setupAuthListener } from './js/auth.js';
+    
+    setupAuthListener((user) => {
+      if (!user) {
+        window.location.href = '/login.html';
+      }
+    });
+
+    document.getElementById('supportForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Support ticket submitted. We will contact you via email.');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

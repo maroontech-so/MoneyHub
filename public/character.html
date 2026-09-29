@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - EARNWAVE</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 60px); max-width: 800px; margin: 0 auto; background: #1f2937; }
+        .chat-header { display: flex; align-items: center; padding: 15px; background: #111827; border-bottom: 1px solid #374151; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; }
+        .header-info { flex-grow: 1; }
+        .char-name { font-size: 1.2rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .ai-label { background: #3b82f6; color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        .char-details { color: #9ca3af; font-size: 0.85rem; margin-top: 2px; }
+        .status { color: #4ade80; font-size: 0.85rem; }
+        .chat-history { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 15px; position: relative; }
+        .message.ai { align-self: flex-start; background: #374151; color: #fff; border-bottom-left-radius: 0; }
+        .message.user { align-self: flex-end; background: #00d4aa; color: #0d1117; border-bottom-right-radius: 0; }
+        .chat-input-area { padding: 15px; background: #111827; border-top: 1px solid #374151; }
+        .input-wrapper { display: flex; gap: 10px; margin-bottom: 5px; }
+        textarea { flex-grow: 1; background: #374151; border: 1px solid #4b5563; color: #fff; border-radius: 8px; padding: 10px; resize: none; height: 50px; font-family: inherit; }
+        .btn-send { background: #00d4aa; color: #0d1117; border: none; border-radius: 8px; padding: 0 20px; font-weight: bold; cursor: pointer; }
+        .btn-send:disabled { background: #4b5563; cursor: not-allowed; }
+        .chat-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: #9ca3af; }
+        .ai-disclaimer { text-align: center; color: #ef4444; font-size: 0.8rem; padding: 10px; font-weight: bold; background: rgba(239, 68, 68, 0.1); }
+        .unlock-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(17, 24, 39, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; padding: 20px; }
+        .typing-indicator { display: none; align-self: flex-start; color: #9ca3af; font-size: 0.9rem; font-style: italic; margin-bottom: 10px;}
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="ai-disclaimer">
+            ⚠️ You are chatting with an AI. Responses are computer-generated.
+        </div>
+        
+        <div class="chat-header">
+            <img src="/assets/default-avatar.png" alt="Avatar" class="avatar" id="charAvatar">
+            <div class="header-info">
+                <div class="char-name">
+                    <span id="charName">Loading...</span>
+                    <span class="ai-label">🤖 AI Character</span>
+                </div>
+                <div class="char-details" id="charDetails">Loading details...</div>
+            </div>
+            <div class="status">● Online</div>
+        </div>
+
+        <div class="chat-history" id="chatHistory">
+            <!-- Messages go here -->
+            <div class="typing-indicator" id="typingIndicator">AI is typing...</div>
+        </div>
+
+        <div class="chat-input-area" id="inputArea">
+            <div class="input-wrapper">
+                <textarea id="messageInput" placeholder="Type your message here..."></textarea>
+                <button class="btn-send" id="btnSend">Send</button>
+            </div>
+            <div class="chat-meta">
+                <span id="charCounter">0 chars (Min 20 for reward)</span>
+                <span id="rewardIndicator">Daily earned: KES 0 / KES 50 cap</span>
+            </div>
+        </div>
+
+        <div class="unlock-overlay" id="unlockOverlay" style="display: none;">
+            <h2 id="unlockMessage">Unlock to start chatting and earning</h2>
+            <p>Chat with this AI character to earn rewards for quality interactions.</p>
+            <button class="btn-primary" id="btnUnlock" style="margin-top: 20px;">Pay via M-Pesa</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, auth, functions } from '/js/firebase-init.js';
+        import { doc, getDoc, collection, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const charId = urlParams.get('id');
+        let character = null;
+
+        const chatHistory = document.getElementById('chatHistory');
+        const messageInput = document.getElementById('messageInput');
+        const btnSend = document.getElementById('btnSend');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        async function init() {
+            if (!charId) { window.location.href = '/chat.html'; return; }
+
+            // Load character details
+            const charDoc = await getDoc(doc(db, 'chatCharacters', charId));
+            if (!charDoc.exists()) { alert('Character not found'); return; }
+            character = charDoc.data();
+
+            document.getElementById('charName').textContent = character.name;
+            document.getElementById('charDetails').textContent = `${character.countryFlag || ''} ${character.country} • ${character.age} yrs - ${character.bio}`;
+            if(character.avatar) document.getElementById('charAvatar').src = character.avatar;
+
+            // Check unlock status
+            const unlocksSnap = await getDoc(doc(db, 'chatUnlocks', `${auth.currentUser.uid}_${charId}`));
+            
+            if (!unlocksSnap.exists() && character.unlockFee > 0) {
+                document.getElementById('unlockOverlay').style.display = 'flex';
+                document.getElementById('unlockMessage').textContent = `Unlock for KES ${character.unlockFee} to start chatting`;
+                document.getElementById('inputArea').style.pointerEvents = 'none';
+                document.getElementById('inputArea').style.opacity = '0.5';
+            } else {
+                loadMessages();
+            }
+        }
+
+        document.getElementById('btnUnlock').addEventListener('click', async () => {
+            const unlockFn = httpsCallable(functions, 'chat-unlockCharacter');
+            try {
+                document.getElementById('btnUnlock').disabled = true;
+                document.getElementById('btnUnlock').textContent = 'Processing...';
+                await unlockFn({ characterId: charId });
+                alert('Unlock initiated. Please check your phone for M-Pesa prompt.');
+                // In reality, wait for webhook/status change.
+            } catch (err) {
+                alert('Unlock failed: ' + err.message);
+                document.getElementById('btnUnlock').disabled = false;
+                document.getElementById('btnUnlock').textContent = 'Pay via M-Pesa';
+            }
+        });
+
+        function loadMessages() {
+            const q = query(
+                collection(db, 'chatMessages'),
+                where('userId', '==', auth.currentUser.uid),
+                where('characterId', '==', charId),
+                orderBy('createdAt', 'asc')
+            );
+
+            onSnapshot(q, (snapshot) => {
+                chatHistory.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const div = document.createElement('div');
+                    div.className = `message ${msg.role === 'user' ? 'user' : 'ai'}`;
+                    div.textContent = msg.content;
+                    chatHistory.appendChild(div);
+                });
+                chatHistory.appendChild(typingIndicator);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            });
+        }
+
+        messageInput.addEventListener('input', () => {
+            const len = messageInput.value.length;
+            document.getElementById('charCounter').textContent = `${len} chars (Min 20 for reward)`;
+        });
+
+        btnSend.addEventListener('click', async () => {
+            const content = messageInput.value.trim();
+            if (!content) return;
+
+            messageInput.value = '';
+            btnSend.disabled = true;
+            typingIndicator.style.display = 'block';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const sendMsgFn = httpsCallable(functions, 'chat-sendChatMessage');
+            try {
+                await sendMsgFn({ characterId: charId, content });
+            } catch (err) {
+                console.error(err);
+                alert('Error sending message');
+            } finally {
+                btnSend.disabled = false;
+                typingIndicator.style.display = 'none';
+            }
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                init();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
+</body>
+</html>

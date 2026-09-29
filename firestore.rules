@@ -1,0 +1,320 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ─────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    function isModerator() {
+      return isAuthenticated() &&
+        (request.auth.token.admin == true || request.auth.token.moderator == true);
+    }
+
+    function isFinanceAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.admin == true || request.auth.token.financeAdmin == true);
+    }
+
+    function isContentManager() {
+      return isAuthenticated() &&
+        (request.auth.token.admin == true || request.auth.token.contentManager == true);
+    }
+
+    // ─── Users & Profiles ─────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Users can read their own profile; admin can read any
+      allow read: if isOwner(userId) || isAdmin();
+      // Users can update limited non-financial fields of their own profile
+      // Financial fields (status, balance, etc.) are Cloud Function only
+      allow update: if isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['status', 'balance', 'riskScore', 'riskFlags', 'accountState', 'suspendedAt', 'bannedAt']);
+      // Only Cloud Functions (admin SDK) can create user docs
+      allow create: if false;
+      allow delete: if false;
+    }
+
+    match /userProfiles/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow update: if isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['lifetimeEarned', 'lifetimeWithdrawn', 'tasksCompleted']);
+      allow create: if false;
+      allow delete: if false;
+    }
+
+    // ─── Financial Data — NO CLIENT WRITES ────────────────────────────────────
+
+    match /wallets/{userId} {
+      allow read: if isOwner(userId) || isFinanceAdmin();
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /walletTransactions/{transactionId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isFinanceAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isFinanceAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /withdrawals/{withdrawalId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isFinanceAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    // ─── Tasks ────────────────────────────────────────────────────────────────
+
+    match /tasks/{taskId} {
+      // Authenticated users can read published tasks
+      allow read: if isAuthenticated() && resource.data.status == 'PUBLISHED';
+      // Admin can read all tasks
+      allow read: if isContentManager();
+      // Only content managers can create/edit tasks
+      allow write: if isContentManager();
+    }
+
+    match /taskAttempts/{attemptId} {
+      // Users can read their own attempts
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      // Cloud Functions handle create/update
+      allow write: if false;
+    }
+
+    match /taskSubmissions/{submissionId} {
+      // Users can read their own submissions
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      // Users can create submissions (not update/delete)
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'PENDING_REVIEW';
+      // Only moderators can update (approve/reject)
+      allow update: if isModerator();
+      allow delete: if false;
+    }
+
+    // ─── Hotels ───────────────────────────────────────────────────────────────
+
+    match /hotels/{hotelId} {
+      allow read: if isAuthenticated();
+      allow write: if isContentManager();
+    }
+
+    match /hotelTasks/{hotelTaskId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /hotelReviews/{reviewId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      // Users can create reviews (not modify after submission)
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'UNDER_REVIEW';
+      allow update: if isModerator();
+      allow delete: if false;
+    }
+
+    // ─── Surveys ──────────────────────────────────────────────────────────────
+
+    match /surveys/{surveyId} {
+      allow read: if isAuthenticated() && resource.data.status == 'ACTIVE';
+      allow read: if isContentManager();
+      allow write: if isContentManager();
+    }
+
+    match /surveyQuestions/{questionId} {
+      allow read: if isAuthenticated();
+      allow write: if isContentManager();
+    }
+
+    match /surveyAttempts/{attemptId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        resource.data.status == 'STARTED' &&
+        request.resource.data.status == 'SUBMITTED';
+      allow delete: if false;
+    }
+
+    // ─── AI Training ──────────────────────────────────────────────────────────
+
+    match /aiTrainingTasks/{taskId} {
+      // Note: answer keys (correctAnswer) must NOT be in these docs
+      // Store answer keys in a separate server-only collection
+      allow read: if isAuthenticated() && resource.data.status == 'PUBLISHED';
+      allow write: if isContentManager();
+    }
+
+    match /aiTrainingAnswerKeys/{taskId} {
+      // Answer keys — server only, no client reads
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /aiTrainingSubmissions/{submissionId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─── Writing Tasks ────────────────────────────────────────────────────────
+
+    match /writingTasks/{taskId} {
+      allow read: if isAuthenticated() && resource.data.status == 'PUBLISHED';
+      allow write: if isContentManager();
+    }
+
+    match /writingSubmissions/{submissionId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isModerator());
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isModerator();
+      allow delete: if false;
+    }
+
+    // ─── Digital Products ─────────────────────────────────────────────────────
+
+    match /products/{productId} {
+      allow read: if isAuthenticated() && resource.data.status == 'ACTIVE';
+      allow read: if isContentManager();
+      allow write: if isContentManager();
+    }
+
+    match /productPurchases/{purchaseId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isFinanceAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /productAccess/{accessId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    // ─── Chat & AI Characters ─────────────────────────────────────────────────
+
+    match /chatCharacters/{characterId} {
+      allow read: if isAuthenticated() && resource.data.status == 'ACTIVE';
+      allow read: if isContentManager();
+      allow write: if isContentManager();
+    }
+
+    match /chatUnlocks/{unlockId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /chatSessions/{sessionId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /chatMessages/{messageId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      // Users cannot write messages directly — must go through sendChatMessage function
+      allow write: if false;
+    }
+
+    match /chatRewards/{rewardId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isFinanceAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    // ─── Referrals & Affiliates ───────────────────────────────────────────────
+
+    match /referralCodes/{codeId} {
+      // Users can read their own referral code
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /referrals/{referralId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.referrerId == request.auth.uid ||
+         resource.data.referredId == request.auth.uid ||
+         isAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /affiliateCommissions/{commissionId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isFinanceAdmin());
+      allow write: if false; // Cloud Functions only
+    }
+
+    // ─── Leaderboard ──────────────────────────────────────────────────────────
+
+    match /leaderboards/{leaderboardId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Cloud Functions only
+    }
+
+    match /leaderboardEntries/{entryId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Cloud Functions only
+    }
+
+    // ─── Notifications ────────────────────────────────────────────────────────
+
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      // Users can only mark their own notifications as read
+      allow update: if isOwner(resource.data.userId) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt']);
+      allow create: if false; // Cloud Functions only
+      allow delete: if false;
+    }
+
+    // ─── System Settings ──────────────────────────────────────────────────────
+
+    match /systemSettings/{document=**} {
+      // Authenticated users can read settings (needed for withdrawal limits, etc.)
+      allow read: if isAuthenticated();
+      // Only admins can write via Cloud Function
+      allow write: if false; // Cloud Functions only (updateSystemSettings function)
+    }
+
+    // ─── Audit Logs — No client access ────────────────────────────────────────
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Cloud Functions only
+    }
+  }
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Marketplace - EARNWAVE</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .banner { background-color: #ff9800; color: #fff; padding: 10px; text-align: center; font-weight: bold; }
+        .character-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+        .character-card { background: #1f2937; border-radius: 8px; padding: 20px; text-align: center; position: relative; }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+        .status-dot { height: 12px; width: 12px; background-color: #4ade80; border-radius: 50%; display: inline-block; position: absolute; top: 20px; right: 20px; }
+        .char-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; color: #fff; }
+        .char-info { color: #9ca3af; font-size: 0.9rem; margin-bottom: 10px; }
+        .char-bio { color: #d1d5db; font-size: 0.9rem; margin-bottom: 15px; height: 40px; overflow: hidden; text-overflow: ellipsis; }
+        .unlock-fee { font-weight: bold; color: #00d4aa; margin-bottom: 15px; }
+        .btn-chat { background-color: #00d4aa; color: #0d1117; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+        .filters { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .filter-btn { background: #374151; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+        .filter-btn.active { background: #00d4aa; color: #0d1117; }
+        .empty-state { text-align: center; color: #9ca3af; padding: 40px; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        ⚠️ IMPORTANT: All characters are AI-powered assistants, not real humans.
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1>AI Chat & Earn</h1>
+            <nav>
+                <a href="/dashboard.html">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="unlocked">Unlocked</button>
+            <button class="filter-btn" data-filter="available">Available</button>
+        </div>
+
+        <div class="character-grid" id="characterGrid">
+            <!-- Loading skeleton or dynamically populated cards -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                No characters found matching your criteria.
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, auth } from '/js/firebase-init.js';
+        import { collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        let allCharacters = [];
+        let unlockedCharIds = new Set();
+
+        async function loadCharacters() {
+            try {
+                // Fetch unlocks for current user
+                if(auth.currentUser) {
+                    const unlocksSnap = await getDocs(query(collection(db, 'chatUnlocks'), where('userId', '==', auth.currentUser.uid)));
+                    unlocksSnap.forEach(doc => unlockedCharIds.add(doc.data().characterId));
+                }
+
+                const charsSnap = await getDocs(collection(db, 'chatCharacters'));
+                allCharacters = charsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                renderCharacters('all');
+            } catch (error) {
+                console.error("Error loading characters:", error);
+            }
+        }
+
+        function renderCharacters(filter) {
+            const grid = document.getElementById('characterGrid');
+            const emptyState = document.getElementById('emptyState');
+            grid.innerHTML = '';
+            
+            let filtered = allCharacters;
+            if (filter === 'unlocked') {
+                filtered = allCharacters.filter(c => unlockedCharIds.has(c.id));
+            } else if (filter === 'available') {
+                filtered = allCharacters.filter(c => !unlockedCharIds.has(c.id));
+            }
+
+            if (filtered.length === 0) {
+                grid.appendChild(emptyState);
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            filtered.forEach(char => {
+                const isUnlocked = unlockedCharIds.has(char.id) || char.unlockFee === 0;
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                card.innerHTML = `
+                    <div class="status-dot"></div>
+                    <img src="${char.avatar || '/assets/default-avatar.png'}" alt="${char.name}" class="avatar">
+                    <div class="char-name">${char.name}</div>
+                    <div class="char-info">${char.countryFlag || '🌍'} ${char.country} • ${char.age} yrs</div>
+                    <div class="char-bio">${char.bio}</div>
+                    <div class="unlock-fee">${isUnlocked ? 'Unlocked' : 'KES ' + char.unlockFee + ' to unlock'}</div>
+                    <button class="btn-chat" onclick="window.location.href='/character.html?id=${char.id}'">
+                        ${isUnlocked ? 'Chat & Earn' : 'Unlock & Chat'}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                renderCharacters(e.target.dataset.filter);
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadCharacters();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
+</body>
+</html>

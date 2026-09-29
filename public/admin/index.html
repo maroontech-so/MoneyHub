@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EARNWAVE</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script type="module" src="../js/admin.js" defer></script>
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="brand">EARNWAVE Admin</div>
+            <nav>
+                <a href="index.html" class="active">Dashboard</a>
+                <a href="users.html">Users</a>
+                <a href="withdrawals.html">Withdrawals</a>
+                <a href="payments.html">Payments</a>
+                <a href="reports.html">Reports</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2>Dashboard Overview</h2>
+                <div class="admin-profile">Admin User</div>
+            </header>
+
+            <div class="stats-grid" id="dashboard-stats">
+                <div class="stat-card"><h3>Total Users</h3><p id="stat-users">...</p></div>
+                <div class="stat-card"><h3>Active Users</h3><p id="stat-active-users">...</p></div>
+                <div class="stat-card"><h3>Today's Registrations</h3><p id="stat-registrations">...</p></div>
+                <div class="stat-card"><h3>Today's Revenue</h3><p id="stat-revenue">...</p></div>
+                <div class="stat-card"><h3>Today's Rewards</h3><p id="stat-rewards">...</p></div>
+                <div class="stat-card"><h3>Today's Withdrawals</h3><p id="stat-withdrawals-vol">...</p></div>
+                <div class="stat-card"><h3>Pending Tasks</h3><p id="stat-pending-tasks">...</p></div>
+                <div class="stat-card alert"><h3>Pending Withdrawals</h3><p id="stat-pending-withdrawals">...</p></div>
+                <div class="stat-card alert"><h3>Pending Reviews</h3><p id="stat-pending-reviews">...</p></div>
+                <div class="stat-card danger"><h3>Failed Payments</h3><p id="stat-failed-payments">...</p></div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3>Registrations (7 Days)</h3>
+                    <div class="chart-placeholder">[Chart.js Line Chart]</div>
+                </div>
+                <div class="chart-box">
+                    <h3>Revenue vs Rewards (7 Days)</h3>
+                    <div class="chart-placeholder">[Chart.js Bar Chart]</div>
+                </div>
+                <div class="chart-box">
+                    <h3>Withdrawal Volume (7 Days)</h3>
+                    <div class="chart-placeholder">[Chart.js Area Chart]</div>
+                </div>
+            </div>
+            
+            <div class="recent-audit">
+                <h3>Recent Audit Logs</h3>
+                <ul id="audit-logs-list">
+                    <li>Loading...</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

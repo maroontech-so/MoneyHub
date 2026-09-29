@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Review - Earnwave</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <main id="hotelApp">
+        <div id="hotelHero" class="hero"></div>
+        <div class="hotel-info">
+            <h1 id="hotelName">Loading...</h1>
+            <p id="hotelLocation"></p>
+            <div id="hotelRating"></div>
+        </div>
+        
+        <section class="assignment-section">
+            <h2>Assignment</h2>
+            <p id="hotelBrief"></p>
+            <ul id="hotelRequirements">
+                <li>Minimum rating required</li>
+                <li>Minimum 100 words</li>
+            </ul>
+        </section>
+
+        <section id="unlockSection" class="unlock-section" style="display:none;">
+            <h3>Unlock this assignment</h3>
+            <p>Fee: KES <span id="unlockFeeText"></span></p>
+            <button id="unlockBtn">Pay with M-Pesa & Unlock</button>
+        </section>
+
+        <section id="reviewFormSection" style="display:none;">
+            <form id="reviewForm">
+                <label>Overall Rating (1-5):</label>
+                <input type="number" id="ratingInput" min="1" max="5" required>
+                
+                <label>Review Title:</label>
+                <input type="text" id="titleInput" minlength="10" required>
+                
+                <label>Detailed Review:</label>
+                <textarea id="bodyInput" rows="5" required></textarea>
+                <p>Word count: <span id="wordCount">0</span> / 100 minimum</p>
+                
+                <label>Pros (comma separated):</label>
+                <input type="text" id="prosInput">
+                
+                <label>Cons (comma separated):</label>
+                <input type="text" id="consInput">
+                
+                <button type="submit" id="submitReviewBtn" disabled>Submit Review</button>
+            </form>
+        </section>
+
+        <div id="completedStatus" style="display:none;">
+            <h3>Review Submitted!</h3>
+            <p>Status: <span id="reviewStatusText"></span></p>
+            <p>Reward: KES <span id="reviewRewardText"></span></p>
+        </div>
+    </main>
+    <script src="/js/hotels.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const hotelId = urlParams.get('id');
+        if (hotelId) loadHotel(hotelId);
+    </script>
+</body>
+</html>

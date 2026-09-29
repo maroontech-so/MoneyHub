@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - EARNWAVE</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script type="module" src="../js/admin.js" defer></script>
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="brand">EARNWAVE Admin</div>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="users.html">Users</a>
+                <a href="withdrawals.html">Withdrawals</a>
+                <a href="payments.html">Payments</a>
+                <a href="reports.html">Reports</a>
+                <a href="settings.html" class="active">Settings</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2>System Settings</h2>
+                <button class="btn btn-primary" id="btn-save-settings">Save All Settings</button>
+            </header>
+            
+            <div id="settings-status" class="status-message hidden"></div>
+
+            <div class="settings-container">
+                <section class="settings-group">
+                    <h3>General</h3>
+                    <div class="form-group">
+                        <label>App Name</label>
+                        <input type="text" id="set-app-name" value="EARNWAVE">
+                    </div>
+                    <div class="form-group">
+                        <label>Support Email</label>
+                        <input type="email" id="set-support-email" value="support@earnwave.co.ke">
+                    </div>
+                    <div class="form-group checkbox">
+                        <label><input type="checkbox" id="set-maintenance"> Maintenance Mode</label>
+                    </div>
+                </section>
+
+                <section class="settings-group">
+                    <h3>Payments (Activation)</h3>
+                    <div class="form-group checkbox">
+                        <label><input type="checkbox" id="set-activation-enabled" checked> Require Account Activation</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Activation Amount (KES)</label>
+                        <input type="number" id="set-activation-amount" value="500">
+                    </div>
+                </section>
+
+                <section class="settings-group">
+                    <h3>Withdrawals</h3>
+                    <div class="form-group checkbox">
+                        <label><input type="checkbox" id="set-withdrawals-enabled" checked> Enable Withdrawals</label>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Minimum Amount (KES)</label>
+                            <input type="number" id="set-wd-min" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Maximum Amount (KES)</label>
+                            <input type="number" id="set-wd-max" value="100000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Daily Limit per User (KES)</label>
+                        <input type="number" id="set-wd-daily" value="300000">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fee Type</label>
+                            <select id="set-wd-fee-type">
+                                <option value="flat">Flat</option>
+                                <option value="percentage">Percentage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fee Value</label>
+                            <input type="number" id="set-wd-fee-value" value="20">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-group">
+                    <h3>Tasks & Rewards</h3>
+                    <div class="form-group">
+                        <label>Max Daily Tasks per User</label>
+                        <input type="number" id="set-tasks-max" value="10">
+                    </div>
+                    <div class="form-group checkbox">
+                        <label><input type="checkbox" id="set-ref-enabled" checked> Enable Referral Rewards</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Referral Reward Amount (KES)</label>
+                        <input type="number" id="set-ref-amount" value="100">
+                    </div>
+                </section>
+
+                <section class="settings-group">
+                    <h3>Chat</h3>
+                    <div class="form-group checkbox">
+                        <label><input type="checkbox" id="set-chat-enabled" checked> Chat Enabled</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Reward per Message (KES)</label>
+                        <input type="number" id="set-chat-reward" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Daily Chat Reward Cap (KES)</label>
+                        <input type="number" id="set-chat-cap" value="50">
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

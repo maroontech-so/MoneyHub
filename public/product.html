@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | EARNWAVE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-functions-compat.js"></script>
+    <script src="js/payments.js"></script>
+    <script src="js/products.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <header class="bg-white shadow mb-8">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+            <a href="products.html" class="text-blue-600 hover:underline">&larr; Back to Marketplace</a>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="product-container">
+        <!-- Loading state -->
+        <div class="animate-pulse flex flex-col md:flex-row gap-8">
+            <div class="w-full md:w-1/2 h-64 bg-gray-200 rounded-lg"></div>
+            <div class="w-full md:w-1/2 space-y-4">
+                <div class="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div class="h-24 bg-gray-200 rounded w-full"></div>
+                <div class="h-10 bg-gray-200 rounded w-1/3"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function init() {
+            if (!productId) {
+                document.getElementById('product-container').innerHTML = '<p>Product not found.</p>';
+                return;
+            }
+
+            try {
+                const product = await window.products.loadProduct(productId);
+                const hasAccess = await window.products.checkProductAccess(productId);
+
+                const actionHtml = hasAccess
+                    ? `<button onclick="downloadProduct('${product.id}')" class="w-full md:w-auto px-8 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition">Download Product</button>`
+                    : `<button onclick="window.location.href='checkout.html?id=${product.id}'" class="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">Buy with M-Pesa - KES ${product.price}</button>`;
+
+                const whatIsIncluded = product.features ? product.features.map(f => `<li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>${f}</li>`).join('') : '<li>Digital download</li>';
+
+                document.getElementById('product-container').innerHTML = `
+                    <div class="flex flex-col md:flex-row gap-8 bg-white p-6 rounded-xl shadow-sm border">
+                        <div class="w-full md:w-1/2">
+                            <img src="${product.coverImage || 'https://via.placeholder.com/600x400'}" alt="${product.title}" class="w-full rounded-lg object-cover shadow">
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col justify-center">
+                            <span class="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-2">${product.category}</span>
+                            <h1 class="text-3xl font-extrabold text-gray-900 mb-4">${product.title}</h1>
+                            <p class="text-gray-600 mb-6 text-lg leading-relaxed">${product.description}</p>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-3">What's included:</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    ${whatIsIncluded}
+                                </ul>
+                            </div>
+
+                            <div class="text-3xl font-bold text-gray-900 mb-6">KES ${product.price}</div>
+                            
+                            <div class="mt-auto">
+                                ${actionHtml}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-12">
+                        <h2 class="text-2xl font-bold mb-6">Related Products</h2>
+                        <div id="related-products" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <!-- Populated dynamically or leave empty for now -->
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('product-container').innerHTML = '<p class="text-red-500">Failed to load product details.</p>';
+            }
+        }
+
+        async function downloadProduct(id) {
+            try {
+                const url = await window.products.getProductDownloadUrl(id);
+                window.open(url, '_blank');
+            } catch(e) {
+                alert('Error downloading: ' + e.message);
+            }
+        }
+
+        setTimeout(init, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - EARNWAVE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 500px;
+    }
+    .logo-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="card auth-card">
+      <div class="logo-container">
+        <div class="logo">EARNWAVE</div>
+        <p class="text-secondary mt-1">Create your account</p>
+      </div>
+      
+      <form id="registerForm">
+        <div id="globalError" class="form-error text-center mb-4"></div>
+        
+        <div class="form-group">
+          <label class="form-label" for="fullName">Full Name</label>
+          <input type="text" id="fullName" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input type="text" id="username" class="form-control" required pattern="[a-zA-Z0-9_]{3,20}" title="3-20 characters, alphanumeric and underscore only">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" id="email" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">M-Pesa Phone Number</label>
+          <input type="tel" id="phone" class="form-control" required placeholder="e.g. 0712345678 or +254712345678">
+          <small class="text-muted" style="font-size: 0.75rem; display:block; margin-top:0.25rem;">For rewards and payouts</small>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-control" required minlength="8">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" class="form-control" required minlength="8">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="referralCode">Referral Code (Optional)</label>
+          <input type="text" id="referralCode" class="form-control">
+        </div>
+
+        <div class="form-group mb-4">
+          <label style="font-size: 0.875rem; color: var(--text-secondary); display:flex; gap: 0.5rem; align-items: flex-start;">
+            <input type="checkbox" id="terms" required style="margin-top: 4px;">
+            <span>I agree to the <a href="/help.html#terms">Terms of Service</a> and <a href="/help.html#privacy">Privacy Policy</a></span>
+          </label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%" id="registerBtn">
+          <span class="btn-text">Create Account</span>
+          <div class="spinner hidden" id="registerSpinner"></div>
+        </button>
+      </form>
+      
+      <div class="text-center mt-4">
+        <span class="text-secondary">Already have an account?</span>
+        <a href="/login.html">Log In</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { registerUser, setupAuthListener } from './js/auth.js';
+    import { normalizePhone } from './js/config.js';
+    
+    // Redirect if already logged in
+    setupAuthListener((user) => {
+      if (user) window.location.href = '/dashboard.html';
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorDiv = document.getElementById('globalError');
+      
+      if (password !== confirmPassword) {
+        errorDiv.textContent = 'Passwords do not match.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      const userData = {
+        fullName: document.getElementById('fullName').value.trim(),
+        username: document.getElementById('username').value.trim().toLowerCase(),
+        email: document.getElementById('email').value.trim(),
+        phone: normalizePhone(document.getElementById('phone').value.trim()),
+        password: password,
+        referralCode: document.getElementById('referralCode').value.trim()
+      };
+      
+      const btnText = document.querySelector('.btn-text');
+      const spinner = document.getElementById('registerSpinner');
+      
+      btnText.classList.add('hidden');
+      spinner.classList.remove('hidden');
+      errorDiv.style.display = 'none';
+      
+      try {
+        await registerUser(userData);
+        // Auth listener handles redirect
+      } catch (err) {
+        errorDiv.textContent = err.message || 'Registration failed.';
+        errorDiv.style.display = 'block';
+        btnText.classList.remove('hidden');
+        spinner.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

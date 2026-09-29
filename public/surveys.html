@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surveys - Earnwave</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <header>
+        <h1>Surveys</h1>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('available')">Available</button>
+            <button class="tab-btn" onclick="switchTab('completed')">Completed</button>
+        </div>
+    </header>
+    <main>
+        <div id="loadingState">Loading surveys...</div>
+        <div id="emptyState" style="display:none;">No surveys available right now.</div>
+        
+        <div id="surveysList" class="survey-grid"></div>
+        <div id="completedSurveysList" class="survey-grid" style="display:none;"></div>
+
+        <!-- Survey Taking Engine Modal/Section -->
+        <div id="surveyTakeEngine" style="display:none;" class="modal">
+            <div class="progress-bar"><div class="progress" id="surveyProgress"></div></div>
+            <h3 id="questionCounter">Question 1 of X</h3>
+            <p id="questionText"></p>
+            <div id="answerArea"></div>
+            <div class="nav-buttons">
+                <button id="prevBtn" style="display:none;">Previous</button>
+                <button id="nextBtn">Next</button>
+                <button id="submitSurveyBtn" style="display:none;">Submit</button>
+            </div>
+        </div>
+    </main>
+    <script src="/js/surveys.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => loadSurveys());
+    </script>
+</body>
+</html>

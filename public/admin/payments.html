@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Payments - EARNWAVE</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script type="module" src="../js/admin.js" defer></script>
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="brand">EARNWAVE Admin</div>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="users.html">Users</a>
+                <a href="withdrawals.html">Withdrawals</a>
+                <a href="payments.html" class="active">Payments</a>
+                <a href="reports.html">Reports</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2>Manage Payments (Inbound)</h2>
+            </header>
+
+            <div class="controls-bar">
+                <select id="payment-status-filter">
+                    <option value="ALL">All Statuses</option>
+                    <option value="SUCCESS">Success</option>
+                    <option value="FAILED">Failed</option>
+                    <option value="PENDING">Pending</option>
+                </select>
+                <button class="btn btn-secondary" id="btn-export-payments">Export CSV</button>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Purpose</th>
+                        <th>Amount</th>
+                        <th>M-Pesa Receipt</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-payments-tbody">
+                    <tr><td colspan="7">Loading...</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

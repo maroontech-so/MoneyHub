@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details - EARNWAVE</title>
+    <style>
+        :root { --bg-dark: #0d1117; --bg-card: #161b22; --accent-green: #00ff88; --accent-cyan: #00d4aa; --text-main: #c9d1d9; --text-muted: #8b949e; --border-color: #30363d; --danger: #f85149; --font-family: -apple-system, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-family); margin: 0; padding-bottom: 70px; }
+        header { display: flex; align-items: center; padding: 16px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;}
+        .back-btn { background: none; border: none; color: var(--text-main); cursor: pointer; padding: 4px; margin-right: 16px; }
+        .back-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        header h1 { font-size: 1.2rem; margin: 0; font-weight: 600; }
+        
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        
+        .task-hero { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .badges { display: flex; gap: 8px; margin-bottom: 12px; }
+        .badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); }
+        .title { font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; }
+        .reward-box { background: rgba(0,255,136,0.1); border: 1px solid var(--accent-green); padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 16px; }
+        .reward-val { font-size: 1.2rem; font-weight: 700; color: var(--accent-green); }
+        
+        .unlock-section { background: rgba(0, 212, 170, 0.1); border: 1px dashed var(--accent-cyan); padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 24px; }
+        .btn-full { width: 100%; padding: 14px; background: var(--accent-green); color: #000; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 12px;}
+        .btn-full:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .section-title { font-size: 1.1rem; margin-bottom: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
+        .instructions { font-size: 0.9rem; line-height: 1.5; color: var(--text-main); margin-bottom: 24px; }
+        
+        .task-form { display: none; }
+        .form-group { margin-bottom: 16px; }
+        textarea { width: 100%; box-sizing: border-box; background: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px; border-radius: 8px; min-height: 100px; resize: vertical; }
+        textarea:focus { outline: none; border-color: var(--accent-cyan); }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="back-btn" onclick="history.back()">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1>Task Details</h1>
+    </header>
+    
+    <div class="container">
+        <div class="task-hero">
+            <div class="badges">
+                <span class="badge" id="t-type">TYPE</span>
+                <span class="badge" id="t-diff">Difficulty</span>
+                <span class="badge" id="t-time">0 min</span>
+            </div>
+            <div class="title" id="t-title">Loading...</div>
+            <div class="reward-box">
+                <div>Potential Reward</div>
+                <div class="reward-val" id="t-reward">KES ---</div>
+            </div>
+        </div>
+
+        <div class="unlock-section" id="unlock-section" style="display:none;">
+            <div id="unlock-text">This task requires a KES --- unlock fee</div>
+            <button class="btn-full" id="btn-unlock">Unlock with M-Pesa</button>
+        </div>
+
+        <div class="section-title">Instructions</div>
+        <div class="instructions" id="t-instructions">Loading instructions...</div>
+
+        <div class="task-form" id="task-form">
+            <div class="form-group">
+                <textarea id="task-submission" placeholder="Enter your submission here..."></textarea>
+            </div>
+            <button class="btn-full" id="btn-submit">Submit Task</button>
+        </div>
+        
+        <div id="status-display" style="display:none; text-align:center; padding: 20px; background: var(--bg-card); border-radius: 8px;">
+            <!-- Status text here -->
+        </div>
+    </div>
+    <script type="module" src="./js/task-detail.js"></script>
+</body>
+</html>

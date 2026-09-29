@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Reviews - Earnwave</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <header>
+        <h1>Hotel Reviews</h1>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search hotels...">
+        </div>
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="available">Available</button>
+            <button class="filter-btn" data-filter="locked">Locked</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+    </header>
+    <main>
+        <div id="loadingState" class="loading-skeleton">Loading hotels...</div>
+        <div id="emptyState" class="empty-state" style="display:none;">No hotels found.</div>
+        <div id="hotelsList" class="hotel-grid"></div>
+        <p class="note">Rewards subject to quality review and approval. See terms.</p>
+    </main>
+    <script src="/js/hotels.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => loadHotels());
+    </script>
+</body>
+</html>

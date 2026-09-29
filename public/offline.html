@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - EARNWAVE</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            background-color: #0d1117; 
+            color: #fff;
+            text-align: center;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .offline-container {
+            padding: 40px;
+            background: #1f2937;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ef4444;
+        }
+        h1 { margin-bottom: 15px; color: #fff; font-size: 1.8rem; }
+        p { color: #9ca3af; margin-bottom: 30px; line-height: 1.5; }
+        .btn-retry {
+            background: #00d4aa;
+            color: #0d1117;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-retry:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="icon">📡</div>
+        <h1>You appear to be offline</h1>
+        <p>EARNWAVE requires an internet connection to load new content and process your actions. Please check your network connection and try again.</p>
+        <button class="btn-retry" onclick="window.location.reload()">Retry Connection</button>
+    </div>
+    
+    <script>
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>

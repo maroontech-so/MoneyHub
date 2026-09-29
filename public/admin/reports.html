@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Reports - EARNWAVE</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script type="module" src="../js/admin.js" defer></script>
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="brand">EARNWAVE Admin</div>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="users.html">Users</a>
+                <a href="withdrawals.html">Withdrawals</a>
+                <a href="payments.html">Payments</a>
+                <a href="reports.html" class="active">Reports</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2>Financial Reports</h2>
+            </header>
+
+            <div class="controls-bar">
+                <select id="report-date-range">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="7">7 Days</option>
+                    <option value="30" selected>30 Days</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <div id="custom-dates" class="hidden">
+                    <input type="date" id="date-from"> to 
+                    <input type="date" id="date-to">
+                </div>
+                <button class="btn btn-primary" id="btn-generate-report">Generate</button>
+                <button class="btn btn-secondary" id="btn-export-report">Export CSV</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Total Revenue</h3><p id="rep-revenue">KES 0</p><small>Payments in</small></div>
+                <div class="stat-card"><h3>Total Rewards</h3><p id="rep-rewards">KES 0</p><small>Paid to users</small></div>
+                <div class="stat-card highlight"><h3>Platform Margin</h3><p id="rep-margin">KES 0</p><small>Rev - Rewards - Withdrawals</small></div>
+                <div class="stat-card"><h3>Total Withdrawals</h3><p id="rep-withdrawals">KES 0</p></div>
+                <div class="stat-card"><h3>Product Sales</h3><p id="rep-products">KES 0</p></div>
+                <div class="stat-card"><h3>Referral Commissions</h3><p id="rep-referrals">KES 0</p></div>
+            </div>
+
+            <div class="report-section mt-4">
+                <h3>Transaction Breakdown</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Count</th>
+                            <th>Volume (KES)</th>
+                            <th>% of Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-breakdown-tbody">
+                        <tr><td colspan="4">Run report to see breakdown</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

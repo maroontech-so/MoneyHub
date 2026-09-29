@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Tasks Management</title>
+    <style>
+        :root { --bg-dark: #f0f2f5; --bg-card: #ffffff; --text-main: #1c1e21; --border-color: #ddd; --primary: #0056b3; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 20px; }
+        .card { background: var(--bg-card); padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: #f8f9fa; }
+        .btn { padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); padding: 40px; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 4px; font-weight: bold; }
+        .form-control { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 4px; }
+        .flex-row { display: flex; gap: 16px; }
+        .flex-1 { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <h2>Task Management</h2>
+            <button class="btn" onclick="document.getElementById('taskModal').style.display='block'">Create Task</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Reward (KES)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="admin-task-list">
+                <!-- Populated by JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <h2>Create / Edit Task</h2>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="t-title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="t-desc" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Instructions</label>
+                <textarea id="t-inst" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="flex-row">
+                <div class="form-group flex-1">
+                    <label>Type</label>
+                    <select id="t-type" class="form-control">
+                        <option value="MICROTASK">Microtask</option>
+                        <option value="SURVEY">Survey</option>
+                        <option value="HOTEL_REVIEW">Hotel Review</option>
+                        <option value="AI_TRAINING">AI Training</option>
+                    </select>
+                </div>
+                <div class="form-group flex-1">
+                    <label>Difficulty</label>
+                    <select id="t-diff" class="form-control">
+                        <option value="EASY">Easy</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="HARD">Hard</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex-row">
+                <div class="form-group flex-1">
+                    <label>Reward (KES)</label>
+                    <input type="number" id="t-reward" class="form-control">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Unlock Fee (KES)</label>
+                    <input type="number" id="t-fee" class="form-control" value="0">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Est. Minutes</label>
+                    <input type="number" id="t-mins" class="form-control">
+                </div>
+            </div>
+            <div class="flex-row">
+                <div class="form-group flex-1">
+                    <label>Status</label>
+                    <select id="t-status" class="form-control">
+                        <option value="DRAFT">Draft</option>
+                        <option value="PUBLISHED">Published</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn" style="background:#ccc" onclick="document.getElementById('taskModal').style.display='none'">Cancel</button>
+                <button class="btn" id="btn-save">Save Task</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="../js/admin-tasks.js"></script>
+</body>
+</html>

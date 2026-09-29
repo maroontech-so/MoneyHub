@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Users - EARNWAVE</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script type="module" src="../js/admin.js" defer></script>
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="brand">EARNWAVE Admin</div>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="users.html" class="active">Users</a>
+                <a href="withdrawals.html">Withdrawals</a>
+                <a href="payments.html">Payments</a>
+                <a href="reports.html">Reports</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2>User Management</h2>
+            </header>
+
+            <div class="controls-bar">
+                <input type="text" id="user-search" placeholder="Search by username, email, phone...">
+                <select id="user-status-filter">
+                    <option value="ALL">All Users</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="SUSPENDED">Suspended</option>
+                    <option value="BANNED">Banned</option>
+                    <option value="PENDING">Pending</option>
+                </select>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Contact</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                        <th>Balance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-users-tbody">
+                    <tr><td colspan="6">Loading...</td></tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button id="u-prev">Prev</button>
+                <button id="u-next">Next</button>
+            </div>
+        </main>
+
+        <!-- User Detail Drawer / Modal -->
+        <div id="user-drawer" class="drawer hidden">
+            <div class="drawer-header">
+                <h3 id="drawer-username">User Name</h3>
+                <button id="close-drawer" class="btn-close">X</button>
+            </div>
+            <div class="drawer-content">
+                <div class="profile-summary">
+                    <p><strong>Email:</strong> <span id="drawer-email"></span></p>
+                    <p><strong>Phone:</strong> <span id="drawer-phone"></span></p>
+                    <p><strong>Status:</strong> <span id="drawer-status"></span></p>
+                    <p><strong>Fraud Risk:</strong> <span id="drawer-fraud"></span></p>
+                </div>
+                
+                <div class="wallet-section">
+                    <h4>Wallet</h4>
+                    <p>Available: <strong id="drawer-balance"></strong></p>
+                    <button class="btn btn-sm btn-primary" id="btn-adjust">Admin Adjustment</button>
+                </div>
+
+                <div class="action-section">
+                    <h4>Actions</h4>
+                    <button class="btn btn-sm btn-danger" id="btn-suspend">Suspend User</button>
+                    <button class="btn btn-sm btn-success hidden" id="btn-reactivate">Reactivate User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

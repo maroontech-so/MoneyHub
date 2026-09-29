@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write & Earn - Earnwave</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <header>
+        <h1>Writing Assignments</h1>
+    </header>
+    <main>
+        <div id="writingTaskList" class="task-grid">
+            <!-- Simulated tasks -->
+            <div class="card">
+                <h3>Write an article about Finance</h3>
+                <p>Discuss saving strategies in Kenya.</p>
+                <p>300 - 500 words</p>
+                <p>Reward: KES 200 | Deadline: Today</p>
+                <span class="badge difficulty">Medium</span>
+                <button onclick="openAssignment('1')">View Assignment</button>
+            </div>
+        </div>
+
+        <div id="assignmentView" style="display:none;" class="modal">
+            <h2>Assignment Brief</h2>
+            <p>Write an article about Finance...</p>
+            <p>Required: 300 - 500 words</p>
+            <textarea id="writingArea" rows="15" placeholder="Start writing here..."></textarea>
+            <p>Words: <span id="currentWordCount">0</span>/300 minimum</p>
+            <button id="submitWritingBtn" disabled>Submit</button>
+            <button id="previewBtn">Preview</button>
+        </div>
+    </main>
+    <script>
+        const writingArea = document.getElementById('writingArea');
+        const countSpan = document.getElementById('currentWordCount');
+        const submitBtn = document.getElementById('submitWritingBtn');
+
+        function openAssignment(id) {
+            document.getElementById('writingTaskList').style.display = 'none';
+            document.getElementById('assignmentView').style.display = 'block';
+        }
+
+        writingArea.addEventListener('input', () => {
+            const words = writingArea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            countSpan.innerText = words;
+            submitBtn.disabled = words < 300;
+        });
+    </script>
+</body>
+</html>

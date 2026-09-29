@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Training - Earnwave</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="instructions-banner">Help improve AI systems. Evaluate AI responses for accuracy and quality.</div>
+    <header>
+        <h1>AI Training Tasks</h1>
+    </header>
+    <main>
+        <div id="taskList" class="task-grid">
+            <!-- Dynamically populated -->
+        </div>
+
+        <div id="taskView" style="display:none;" class="modal">
+            <h2 id="taskPrompt"></h2>
+            <div id="taskContent"></div>
+            <button id="submitEvaluationBtn">Submit Evaluation</button>
+        </div>
+    </main>
+    <script>
+        // Placeholder for AI training JS
+        const tasks = [
+            { id: '1', type: 'response_ranking', prompt: 'Which summary is better?', reward: 50, time: 2, responseA: 'Summary A...', responseB: 'Summary B...' }
+        ];
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = tasks.map(t => `
+                <div class="card">
+                    <span class="badge">${t.type.replace('_', ' ')}</span>
+                    <h3>${t.prompt}</h3>
+                    <p>Reward: KES ${t.reward} | Time: ${t.time} mins</p>
+                    <button onclick="startTask('${t.id}')">Start</button>
+                </div>
+            `).join('');
+        }
+        function startTask(id) {
+            document.getElementById('taskList').style.display = 'none';
+            document.getElementById('taskView').style.display = 'block';
+            document.getElementById('taskPrompt').innerText = tasks[0].prompt;
+            document.getElementById('taskContent').innerHTML = `
+                <div class="response"><h4>Response A</h4><p>${tasks[0].responseA}</p></div>
+                <div class="response"><h4>Response B</h4><p>${tasks[0].responseB}</p></div>
+                <div class="rating-buttons">
+                    <button>A is Better</button>
+                    <button>B is Better</button>
+                    <button>Both Good</button>
+                    <button>Neither Good</button>
+                </div>
+            `;
+        }
+        document.addEventListener('DOMContentLoaded', renderTasks);
+    </script>
+</body>
+</html>

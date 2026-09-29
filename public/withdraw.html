@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw Funds - EARNWAVE</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/withdrawals.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>EARNWAVE</h1>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="withdraw.html" class="active">Withdraw</a>
+            <a href="payouts.html">History</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="balance-card">
+            <h2>Available Balance</h2>
+            <div class="balance-display" id="available-balance">KES 0.00</div>
+            <div class="pending-balance" id="pending-balance">KES 0.00 (pending)</div>
+        </section>
+
+        <section class="withdraw-section">
+            <h3>Request Withdrawal</h3>
+            
+            <div id="status-message" class="status-message hidden"></div>
+
+            <form id="withdraw-form">
+                <div class="form-group">
+                    <label for="amount">Amount to Withdraw (KES)</label>
+                    <input type="number" id="amount" name="amount" required>
+                    <small id="amount-hint" class="hint">Loading limits...</small>
+                </div>
+
+                <div class="quick-amounts">
+                    <button type="button" class="btn-quick" data-amount="500">500</button>
+                    <button type="button" class="btn-quick" data-amount="1000">1000</button>
+                    <button type="button" class="btn-quick" data-amount="2000">2000</button>
+                    <button type="button" class="btn-quick" data-amount="5000">5000</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">M-Pesa Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="e.g. 254712345678" required>
+                </div>
+
+                <div class="fee-breakdown" id="fee-breakdown">
+                    <div class="fee-row">
+                        <span>Withdrawal Amount:</span>
+                        <span id="display-amount">KES 0</span>
+                    </div>
+                    <div class="fee-row">
+                        <span>Transaction Fee:</span>
+                        <span id="display-fee">KES 0</span>
+                    </div>
+                    <div class="fee-row highlight">
+                        <span>You Receive:</span>
+                        <span id="display-net">KES 0</span>
+                    </div>
+                </div>
+
+                <div class="daily-limit-info" id="daily-limit-info">
+                    Daily limit: Loading...
+                </div>
+
+                <button type="submit" id="btn-withdraw" class="btn btn-primary btn-block" disabled>Withdraw</button>
+            </form>
+        </section>
+    </main>
+
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Confirm Withdrawal</h3>
+            <p>Are you sure you want to withdraw <strong id="modal-amount"></strong> to <strong id="modal-phone"></strong>?</p>
+            <div class="modal-actions">
+                <button id="btn-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="btn-confirm" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - EARNWAVE</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        .settings-section { background: #1f2937; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .settings-section h2 { margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #374151; padding-bottom: 10px; font-size: 1.2rem; }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #374151; }
+        .setting-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .setting-info h3 { margin: 0 0 5px 0; font-size: 1rem; color: #fff; }
+        .setting-info p { margin: 0; font-size: 0.85rem; color: #9ca3af; }
+        
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4b5563; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00d4aa; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .btn-danger { background-color: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; color: #d1d5db; }
+        .input-group input { width: 100%; padding: 10px; background: #374151; border: 1px solid #4b5563; border-radius: 4px; color: white; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Settings</h1>
+            <nav>
+                <a href="/dashboard.html">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="settings-section">
+            <h2>Notifications</h2>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Push Notifications</h3>
+                    <p>Receive alerts on your device</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="pushToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Task Updates</h3>
+                    <p>Get notified when tasks are approved or rejected</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="taskToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Withdrawal Updates</h3>
+                    <p>Get notified about payment processing</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="withdrawToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Privacy</h2>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Show in Leaderboard</h3>
+                    <p>Allow your profile to appear in public rankings</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="leaderboardToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>M-Pesa Number</h2>
+            <div class="setting-row" style="display: block;">
+                <p style="margin-bottom: 10px; color: #9ca3af;">Current: <strong id="currentPhone" style="color: #fff;">Loading...</strong></p>
+                <button class="btn-secondary" onclick="alert('Phone number update requires OTP verification. Feature coming soon.')">Update Number</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Security</h2>
+            <div class="setting-row" style="display: block;">
+                <form id="passwordForm">
+                    <div class="input-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Update Password</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="settings-section" style="border: 1px solid #ef4444;">
+            <h2 style="color: #ef4444; border-bottom-color: #7f1d1d;">Danger Zone</h2>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Delete Account</h3>
+                    <p>Permanently remove your account and all data</p>
+                </div>
+                <button class="btn-danger" id="btnDeleteAccount">Delete Account</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { auth, db } from '/js/firebase-init.js';
+        import { doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { updatePassword, deleteUser } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        async function loadSettings(user) {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                document.getElementById('currentPhone').textContent = data.phoneNumber ? 
+                    data.phoneNumber.substring(0,6) + '****' + data.phoneNumber.substring(10) : 'Not set';
+                
+                if (data.settings) {
+                    document.getElementById('pushToggle').checked = !!data.settings.pushEnabled;
+                    document.getElementById('taskToggle').checked = data.settings.taskUpdates !== false;
+                    document.getElementById('withdrawToggle').checked = data.settings.withdrawUpdates !== false;
+                    document.getElementById('leaderboardToggle').checked = data.settings.showInLeaderboard !== false;
+                }
+            }
+        }
+
+        async function saveSetting(key, value) {
+            if(!auth.currentUser) return;
+            try {
+                await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+                    [`settings.${key}`]: value
+                });
+            } catch (err) {
+                console.error("Error saving setting:", err);
+            }
+        }
+
+        document.getElementById('pushToggle').addEventListener('change', (e) => saveSetting('pushEnabled', e.target.checked));
+        document.getElementById('taskToggle').addEventListener('change', (e) => saveSetting('taskUpdates', e.target.checked));
+        document.getElementById('withdrawToggle').addEventListener('change', (e) => saveSetting('withdrawUpdates', e.target.checked));
+        document.getElementById('leaderboardToggle').addEventListener('change', (e) => saveSetting('showInLeaderboard', e.target.checked));
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPwd = document.getElementById('newPassword').value;
+            try {
+                await updatePassword(auth.currentUser, newPwd);
+                alert("Password updated successfully");
+                document.getElementById('newPassword').value = '';
+            } catch (err) {
+                alert("Error updating password. You may need to sign in again. " + err.message);
+            }
+        });
+
+        document.getElementById('btnDeleteAccount').addEventListener('click', async () => {
+            if(confirm("Are you ABSOLUTELY sure? This will delete all your data, earnings, and referrals permanently. This action cannot be undone.")) {
+                if(confirm("Final confirmation: Delete account?")) {
+                    try {
+                        await deleteUser(auth.currentUser);
+                        window.location.href = '/register.html';
+                    } catch (err) {
+                        alert("Error deleting account. Please sign in again and retry. " + err.message);
+                    }
+                }
+            }
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadSettings(user);
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
+</body>
+</html>

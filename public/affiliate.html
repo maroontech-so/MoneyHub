@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Program - EARNWAVE</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .referral-card { background: #1f2937; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px; }
+        .ref-code { font-size: 2.5rem; font-weight: bold; color: #00d4aa; letter-spacing: 2px; margin: 20px 0; padding: 15px; background: #111827; border-radius: 8px; display: inline-block; }
+        .share-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .btn-share { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: #fff; }
+        .btn-copy { background: #374151; }
+        .btn-wa { background: #25D366; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #1f2937; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 10px; }
+        .table-container { background: #1f2937; border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #374151; color: #d1d5db; }
+        th { background: #111827; font-weight: bold; color: #9ca3af; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .status-pending { background: #f59e0b22; color: #f59e0b; }
+        .status-qualified { background: #10b98122; color: #10b981; }
+        .how-it-works { background: #1f2937; padding: 20px; border-radius: 8px; }
+        .steps { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        .step { display: flex; gap: 15px; align-items: flex-start; }
+        .step-num { background: #00d4aa; color: #0d1117; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .terms { font-size: 0.8rem; color: #6b7280; margin-top: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Affiliate Program</h1>
+            <nav>
+                <a href="/dashboard.html">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="referral-card">
+            <h2>Your Referral Code</h2>
+            <div class="ref-code" id="refCode">Loading...</div>
+            <p>Share your link with friends to earn commission when they join and participate.</p>
+            <div class="share-buttons">
+                <button class="btn-share btn-copy" id="btnCopy">Copy Link</button>
+                <button class="btn-share btn-wa" id="btnWa">Share via WhatsApp</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div>Link Clicks</div>
+                <div class="stat-value" id="statClicks">0</div>
+            </div>
+            <div class="stat-card">
+                <div>Registrations</div>
+                <div class="stat-value" id="statRegs">0</div>
+            </div>
+            <div class="stat-card">
+                <div>Qualified Referrals</div>
+                <div class="stat-value" id="statQualified">0</div>
+            </div>
+            <div class="stat-card">
+                <div>Commission Earned</div>
+                <div class="stat-value" id="statCommission">KES 0</div>
+            </div>
+        </div>
+
+        <h2>Your Referrals</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Joined Date</th>
+                        <th>Status</th>
+                        <th>Commission</th>
+                    </tr>
+                </thead>
+                <tbody id="referralsTable">
+                    <tr><td colspan="4" style="text-align: center;">Loading referrals...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="how-it-works">
+            <h2>How it works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div><strong>Share your unique link</strong> with friends, family, or on social media.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div><strong>Friend registers</strong> using your link and referral code.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div><strong>Friend qualifies</strong> by completing their first task or chatting with an AI.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div><strong>You earn commission</strong> automatically credited to your wallet.</div>
+                </div>
+            </div>
+        </div>
+
+        <p class="terms">Terms: Commission rates and qualification requirements may change. Self-referrals, circular referrals, and abuse will result in account suspension and forfeiture of earnings.</p>
+    </main>
+
+    <script type="module">
+        import { db, auth } from '/js/firebase-init.js';
+        import { collection, query, where, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        let referralLink = "";
+
+        async function loadAffiliateData(user) {
+            try {
+                // 1. Get referral code for user
+                const codesRef = collection(db, 'referralCodes');
+                const q = query(codesRef, where('userId', '==', user.uid));
+                const querySnapshot = await getDocs(q);
+                
+                let codeData = null;
+                if (!querySnapshot.empty) {
+                    codeData = querySnapshot.docs[0].data();
+                    const code = codeData.code;
+                    document.getElementById('refCode').textContent = code;
+                    referralLink = `${window.location.origin}/register.html?ref=${code}`;
+                    
+                    document.getElementById('statClicks').textContent = codeData.clickCount || 0;
+                    document.getElementById('statRegs').textContent = codeData.registrationCount || 0;
+                } else {
+                    document.getElementById('refCode').textContent = "Not found";
+                }
+
+                // 2. Get referrals
+                const referralsRef = collection(db, 'referrals');
+                const refQ = query(referralsRef, where('referrerId', '==', user.uid));
+                const refSnap = await getDocs(refQ);
+                
+                const table = document.getElementById('referralsTable');
+                table.innerHTML = '';
+                
+                let qualifiedCount = 0;
+                let totalCommission = 0;
+
+                if(refSnap.empty) {
+                    table.innerHTML = '<tr><td colspan="4" style="text-align: center;">No referrals yet.</td></tr>';
+                } else {
+                    refSnap.forEach(docSnap => {
+                        const ref = docSnap.data();
+                        if(ref.status === 'QUALIFIED') {
+                            qualifiedCount++;
+                            totalCommission += (ref.commissionAmount || 0);
+                        }
+                        
+                        const tr = document.createElement('tr');
+                        const dateStr = ref.createdAt ? new Date(ref.createdAt.toDate()).toLocaleDateString() : 'N/A';
+                        const statusClass = ref.status === 'QUALIFIED' ? 'status-qualified' : 'status-pending';
+                        
+                        tr.innerHTML = `
+                            <td>User_${ref.referredId.substring(0,5)}***</td>
+                            <td>${dateStr}</td>
+                            <td><span class="status-badge ${statusClass}">${ref.status}</span></td>
+                            <td>KES ${ref.commissionAmount || 0}</td>
+                        `;
+                        table.appendChild(tr);
+                    });
+                }
+                
+                document.getElementById('statQualified').textContent = qualifiedCount;
+                document.getElementById('statCommission').textContent = `KES ${totalCommission}`;
+
+            } catch (err) {
+                console.error("Error loading affiliate data", err);
+            }
+        }
+
+        document.getElementById('btnCopy').addEventListener('click', () => {
+            navigator.clipboard.writeText(referralLink);
+            const btn = document.getElementById('btnCopy');
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy Link', 2000);
+        });
+
+        document.getElementById('btnWa').addEventListener('click', () => {
+            const text = encodeURIComponent(`Join EARNWAVE and start earning! Use my link: ${referralLink}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadAffiliateData(user);
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
+</body>
+</html>

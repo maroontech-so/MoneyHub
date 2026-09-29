@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EARNWAVE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .splash {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: var(--bg-primary);
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="splash">
+    <div class="logo">EARNWAVE</div>
+    <div class="spinner"></div>
+  </div>
+  
+  <script type="module">
+    import { auth } from './js/firebase-init.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    
+    // Check auth state and redirect
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = '/dashboard.html';
+      } else {
+        window.location.href = '/login.html';
+      }
+    });
+  </script>
+</body>
+</html>

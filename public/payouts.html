@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payout History - EARNWAVE</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/withdrawals.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>EARNWAVE</h1>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="withdraw.html">Withdraw</a>
+            <a href="payouts.html" class="active">History</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="summary-section">
+            <h2>Withdrawal History</h2>
+            <div class="summary-card">
+                <span>Total Withdrawn:</span>
+                <strong id="total-withdrawn">KES 0.00</strong>
+            </div>
+        </section>
+
+        <section class="filters">
+            <select id="status-filter">
+                <option value="ALL">All Statuses</option>
+                <option value="REQUESTED">Requested</option>
+                <option value="PROCESSING">Processing</option>
+                <option value="SUBMITTED">Submitted</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="FAILED">Failed</option>
+            </select>
+            <select id="date-filter">
+                <option value="ALL">All Time</option>
+                <option value="7">Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+            </select>
+        </section>
+
+        <section class="history-list">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Fee</th>
+                        <th>Net Received</th>
+                        <th>Phone</th>
+                        <th>Ref</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="payout-tbody">
+                    <!-- Loaded via JS -->
+                    <tr>
+                        <td colspan="7" class="text-center">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div id="empty-state" class="empty-state hidden">
+                <p>No withdrawals found.</p>
+            </div>
+            
+            <div class="pagination">
+                <button id="btn-prev" disabled>Previous</button>
+                <span id="page-info">Page 1</span>
+                <button id="btn-next" disabled>Next</button>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

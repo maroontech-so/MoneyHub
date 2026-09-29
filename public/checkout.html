@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | EARNWAVE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-functions-compat.js"></script>
+    <script src="js/payments.js"></script>
+    <script src="js/products.js"></script>
+</head>
+<body class="bg-gray-100 font-sans h-screen flex flex-col">
+    <header class="bg-white shadow py-4">
+        <div class="max-w-3xl mx-auto px-4 flex items-center">
+            <a href="javascript:history.back()" class="text-gray-500 hover:text-gray-900 font-medium">&larr; Back</a>
+            <h1 class="text-xl font-bold mx-auto">Secure Checkout</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden">
+            <div id="checkout-content" class="p-6">
+                <div class="animate-pulse space-y-4">
+                    <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+                    <div class="h-8 bg-gray-200 rounded w-3/4"></div>
+                    <div class="h-24 bg-gray-200 rounded w-full"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function initCheckout() {
+            if (!productId) {
+                document.getElementById('checkout-content').innerHTML = '<p class="text-red-500">Invalid product.</p>';
+                return;
+            }
+
+            try {
+                const product = await window.products.loadProduct(productId);
+                
+                // Get user phone if available
+                let defaultPhone = '';
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    if (userDoc.exists && userDoc.data().phone) {
+                        defaultPhone = userDoc.data().phone;
+                    }
+                }
+
+                document.getElementById('checkout-content').innerHTML = `
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Order Summary</h2>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600 font-medium">${product.title}</span>
+                            <span class="font-bold">KES ${product.price}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-gray-500 border-t border-gray-200 pt-2 mt-2">
+                            <span>Total (No hidden fees)</span>
+                            <span class="font-bold text-gray-900 text-lg">KES ${product.price}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <div class="border-2 border-green-500 bg-green-50 rounded-lg p-3 flex items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" alt="M-Pesa" class="h-8 mr-3">
+                            <span class="font-bold text-gray-900">M-Pesa STK Push</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">M-Pesa Phone Number</label>
+                        <input type="tel" id="phone" value="${defaultPhone}" placeholder="e.g. 0712345678" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 p-3 border">
+                        <p class="text-xs text-gray-500 mt-1">Steps: 1. Confirm &rarr; 2. Enter PIN on phone &rarr; 3. Done</p>
+                    </div>
+
+                    <button id="pay-btn" class="w-full bg-green-600 text-white font-bold py-4 rounded-lg hover:bg-green-700 transition shadow-lg flex justify-center items-center">
+                        Pay KES ${product.price}
+                    </button>
+                `;
+
+                document.getElementById('pay-btn').addEventListener('click', () => {
+                    const phone = document.getElementById('phone').value;
+                    if (!window.payments.validateMpesaPhone(phone)) {
+                        alert('Please enter a valid Safaricom number');
+                        return;
+                    }
+                    
+                    window.payments.showPaymentModal({
+                        amount: product.price,
+                        phone: phone,
+                        purpose: 'PRODUCT_PURCHASE',
+                        referenceId: productId,
+                        onSuccess: () => {
+                            window.location.href = `product.html?id=${productId}`;
+                        },
+                        onFail: () => {
+                            // User can try again
+                        }
+                    });
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('checkout-content').innerHTML = '<p class="text-red-500">Failed to load checkout details.</p>';
+            }
+        }
+
+        setTimeout(initCheckout, 1000);
+    </script>
+</body>
+</html>
