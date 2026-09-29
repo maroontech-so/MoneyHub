@@ -10,9 +10,9 @@ const firebaseConfig = {
   measurementId: "G-LVEZD927PE"
 };
 
-// EARNWAVE Application Configuration
+// PesaWave Application Configuration
 const APP_CONFIG = {
-  name: 'EARNWAVE',
+  name: 'PesaWave',
   currency: 'KES',
   currencySymbol: 'KES',
   version: '1.0.0',

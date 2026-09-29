@@ -396,7 +396,10 @@ export class TaskEngine {
         submitBtn.textContent = `Verify & Claim KES ${this.currentTask.reward.toFixed(2)}`;
       }
       if (errorEl) {
-        errorEl.textContent = err.message || 'Server validation failed. Please check your submission.';
+        errorEl.innerHTML = err.message || 'Server validation failed. Please check your submission.';
+        if (err.message && err.message.includes('activation')) {
+          errorEl.innerHTML += `<br><a href="/activation.html" style="color:var(--accent-green); font-weight:600; text-decoration:underline; display:inline-block; margin-top:0.4rem;">Click here to pay KES 5.00 via PayHero & Activate Account</a>`;
+        }
         errorEl.style.display = 'block';
       }
     }

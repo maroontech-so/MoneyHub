@@ -32,6 +32,38 @@
       "validationNotes": "Comparative evaluation and reasoning verified.",
       "submittedAt": "2026-09-29T20:25:21.956Z",
       "reviewedAt": "2026-09-29T20:25:21.956Z"
+    },
+    {
+      "id": "sub_mun88g5r_e5a766",
+      "userId": "user_fresh_test_01",
+      "taskId": "task_ai_1",
+      "taskType": "ai_evaluation",
+      "taskTitle": "Evaluation Task",
+      "rewardKes": 100,
+      "payload": {
+        "preferredModel": "Model A",
+        "reasoning": "Model A produced a significantly clearer, more structured and accurate Swahili translation."
+      },
+      "status": "APPROVED",
+      "validationNotes": "Comparative evaluation and reasoning verified.",
+      "submittedAt": "2026-09-29T22:07:13.359Z",
+      "reviewedAt": "2026-09-29T22:07:13.359Z"
+    },
+    {
+      "id": "sub_mun88l3l_c031e8",
+      "userId": "user_unactivated_99",
+      "taskId": "task_ai_1",
+      "taskType": "ai_evaluation",
+      "taskTitle": "Evaluation Task",
+      "rewardKes": 100,
+      "payload": {
+        "preferredModel": "Model A",
+        "reasoning": "Test reasoning description for evaluation."
+      },
+      "status": "APPROVED",
+      "validationNotes": "Comparative evaluation and reasoning verified.",
+      "submittedAt": "2026-09-29T22:07:19.761Z",
+      "reviewedAt": "2026-09-29T22:07:19.761Z"
     }
   ]
 }

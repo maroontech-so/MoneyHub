@@ -21,41 +21,7 @@ export const TRANSACTION_TYPES = {
   ADMIN_ADJUSTMENT: 'ADMIN_ADJUSTMENT'
 };
 
-const INITIAL_LEDGER_ENTRIES = [
-  {
-    id: 'tx_seed_001',
-    userId: 'usr_default',
-    type: 'BONUS',
-    amount: 250.00,
-    direction: 'CREDIT',
-    status: 'COMPLETED',
-    description: 'Welcome Sign-up Bonus & Identity Verification',
-    referenceId: 'onboarding_welcome',
-    timestamp: new Date(Date.now() - 86400000 * 3).toISOString()
-  },
-  {
-    id: 'tx_seed_002',
-    userId: 'usr_default',
-    type: 'TASK_REWARD',
-    amount: 140.00,
-    direction: 'CREDIT',
-    status: 'COMPLETED',
-    description: 'Completed Task: Mobile Money Usage in Rural SMEs',
-    referenceId: 'task_survey_1',
-    timestamp: new Date(Date.now() - 86400000 * 2).toISOString()
-  },
-  {
-    id: 'tx_seed_003',
-    userId: 'usr_default',
-    type: 'AI_TRAINING_REWARD',
-    amount: 220.00,
-    direction: 'CREDIT',
-    status: 'COMPLETED',
-    description: 'Completed Task: English-Swahili Dialogue Evaluation',
-    referenceId: 'task_ai_1',
-    timestamp: new Date(Date.now() - 86400000 * 1).toISOString()
-  }
-];
+const INITIAL_LEDGER_ENTRIES = [];
 
 class LedgerService {
   constructor() {

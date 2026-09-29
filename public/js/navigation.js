@@ -49,7 +49,7 @@ class NavigationManager {
     let sidebarHtml = `
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header d-flex justify-content-between align-items-center">
-          <div style="font-weight: 800; color: var(--accent-green); font-size: 1.25rem;">EARNWAVE</div>
+          <div style="font-weight: 800; color: var(--accent-green); font-size: 1.25rem;">PesaWave</div>
           <button id="closeSidebar" class="btn btn-ghost d-md-none" style="padding: 0.25rem; display:inline-flex; align-items:center;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -121,7 +121,7 @@ class NavigationManager {
         <button id="openSidebar" class="btn btn-ghost" style="padding: 0.5rem; display:inline-flex; align-items:center;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div style="font-weight: 800; color: var(--accent-green); font-size: 1.25rem;">EARNWAVE</div>
+        <div style="font-weight: 800; color: var(--accent-green); font-size: 1.25rem;">PesaWave</div>
         <div class="notification-bell" style="display:inline-flex; align-items:center; position:relative;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           <span class="notification-badge">3</span>

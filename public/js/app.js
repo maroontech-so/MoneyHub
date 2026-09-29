@@ -11,6 +11,7 @@ import { KNOWLEDGE_BASE } from './data/knowledge-base.js';
 import { TaskEngine } from './components/task-engine.js';
 import { ICONS } from './utils/icons.js';
 import { themeManager } from './utils/theme.js';
+import { setupAuthListener, logoutUser, checkUserActivation } from './auth.js';
 
 class EarnWaveApp {
   constructor() {
@@ -43,6 +44,37 @@ class EarnWaveApp {
     this.bindSupportEvents();
     this.bindAdminEvents();
     this.bindProfileEvents();
+
+    // Setup real Firebase Auth Guard
+    setupAuthListener(async (user) => {
+      if (!user) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      localStorage.setItem('earnwave_user_uid', user.uid);
+      localStorage.setItem('earnwave_user_email', user.email || '');
+
+      // Check if user has paid the KES 5 activation fee
+      const isActivated = await checkUserActivation(user.uid);
+      if (!isActivated) {
+        window.location.href = '/activation.html';
+        return;
+      }
+
+      store.updateUser({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0],
+        status: 'ACTIVE',
+        activated: true
+      });
+
+      // Synchronize with server ledger
+      await store.syncWithServer();
+      this.updateNavbarStats();
+      this.renderCurrentView();
+    });
 
     // Subscribe to state updates
     store.subscribe(() => {
@@ -1026,6 +1058,10 @@ class EarnWaveApp {
   // VIEW 10: PROFILE & SETTINGS
   // ==========================================
   bindProfileEvents() {
+    document.getElementById('btnLogoutProfileBtn')?.addEventListener('click', () => {
+      logoutUser();
+    });
+
     document.getElementById('profileForm')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const displayName = document.getElementById('profDisplayName').value.trim();

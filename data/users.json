@@ -1,0 +1,38 @@
+{
+  "users": {
+    "user_fresh_test_01": {
+      "uid": "user_fresh_test_01",
+      "email": "freshuser@test.com",
+      "username": "freshuser",
+      "phone": "0711223344",
+      "displayName": "freshuser",
+      "status": "ACTIVE",
+      "activated": true,
+      "role": "USER",
+      "activationFee": 5,
+      "createdAt": "2026-09-29T22:06:39.623Z",
+      "updatedAt": "2026-09-29T22:07:03.540Z",
+      "activationPaidAt": "2026-09-29T22:07:03.540Z",
+      "activationPayment": {
+        "reference": "DIRECT_LINK_PAYMENT",
+        "mpesaReceipt": "QWE123TEST",
+        "phone": "0711223344",
+        "amount": 5,
+        "via": "PAYHERO_DIRECT_LINK"
+      }
+    },
+    "user_unactivated_99": {
+      "uid": "user_unactivated_99",
+      "email": "unactive@test.com",
+      "username": "unactive",
+      "phone": "",
+      "displayName": "Earner",
+      "status": "PENDING_ACTIVATION",
+      "activated": false,
+      "role": "USER",
+      "activationFee": 5,
+      "createdAt": "2026-09-29T22:07:19.731Z",
+      "updatedAt": "2026-09-29T22:07:19.731Z"
+    }
+  }
+}

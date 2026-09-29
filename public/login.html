@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - EARNWAVE</title>
+  <title>Login - PesaWave</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .auth-container {
@@ -15,7 +15,12 @@
     }
     .auth-card {
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      box-shadow: var(--shadow-card);
     }
     .logo-container {
       text-align: center;
@@ -34,49 +39,52 @@
   <div class="auth-container">
     <div class="card auth-card">
       <div class="logo-container">
-        <div class="logo">EARNWAVE</div>
-        <p class="text-secondary mt-1">Welcome back</p>
+        <a href="/index.html" style="text-decoration:none; display:inline-flex; flex-direction:column; align-items:center; gap:0.5rem;">
+          <img src="/logo.png" alt="PesaWave Logo" style="height:68px; width:auto; max-width:200px; object-fit:contain; border-radius:12px; margin-bottom:0.25rem;">
+          <div class="logo">PesaWave</div>
+        </a>
+        <p class="text-secondary mt-1">Welcome back. Enter your account credentials.</p>
       </div>
       
       <form id="loginForm">
-        <div id="globalError" class="form-error text-center mb-4"></div>
+        <div id="globalError" class="form-error text-center mb-4" style="display:none; color:var(--danger); background:rgba(248,81,73,0.1); padding:0.75rem; border-radius:6px; font-size:0.88rem;"></div>
         
-        <div class="form-group">
-          <label class="form-label" for="identifier">Email or Username</label>
-          <input type="text" id="identifier" class="form-control" required placeholder="Enter email or username">
+        <div class="form-group mb-3">
+          <label class="form-label" for="identifier" style="display:block; margin-bottom:0.35rem; font-size:0.85rem; color:var(--text-secondary);">Email Address</label>
+          <input type="email" id="identifier" class="form-control" required placeholder="you@example.com" style="width:100%; padding:0.75rem; border-radius:6px; border:1px solid var(--border); background:var(--input-bg); color:var(--text-primary);">
         </div>
         
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input type="password" id="password" class="form-control" required placeholder="Enter password">
+        <div class="form-group mb-4">
+          <label class="form-label" for="password" style="display:block; margin-bottom:0.35rem; font-size:0.85rem; color:var(--text-secondary);">Password</label>
+          <input type="password" id="password" class="form-control" required placeholder="Enter password" style="width:100%; padding:0.75rem; border-radius:6px; border:1px solid var(--border); background:var(--input-bg); color:var(--text-primary);">
         </div>
         
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <label style="font-size: 0.875rem; color: var(--text-secondary);">
-            <input type="checkbox" id="rememberMe"> Remember me
-          </label>
-          <a href="#" id="forgotPassword" style="font-size: 0.875rem;">Forgot Password?</a>
-        </div>
-        
-        <button type="submit" class="btn btn-primary" style="width: 100%" id="loginBtn">
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding:0.85rem; font-size:1rem; font-weight:600; cursor:pointer;" id="loginBtn">
           <span class="btn-text">Log In</span>
-          <div class="spinner hidden" id="loginSpinner"></div>
+          <div class="spinner hidden" id="loginSpinner" style="display:none;">Logging in...</div>
         </button>
       </form>
       
-      <div class="text-center mt-4">
+      <div class="text-center mt-4" style="margin-top:1.5rem; text-align:center; font-size:0.9rem;">
         <span class="text-secondary">Don't have an account?</span>
-        <a href="/register.html">Sign Up</a>
+        <a href="/register.html" style="color:var(--accent-green); font-weight:600; text-decoration:none; margin-left:0.25rem;">Create Account</a>
       </div>
     </div>
   </div>
 
   <script type="module">
-    import { loginUser, setupAuthListener } from './js/auth.js';
+    import { loginUser, setupAuthListener, checkUserActivation } from './js/auth.js';
     
-    // Redirect if already logged in
-    setupAuthListener((user) => {
-      if (user) window.location.href = '/dashboard.html';
+    // Check if already authenticated
+    setupAuthListener(async (user) => {
+      if (user) {
+        const isActivated = await checkUserActivation(user.uid);
+        if (!isActivated) {
+          window.location.href = '/activation.html';
+        } else {
+          window.location.href = '/index.html';
+        }
+      }
     });
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -87,21 +95,29 @@
       const btnText = document.querySelector('.btn-text');
       const spinner = document.getElementById('loginSpinner');
       const errorDiv = document.getElementById('globalError');
+      const submitBtn = document.getElementById('loginBtn');
       
-      if (btnText) btnText.classList.add('hidden');
-      if (spinner) spinner.classList.remove('hidden');
+      if (btnText) btnText.style.display = 'none';
+      if (spinner) spinner.style.display = 'inline-block';
       if (errorDiv) errorDiv.style.display = 'none';
+      if (submitBtn) submitBtn.disabled = true;
       
       try {
-        await loginUser(identifier, password);
-        // Auth listener will handle redirect
+        const user = await loginUser(identifier, password);
+        const isActivated = await checkUserActivation(user.uid);
+        if (!isActivated) {
+          window.location.href = '/activation.html';
+        } else {
+          window.location.href = '/index.html';
+        }
       } catch (err) {
         if (errorDiv) {
-          errorDiv.textContent = err.message || 'Login failed. Please check your credentials.';
+          errorDiv.textContent = err.message || 'Login failed. Please check your email and password.';
           errorDiv.style.display = 'block';
         }
-        if (btnText) btnText.classList.remove('hidden');
-        if (spinner) spinner.classList.add('hidden');
+        if (btnText) btnText.style.display = 'inline-block';
+        if (spinner) spinner.style.display = 'none';
+        if (submitBtn) submitBtn.disabled = false;
       }
     });
   </script>

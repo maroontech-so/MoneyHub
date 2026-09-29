@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>EARNWAVE - Kenya Digital Earning Marketplace</title>
-  <meta name="description" content="EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
-  <meta property="og:title" content="EARNWAVE">
-  <meta property="og:description" content="EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
+  <title>PesaWave - Kenya Digital Earning Marketplace</title>
+  <meta name="description" content="PesaWave rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
+  <meta property="og:title" content="PesaWave">
+  <meta property="og:description" content="PesaWave rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/marketplace.css">
   <link rel="manifest" href="/manifest.json">
@@ -31,8 +31,8 @@
     <!-- Desktop Sidebar (>= 1024px) -->
     <aside class="desktop-sidebar">
       <div class="brand-logo" style="margin-bottom: 2rem;">
-        <img src="/images/logo.png" alt="EARNWAVE Logo" class="brand-logo-img" style="height:32px; width:auto; max-width:36px; object-fit:contain; border-radius:6px; flex-shrink:0;" onerror="this.src='https://i.ibb.co/nN9yMZnF/gpt-image-2-The-Money-Hub-logo-stands-out-as-a-striking-symbol-of-financial-prowess-and-innov-0-remo.png'">
-        EARNWAVE
+        <img src="/images/logo.png" alt="PesaWave Logo" class="brand-logo-img" style="height:32px; width:auto; max-width:36px; object-fit:contain; border-radius:6px; flex-shrink:0;" onerror="this.src='https://i.ibb.co/nN9yMZnF/gpt-image-2-The-Money-Hub-logo-stands-out-as-a-striking-symbol-of-financial-prowess-and-innov-0-remo.png'">
+        PesaWave
       </div>
 
       <nav class="sidebar-nav">
@@ -68,10 +68,6 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <span>Support Desk</span>
         </button>
-        <button class="sidebar-nav-btn" data-view="admin">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-          <span>Staff Portal</span>
-        </button>
         <button class="sidebar-nav-btn" data-view="profile">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span>Account & Theme</span>
@@ -79,7 +75,7 @@
       </nav>
 
       <div style="padding-top:1.25rem; border-top:1px solid var(--border); font-size:0.75rem; color:var(--text-muted);">
-        EARNWAVE Platform 2026<br>
+        PesaWave Platform 2026<br>
         Safaricom Daraja B2C
       </div>
     </aside>
@@ -89,8 +85,8 @@
       <!-- Top Navbar -->
       <header class="top-navbar">
         <div class="brand-logo" id="brandLogoBtn" style="cursor:pointer;">
-          <img src="/images/logo.png" alt="EARNWAVE Logo" class="brand-logo-img" style="height:28px; width:auto; max-width:32px; object-fit:contain; border-radius:5px; flex-shrink:0;" onerror="this.src='https://i.ibb.co/nN9yMZnF/gpt-image-2-The-Money-Hub-logo-stands-out-as-a-striking-symbol-of-financial-prowess-and-innov-0-remo.png'">
-          EARNWAVE
+          <img src="/images/logo.png" alt="PesaWave Logo" class="brand-logo-img" style="height:28px; width:auto; max-width:32px; object-fit:contain; border-radius:5px; flex-shrink:0;" onerror="this.src='https://i.ibb.co/nN9yMZnF/gpt-image-2-The-Money-Hub-logo-stands-out-as-a-striking-symbol-of-financial-prowess-and-innov-0-remo.png'">
+          PesaWave
         </div>
 
         <div class="user-quick-stats">
@@ -730,7 +726,10 @@
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Bio & Skill Specializations</label>
                 <textarea id="profBio" rows="3" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;"></textarea>
               </div>
-              <button type="submit" class="btn btn-primary">Save Profile Details</button>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;">
+                <button type="submit" class="btn btn-primary">Save Profile Details</button>
+                <button type="button" class="btn btn-outline" id="btnLogoutProfileBtn" style="border-color:var(--danger); color:var(--danger); cursor:pointer;">Log Out</button>
+              </div>
             </form>
           </div>
         </section>

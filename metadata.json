@@ -1,6 +1,6 @@
 {
-  "name": "EARNWAVE",
-  "description": "EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.",
+  "name": "PesaWave",
+  "description": "PesaWave rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.",
   "permissions": [],
   "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

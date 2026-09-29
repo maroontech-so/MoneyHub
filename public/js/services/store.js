@@ -20,35 +20,39 @@ class StateStore {
   init() {
     // 1. Initialize User if not exists
     if (!this.get('user')) {
+      const savedUid = (typeof localStorage !== 'undefined') ? localStorage.getItem('earnwave_user_uid') : null;
+      const savedEmail = (typeof localStorage !== 'undefined') ? localStorage.getItem('earnwave_user_email') : null;
+      const savedPhone = (typeof localStorage !== 'undefined') ? localStorage.getItem('earnwave_user_phone') : null;
+      
       const defaultUser = {
-        uid: 'user_' + Math.random().toString(36).substring(2, 9),
-        username: 'EarnWavePioneer',
-        email: 'pioneer@earnwave.co.ke',
-        phone: '254712345678',
-        displayName: 'Pioneer Member',
+        uid: savedUid || '',
+        username: savedEmail ? savedEmail.split('@')[0] : 'Earner',
+        email: savedEmail || '',
+        phone: savedPhone || '',
+        displayName: savedEmail ? savedEmail.split('@')[0] : 'Earner',
         country: 'Kenya',
         county: 'Nairobi',
-        city: 'Westlands',
-        bio: 'Digital task specialist and fintech market researcher.',
-        status: 'ACTIVE',
+        city: 'Nairobi',
+        bio: 'Digital task earner.',
+        status: (typeof localStorage !== 'undefined' && localStorage.getItem('earnwave_user_status')) || 'PENDING_ACTIVATION',
         role: 'USER',
-        level: 2,
-        xp: 650,
-        streakDays: 3,
+        level: 1,
+        xp: 0,
+        streakDays: 1,
         lastStreakDate: new Date().toISOString().split('T')[0],
         referralCode: 'WAVE' + Math.floor(1000 + Math.random() * 9000),
         referredBy: null,
-        joinedAt: new Date(Date.now() - 5 * 86400000).toISOString()
+        joinedAt: new Date().toISOString()
       };
       this.set('user', defaultUser);
     }
 
-    // 2. Initialize Default Fallback Wallet
+    // 2. Initialize Default Zero Wallet - fresh accounts start at 0.00
     if (!this.get('wallet')) {
       this.set('wallet', {
-        availableBalance: 610.00,
+        availableBalance: 0.00,
         pendingBalance: 0.00,
-        totalEarned: 610.00,
+        totalEarned: 0.00,
         totalWithdrawn: 0.00,
         currency: 'KES'
       });
@@ -92,10 +96,18 @@ class StateStore {
     }
   }
 
+  getUserId() {
+    const user = this.getUser();
+    return user?.uid || (typeof localStorage !== 'undefined' ? localStorage.getItem('earnwave_user_uid') : '') || '';
+  }
+
   // --- Real Server Synchronization ---
   async syncWithServer() {
     try {
-      const res = await fetch('/api/wallet/ledger');
+      const uid = this.getUserId();
+      const res = await fetch('/api/wallet/ledger', {
+        headers: uid ? { 'x-user-id': uid } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -108,12 +120,16 @@ class StateStore {
         }
       }
 
-      // Sync Admin Queue
-      const adminRes = await fetch('/api/admin/submissions');
-      if (adminRes.ok) {
-        const adminData = await adminRes.json();
-        if (adminData.success && adminData.submissions) {
-          this.set('admin_submissions', adminData.submissions);
+      // Check User Status & Activation
+      if (uid) {
+        const statusRes = await fetch('/api/auth/user-status', {
+          headers: { 'x-user-id': uid }
+        });
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.user) {
+            this.updateUser(statusData.user);
+          }
         }
       }
     } catch (e) {
@@ -172,9 +188,13 @@ class StateStore {
 
   // --- Server-Authoritative M-Pesa Withdrawal ---
   async requestWithdrawal(phone, amount) {
+    const uid = this.getUserId();
     const res = await fetch('/api/wallet/withdraw', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': uid
+      },
       body: JSON.stringify({ phone, amount: Number(amount) })
     });
 
@@ -190,9 +210,13 @@ class StateStore {
 
   // --- Task Operations & Server Submissions ---
   async submitTaskWork(taskId, taskType, taskTitle, rewardKes, payload) {
+    const uid = this.getUserId();
     const res = await fetch(`/api/tasks/${taskId}/submit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': uid
+      },
       body: JSON.stringify({ taskType, taskTitle, rewardKes, payload })
     });
 

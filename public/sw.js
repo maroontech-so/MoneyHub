@@ -104,7 +104,7 @@ self.addEventListener('sync', event => {
 self.addEventListener('push', event => {
     const data = event.data ? event.data.json() : {};
     
-    const title = data.title || 'EARNWAVE Notification';
+    const title = data.title || 'PesaWave Notification';
     const options = {
         body: data.body || 'You have a new message.',
         icon: '/assets/icons/icon-192.png',

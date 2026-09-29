@@ -1,0 +1,39 @@
+{
+  "payments": [
+    {
+      "id": "pay_wh_mun884b4",
+      "externalReference": "TEST_REF_001",
+      "status": "COMPLETED",
+      "amount": 5,
+      "phone": "0711223344",
+      "mpesaReceipt": "QWE123TEST",
+      "callbackData": {
+        "status": "Success",
+        "amount": 5,
+        "phone": "0711223344",
+        "external_reference": "TEST_REF_001",
+        "result_code": 0,
+        "MpesaReceiptNumber": "QWE123TEST"
+      },
+      "createdAt": "2026-09-29T22:06:58.000Z",
+      "updatedAt": "2026-09-29T22:06:58.000Z"
+    },
+    {
+      "id": "pay_wh_mun884bj",
+      "externalReference": "TEST_REF_002",
+      "status": "FAILED",
+      "amount": 5,
+      "phone": "",
+      "mpesaReceipt": null,
+      "callbackData": {
+        "status": "Failed",
+        "amount": 5,
+        "external_reference": "TEST_REF_002",
+        "result_code": 1032,
+        "result_desc": "Cancelled by user"
+      },
+      "createdAt": "2026-09-29T22:06:58.015Z",
+      "updatedAt": "2026-09-29T22:06:58.015Z"
+    }
+  ]
+}

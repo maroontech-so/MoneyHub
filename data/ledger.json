@@ -1,127 +1,53 @@
 {
   "transactions": [
     {
-      "id": "tx_seed_001",
-      "userId": "usr_default",
-      "type": "BONUS",
-      "amount": 250,
+      "id": "tx_mun888l1_2ca7e0",
+      "userId": "user_fresh_test_01",
+      "type": "ADMIN_ADJUSTMENT",
+      "amount": 5,
       "direction": "CREDIT",
       "status": "COMPLETED",
-      "description": "Welcome Sign-up Bonus & Identity Verification",
-      "referenceId": "onboarding_welcome",
-      "timestamp": "2026-09-26T18:39:34.027Z"
-    },
-    {
-      "id": "tx_seed_002",
-      "userId": "usr_default",
-      "type": "TASK_REWARD",
-      "amount": 140,
-      "direction": "CREDIT",
-      "status": "COMPLETED",
-      "description": "Completed Task: Mobile Money Usage in Rural SMEs",
-      "referenceId": "task_survey_1",
-      "timestamp": "2026-09-27T18:39:34.028Z"
-    },
-    {
-      "id": "tx_seed_003",
-      "userId": "usr_default",
-      "type": "AI_TRAINING_REWARD",
-      "amount": 220,
-      "direction": "CREDIT",
-      "status": "COMPLETED",
-      "description": "Completed Task: English-Swahili Dialogue Evaluation",
-      "referenceId": "task_ai_1",
-      "timestamp": "2026-09-28T18:39:34.028Z"
-    },
-    {
-      "id": "tx_mun0yi38_8e4f74",
-      "userId": "usr_default",
-      "type": "WRITING_REWARD",
-      "amount": 180,
-      "direction": "CREDIT",
-      "status": "COMPLETED",
-      "description": "Manual Review Approved: Fintech in Kenya Analysis",
-      "referenceId": "sub_mun0yi2t_709b43",
+      "description": "Account Activated (PayHero Verified - KES 5.00)",
+      "referenceId": "DIRECT_LINK_PAYMENT",
       "metadata": {
-        "submissionId": "sub_mun0yi2t_709b43",
-        "reviewerNotes": "Verified source depth and quality."
+        "reference": "DIRECT_LINK_PAYMENT",
+        "mpesaReceipt": "QWE123TEST",
+        "phone": "0711223344",
+        "amount": 5,
+        "via": "PAYHERO_DIRECT_LINK",
+        "feeRefundedAsCredit": true
       },
-      "timestamp": "2026-09-29T18:43:31.988Z"
+      "timestamp": "2026-09-29T22:07:03.541Z"
     },
     {
-      "id": "tx_mun0yi3g_d66a62",
-      "userId": "usr_default",
-      "type": "WITHDRAWAL",
-      "amount": 200,
-      "direction": "DEBIT",
-      "status": "COMPLETED",
-      "description": "M-Pesa Payout to 254712345678",
-      "referenceId": "MPESA_B2C_MUN0YI3G",
-      "metadata": {
-        "phone": "254712345678",
-        "payoutChannel": "Safaricom Daraja B2C",
-        "fee": 15
-      },
-      "timestamp": "2026-09-29T18:43:31.996Z"
-    },
-    {
-      "id": "tx_mun0yi3g_927ae5",
-      "userId": "usr_default",
-      "type": "PENALTY",
-      "amount": 15,
-      "direction": "DEBIT",
-      "status": "COMPLETED",
-      "description": "M-Pesa Network B2C Disbursement Fee",
-      "referenceId": "tx_mun0yi3g_d66a62",
-      "metadata": {
-        "feeFor": "tx_mun0yi3g_d66a62"
-      },
-      "timestamp": "2026-09-29T18:43:31.996Z"
-    },
-    {
-      "id": "tx_mun4le50_d12ca7",
-      "userId": "usr_default",
-      "type": "WITHDRAWAL",
-      "amount": 200,
-      "direction": "DEBIT",
-      "status": "COMPLETED",
-      "description": "M-Pesa Payout to 254712345678",
-      "referenceId": "MPESA_B2C_MUN4LE4Z",
-      "metadata": {
-        "phone": "254712345678",
-        "payoutChannel": "Safaricom Daraja B2C",
-        "fee": 15
-      },
-      "timestamp": "2026-09-29T20:25:18.804Z"
-    },
-    {
-      "id": "tx_mun4le51_667bdd",
-      "userId": "usr_default",
-      "type": "PENALTY",
-      "amount": 15,
-      "direction": "DEBIT",
-      "status": "COMPLETED",
-      "description": "M-Pesa Network B2C Disbursement Fee",
-      "referenceId": "tx_mun4le50_d12ca7",
-      "metadata": {
-        "feeFor": "tx_mun4le50_d12ca7"
-      },
-      "timestamp": "2026-09-29T20:25:18.805Z"
-    },
-    {
-      "id": "tx_mun4lgkl_cc1986",
-      "userId": "usr_default",
+      "id": "tx_mun88g5s_69db33",
+      "userId": "user_fresh_test_01",
       "type": "AI_TRAINING_REWARD",
       "amount": 100,
       "direction": "CREDIT",
       "status": "COMPLETED",
       "description": "Task Verified: Evaluation Task",
-      "referenceId": "sub_mun4lgkk_dda675",
+      "referenceId": "sub_mun88g5r_e5a766",
       "metadata": {
         "taskId": "task_ai_1",
-        "submissionId": "sub_mun4lgkk_dda675"
+        "submissionId": "sub_mun88g5r_e5a766"
       },
-      "timestamp": "2026-09-29T20:25:21.957Z"
+      "timestamp": "2026-09-29T22:07:13.360Z"
+    },
+    {
+      "id": "tx_mun88l3l_b7dee0",
+      "userId": "user_unactivated_99",
+      "type": "AI_TRAINING_REWARD",
+      "amount": 100,
+      "direction": "CREDIT",
+      "status": "COMPLETED",
+      "description": "Task Verified: Evaluation Task",
+      "referenceId": "sub_mun88l3l_c031e8",
+      "metadata": {
+        "taskId": "task_ai_1",
+        "submissionId": "sub_mun88l3l_c031e8"
+      },
+      "timestamp": "2026-09-29T22:07:19.761Z"
     }
   ]
 }

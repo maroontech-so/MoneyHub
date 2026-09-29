@@ -3,131 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activate Account - EARNWAVE</title>
+    <title>Account Activation - PesaWave</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/components.css">
     <style>
-        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background-color: #0d1117; }
-        .activation-card { background: #1f2937; padding: 40px; border-radius: 12px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .icon { font-size: 3rem; margin-bottom: 20px; }
-        h1 { margin-bottom: 10px; color: #fff; }
-        .status { color: #f59e0b; font-weight: bold; margin-bottom: 20px; background: #f59e0b22; padding: 10px; border-radius: 8px; }
-        .benefits { text-align: left; background: #111827; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .benefits ul { list-style: none; padding: 0; margin: 0; }
-        .benefits li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; color: #d1d5db; }
-        .benefits li::before { content: "✓"; color: #00d4aa; font-weight: bold; }
-        .fee { font-size: 1.5rem; font-weight: bold; color: #00d4aa; margin-bottom: 20px; }
-        .btn-activate { width: 100%; padding: 15px; font-size: 1.1rem; margin-bottom: 15px; }
-        .terms-note { font-size: 0.8rem; color: #6b7280; }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-dark, #0d1117);
+            color: var(--text-primary, #fff);
+            padding: 1rem;
+        }
+        .activation-card {
+            background: var(--bg-card, #161b22);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid var(--border, #30363d);
+            position: relative;
+        }
+        .icon-circle {
+            width: 64px;
+            height: 64px;
+            background: rgba(0, 212, 170, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            color: var(--accent-green, #00ff88);
+        }
+        h1 { margin-bottom: 0.5rem; font-size: 1.6rem; color: #fff; }
+        .subtitle { color: #8b949e; font-size: 0.9rem; margin-bottom: 1.5rem; }
         
-        #loadingOverlay { position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(17,24,39,0.9); display: none; align-items: center; justify-content: center; flex-direction: column; border-radius: 12px; z-index: 10; }
-        .spinner { border: 4px solid #374151; border-top: 4px solid #00d4aa; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fee-badge {
+            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,212,170,0.15));
+            border: 1px solid rgba(0,255,136,0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .fee-amount {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-green, #00ff88);
+            letter-spacing: -0.02em;
+        }
+        .fee-label {
+            font-size: 0.85rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        .benefits {
+            text-align: left;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .benefits ul { list-style: none; padding: 0; margin: 0; }
+        .benefits li { margin-bottom: 0.6rem; display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #c9d1d9; }
+        .benefits li::before { content: "✓"; color: #00ff88; font-weight: bold; }
+
+        .btn-payhero-direct {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00d4aa, #00b386);
+            color: #0d1117;
+            font-weight: 700;
+            font-size: 1.05rem;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .btn-payhero-direct:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .stk-section {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 1.25rem;
+            margin-top: 1.25rem;
+            text-align: left;
+        }
+        .stk-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #c9d1d9;
+            margin-bottom: 0.5rem;
+        }
+        .stk-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .stk-input {
+            flex: 1;
+            padding: 0.75rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+        .btn-stk {
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-stk:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .verify-box {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.85rem;
+        }
+
+        .alert-box {
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .alert-info { background: rgba(0, 212, 170, 0.1); color: #00d4aa; border: 1px solid rgba(0, 212, 170, 0.3); }
+        .alert-error { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
+        .alert-success { background: rgba(48, 209, 88, 0.1); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.3); }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 0.4rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="activation-card">
-        <div class="icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <div style="margin-bottom: 1.25rem;">
+            <img src="/logo.png" alt="PesaWave Logo" style="height:52px; width:auto; max-width:180px; object-fit:contain; border-radius:10px;">
         </div>
-        <h1>Unlock Your Account</h1>
-        <div class="status">Your account requires activation</div>
-        
-        <div class="benefits" id="benefitsList">
+
+        <div class="icon-circle">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+
+        <h1>Activate Your Account</h1>
+        <p class="subtitle" id="userGreeting">Complete one-time activation to unlock all earning tasks and payouts.</p>
+
+        <div id="statusAlert" class="alert-box"></div>
+
+        <div class="fee-badge">
+            <div class="fee-amount">KES 5.00</div>
+            <div class="fee-label">One-Time Activation Fee</div>
+        </div>
+
+        <div class="benefits">
             <ul>
-                <li>Access to all earning tasks</li>
-                <li>Chat with AI assistants for rewards</li>
-                <li>Join the affiliate program</li>
-                <li>Withdraw earnings instantly via M-Pesa</li>
+                <li>Instant access to Microtasks, Surveys & Hotel Audits</li>
+                <li>AI Training evaluations & Content writing jobs</li>
+                <li>Instant Safaricom M-Pesa automated payouts</li>
+                <li>Starts from zero balance (100% genuine earnings)</li>
             </ul>
         </div>
 
-        <div class="fee">Activation Fee: KES <span id="activationAmount">...</span></div>
+        <!-- Primary Action: Direct PayHero Link -->
+        <a href="https://short.payhero.co.ke/s/Y8yixT9fZWwk7w2uUoiqHQ" target="_blank" class="btn-payhero-direct" id="payheroDirectLinkBtn">
+            Pay KES 5.00 via PayHero
+        </a>
+        <div style="font-size:0.78rem; color:#8b949e; margin-bottom:1.25rem;">
+            Click above to open PayHero secure M-Pesa checkout.
+        </div>
 
-        <button class="btn-primary btn-activate" id="btnActivate">Activate with M-Pesa</button>
-        <div class="terms-note">Note: Activation fee is non-refundable. See our terms of service.</div>
+        <!-- Alternative: STK Push -->
+        <div class="stk-section">
+            <div class="stk-title">Or trigger direct M-Pesa prompt on phone:</div>
+            <div class="stk-input-group">
+                <input type="tel" id="stkPhoneInput" class="stk-input" placeholder="07XXXXXXXX" value="">
+                <button type="button" class="btn-stk" id="btnTriggerStk">Send Prompt</button>
+            </div>
+            <small style="font-size:0.75rem; color:#8b949e; display:block;">PayHero will send an STK prompt of KES 5 to your phone.</small>
+        </div>
 
-        <div id="loadingOverlay">
-            <div class="spinner"></div>
-            <div style="color: #fff; font-weight: bold;" id="loadingText">Initiating payment...</div>
-            <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 10px;">Please check your phone for the M-Pesa prompt.</div>
+        <!-- Verification / Code Input -->
+        <div class="verify-box">
+            <div style="margin-bottom:0.6rem; color:#8b949e;">Already completed payment on PayHero?</div>
+            <div style="display:flex; gap:0.5rem; justify-content:center;">
+                <input type="text" id="receiptInput" class="stk-input" placeholder="M-Pesa code (optional)" style="max-width:180px; text-transform:uppercase;">
+                <button type="button" class="btn-stk" id="btnVerifyPayment" style="background:#00d4aa; color:#000; border:none;">
+                    Verify & Unlock
+                </button>
+            </div>
+        </div>
+
+        <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#8b949e;">
+            <span id="checkingIndicator"><span class="loading-spinner"></span> Checking status...</span>
+            <button type="button" id="btnLogoutBtn" style="background:none; border:none; color:#f85149; cursor:pointer; font-size:0.8rem; text-decoration:underline;">
+                Log Out
+            </button>
         </div>
     </div>
 
     <script type="module">
-        import { db, auth, functions } from '/js/firebase-init.js';
-        import { doc, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-        import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { auth } from '/js/firebase-init.js';
+        import { setupAuthListener, logoutUser } from '/js/auth.js';
 
-        async function init() {
-            // Load system settings for activation fee
+        let currentUid = localStorage.getItem('earnwave_user_uid') || '';
+        let pollTimer = null;
+
+        function showAlert(msg, type = 'info') {
+            const el = document.getElementById('statusAlert');
+            if (!el) return;
+            el.className = `alert-box alert-${type}`;
+            el.innerHTML = msg;
+            el.style.display = 'block';
+        }
+
+        async function checkActivationStatus() {
+            if (!currentUid) return;
             try {
-                const settingsDoc = await getDoc(doc(db, 'systemSettings', 'general'));
-                const amtEl = document.getElementById('activationAmount');
-                if (settingsDoc.exists()) {
-                    const data = settingsDoc.data();
-                    if (data.activation && data.activation.amount) {
-                        if (amtEl) amtEl.textContent = data.activation.amount;
-                    } else {
-                        if (amtEl) amtEl.textContent = "500"; // default fallback
+                const res = await fetch('/api/auth/user-status', {
+                    headers: { 'x-user-id': currentUid }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.activated || data.status === 'ACTIVE') {
+                        clearInterval(pollTimer);
+                        showAlert('🎉 Account Activated Successfully! Redirecting to marketplace...', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/index.html';
+                        }, 1200);
                     }
-                } else {
-                    if (amtEl) amtEl.textContent = "500";
                 }
             } catch(e) {
-                console.error("Error loading settings", e);
-                const amtEl = document.getElementById('activationAmount');
-                if (amtEl) amtEl.textContent = "500";
+                console.warn('Status poll error:', e.message);
             }
         }
 
-        document.getElementById('btnActivate')?.addEventListener('click', async () => {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.style.display = 'flex';
-            
-            try {
-                // Call Cloud Function to initiate STK Push
-                // Assuming admin-processPayment handles generic payments or there is a specific one
-                // We'll simulate the call logic
-                const initiateActivation = httpsCallable(functions, 'payments-initiateActivation');
-                await initiateActivation();
+        // Initialize listener
+        setupAuthListener((user) => {
+            if (user) {
+                currentUid = user.uid;
+                localStorage.setItem('earnwave_user_uid', user.uid);
                 
-                const loadEl = document.getElementById('loadingText');
-                if (loadEl) loadEl.textContent = "Waiting for payment confirmation...";
-                
-                // Listen to user document for status change
-                const unsub = onSnapshot(doc(db, 'users', auth.currentUser.uid), (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().status === 'ACTIVE') {
-                        unsub();
-                        window.location.href = '/dashboard.html';
-                    }
-                });
+                const greeting = document.getElementById('userGreeting');
+                if (greeting) {
+                    greeting.textContent = `Welcome ${user.displayName || user.email}! Pay the KES 5 activation fee to activate.`;
+                }
 
-                // Timeout after 60 seconds
-                setTimeout(() => {
-                    unsub();
-                    overlay.style.display = 'none';
-                    alert("Payment timeout. If you completed the payment, your account will be activated shortly.");
-                }, 60000);
+                const savedPhone = localStorage.getItem('earnwave_user_phone');
+                if (savedPhone) {
+                    const phoneEl = document.getElementById('stkPhoneInput');
+                    if (phoneEl && !phoneEl.value) phoneEl.value = savedPhone;
+                }
 
-            } catch (err) {
-                overlay.style.display = 'none';
-                alert("Failed to initiate payment: " + err.message);
+                // Check immediate status
+                checkActivationStatus();
+                // Start polling every 3.5s
+                if (pollTimer) clearInterval(pollTimer);
+                pollTimer = setInterval(checkActivationStatus, 3500);
+            } else {
+                // If not logged in, redirect to login
+                window.location.href = '/login.html';
             }
         });
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                init();
-                // Check if already active
-                getDoc(doc(db, 'users', user.uid)).then(docSnap => {
-                    if (docSnap.exists() && docSnap.data().status === 'ACTIVE') {
-                        window.location.href = '/dashboard.html';
-                    }
-                });
-            } else {
-                window.location.href = '/login.html';
+        // Trigger STK Push
+        document.getElementById('btnTriggerStk')?.addEventListener('click', async () => {
+            const phone = document.getElementById('stkPhoneInput')?.value.trim();
+            if (!phone) {
+                showAlert('Please enter your M-Pesa phone number.', 'error');
+                return;
             }
+
+            const btn = document.getElementById('btnTriggerStk');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            showAlert('Sending KES 5 STK Prompt via PayHero...', 'info');
+
+            try {
+                const res = await fetch('/api/payhero/stk-push', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': currentUid
+                    },
+                    body: JSON.stringify({
+                        phone,
+                        amount: 5,
+                        userId: currentUid
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('📲 Payment prompt sent! Check your phone and enter your M-Pesa PIN. Waiting for confirmation...', 'success');
+                } else {
+                    showAlert(data.error || 'Could not send STK prompt. Please use the PayHero direct payment link above.', 'error');
+                }
+            } catch (err) {
+                showAlert('Network error sending STK prompt. Please click the direct PayHero link above.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Prompt';
+            }
+        });
+
+        // Manual Verify
+        document.getElementById('btnVerifyPayment')?.addEventListener('click', async () => {
+            const receipt = document.getElementById('receiptInput')?.value.trim();
+            const phone = document.getElementById('stkPhoneInput')?.value.trim();
+
+            const btn = document.getElementById('btnVerifyPayment');
+            btn.disabled = true;
+            btn.textContent = 'Verifying...';
+
+            try {
+                const res = await fetch('/api/payhero/confirm-activation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': currentUid
+                    },
+                    body: JSON.stringify({
+                        userId: currentUid,
+                        mpesaReceipt: receipt || null,
+                        phone: phone || null
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('🎉 Account Activated! Redirecting to dashboard...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1000);
+                } else {
+                    showAlert(data.error || 'Verification failed. Please complete the KES 5 payment.', 'error');
+                }
+            } catch (err) {
+                showAlert('Verification request failed. Please check your connection.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verify & Unlock';
+            }
+        });
+
+        document.getElementById('btnLogoutBtn')?.addEventListener('click', () => {
+            if (pollTimer) clearInterval(pollTimer);
+            logoutUser();
         });
     </script>
 </body>

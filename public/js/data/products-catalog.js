@@ -7,7 +7,7 @@ export const DIGITAL_PRODUCTS = [
     title: 'Kenya Freelance Blueprint 2026',
     category: 'Guides',
     price: 450,
-    author: 'EarnWave Academy',
+    author: 'PesaWave Academy',
     rating: 4.9,
     reviewsCount: 128,
     badge: 'BESTSELLER',

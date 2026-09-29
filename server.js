@@ -8,6 +8,8 @@ import { ledgerService } from './server/ledger.js';
 import { taskService } from './server/tasks.js';
 import { forexEngine } from './server/forex.js';
 import { chatService } from './server/chat.js';
+import { payHeroService, PAYHERO_CONFIG } from './server/payhero.js';
+import { usersService } from './server/users.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,10 +35,101 @@ app.use('/api', (req, res, next) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ONLINE',
-    platform: 'EARNWAVE Production Task Marketplace',
+    platform: 'PesaWave Production Task Marketplace',
     darajaStatus: 'CONNECTED',
+    payheroStatus: 'CONNECTED',
     timestamp: new Date().toISOString()
   });
+});
+
+// ==========================================
+// 1.1 PAYHERO REAL PAYMENTS & ACTIVATION
+// ==========================================
+app.get('/api/payhero/config', (req, res) => {
+  res.json({
+    success: true,
+    directLink: PAYHERO_CONFIG.directLink,
+    activationAmountKes: PAYHERO_CONFIG.activationAmountKes,
+    accountId: PAYHERO_CONFIG.accountId,
+    channelId: PAYHERO_CONFIG.channelId
+  });
+});
+
+app.post('/api/payhero/stk-push', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.body.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'User ID is required' });
+    }
+    const { phone, amount } = req.body;
+    const result = await payHeroService.initiateStkPush({
+      userId,
+      phone,
+      amount: amount || 5,
+      host: req.headers.host || 'localhost:3000'
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// PayHero Webhooks for both success and failed transactions
+const handlePayHeroWebhook = (req, res) => {
+  try {
+    const result = payHeroService.processWebhook(req.body);
+    res.status(200).json({ success: true, ...result });
+  } catch (err) {
+    console.error('[PayHero Webhook Error]:', err);
+    res.status(200).json({ success: false, error: err.message });
+  }
+};
+app.post('/api/payhero/webhook', handlePayHeroWebhook);
+app.post('/api/payments/payhero-callback', handlePayHeroWebhook);
+
+app.get('/api/payhero/status/:reference', (req, res) => {
+  const payment = payHeroService.getPaymentStatus(req.params.reference);
+  res.json({ success: true, payment });
+});
+
+app.post('/api/payhero/confirm-activation', (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.body.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'User ID is required' });
+    }
+    const { mpesaReceipt, reference, phone } = req.body;
+    const result = payHeroService.confirmPayment({ userId, mpesaReceipt, reference, phone });
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// 1.2 USER PROFILE & ACTIVATION STATUS
+// ==========================================
+app.post('/api/auth/register-sync', (req, res) => {
+  try {
+    const { uid, email, username, phone, displayName } = req.body;
+    const user = usersService.registerOrSync({ uid, email, username, phone, displayName });
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/auth/user-status', (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.query.userId;
+    if (!userId) {
+      return res.json({ success: true, authenticated: false });
+    }
+    const status = usersService.getUserStatus(userId);
+    res.json({ success: true, ...status });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // ==========================================
@@ -66,6 +159,14 @@ app.get('/api/wallet/ledger', (req, res) => {
 app.post('/api/wallet/withdraw', (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || 'usr_default';
+    const user = usersService.getUser(userId);
+    if (user && !user.activated && user.status !== 'ACTIVE') {
+      return res.status(403).json({
+        success: false,
+        requiresActivation: true,
+        error: 'Account activation required. Please pay KES 5 activation fee via PayHero to enable withdrawals.'
+      });
+    }
     const { phone, amount } = req.body;
     const result = ledgerService.requestWithdrawal({ userId, phone, amount });
     res.json(result);
@@ -103,6 +204,14 @@ app.get('/api/tasks/:id/draft', (req, res) => {
 app.post('/api/tasks/:id/submit', (req, res) => {
   try {
     const userId = req.headers['x-user-id'] || 'usr_default';
+    const user = usersService.getUser(userId);
+    if (user && !user.activated && user.status !== 'ACTIVE') {
+      return res.status(403).json({
+        success: false,
+        requiresActivation: true,
+        error: 'Account activation required. Please pay KES 5 activation fee via PayHero to unlock task submissions.'
+      });
+    }
     const taskId = req.params.id;
     const { taskType, taskTitle, rewardKes, payload } = req.body;
     const result = taskService.submitTask({
@@ -264,5 +373,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, HOST, () => {
-  console.log(`EARNWAVE server is running on http://${HOST}:${PORT}`);
+  console.log(`PesaWave server is running on http://${HOST}:${PORT}`);
 });
