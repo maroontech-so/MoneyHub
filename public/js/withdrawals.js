@@ -152,21 +152,25 @@ async function initWithdrawPage(user) {
     
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (btnWithdraw.disabled) return;
+        if (btnWithdraw && btnWithdraw.disabled) return;
         
-        document.getElementById('modal-amount').innerText = `KES ${amountInput.value}`;
-        document.getElementById('modal-phone').innerText = phoneInput.value;
-        modal.classList.remove('hidden');
+        const mAmount = document.getElementById('modal-amount');
+        if (mAmount && amountInput) mAmount.innerText = `KES ${amountInput.value}`;
+        const mPhone = document.getElementById('modal-phone');
+        if (mPhone && phoneInput) mPhone.innerText = phoneInput.value;
+        if (modal) modal.classList.remove('hidden');
     });
 
-    document.getElementById('btn-cancel').addEventListener('click', () => {
-        modal.classList.add('hidden');
+    document.getElementById('btn-cancel')?.addEventListener('click', () => {
+        if (modal) modal.classList.add('hidden');
     });
 
-    document.getElementById('btn-confirm').addEventListener('click', async () => {
-        modal.classList.add('hidden');
-        btnWithdraw.disabled = true;
-        btnWithdraw.innerText = 'Processing...';
+    document.getElementById('btn-confirm')?.addEventListener('click', async () => {
+        if (modal) modal.classList.add('hidden');
+        if (btnWithdraw) {
+            btnWithdraw.disabled = true;
+            btnWithdraw.innerText = 'Processing...';
+        }
         const msgDiv = document.getElementById('status-message');
         
         try {
@@ -174,19 +178,23 @@ async function initWithdrawPage(user) {
             const phone = phoneInput.value;
             await requestWithdrawal(amount, phone);
             
-            msgDiv.innerText = 'Your withdrawal is being processed. You will receive M-Pesa within minutes.';
-            msgDiv.className = 'status-message success';
-            amountInput.value = '';
+            if (msgDiv) {
+                msgDiv.innerText = 'Your withdrawal is being processed. You will receive M-Pesa within minutes.';
+                msgDiv.className = 'status-message success';
+            }
+            if (amountInput) amountInput.value = '';
             updateFeeDisplay();
             dailyWithdrawn += amount;
             updateDailyLimitDisplay();
         } catch (error) {
-            msgDiv.innerText = error.message || 'Error processing withdrawal.';
-            msgDiv.className = 'status-message error';
+            if (msgDiv) {
+                msgDiv.innerText = error.message || 'Error processing withdrawal.';
+                msgDiv.className = 'status-message error';
+            }
         } finally {
-            msgDiv.classList.remove('hidden');
+            if (msgDiv) msgDiv.classList.remove('hidden');
             validateForm();
-            btnWithdraw.innerText = 'Withdraw';
+            if (btnWithdraw) btnWithdraw.innerText = 'Withdraw';
         }
     });
 }
@@ -201,7 +209,8 @@ async function initPayoutsPage(user) {
     // Subscribe to total withdrawn
     subscribeToBalance(user.uid, (wallet) => {
         const total = wallet.lifetimeWithdrawn || 0;
-        document.getElementById('total-withdrawn').innerText = `KES ${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        const totEl = document.getElementById('total-withdrawn');
+        if (totEl) totEl.innerText = `KES ${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
     });
 
     async function loadWithdrawals() {

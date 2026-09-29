@@ -138,7 +138,11 @@ class NavigationManager {
 
     appShell.innerHTML = sidebarHtml;
     appShell.appendChild(mainContent);
-    appShell.innerHTML += bottomNavHtml;
+    const bottomNavWrapper = document.createElement('div');
+    bottomNavWrapper.innerHTML = bottomNavHtml;
+    if (bottomNavWrapper.firstElementChild) {
+      appShell.appendChild(bottomNavWrapper.firstElementChild);
+    }
 
     document.body.appendChild(appShell);
   }
@@ -166,8 +170,10 @@ class NavigationManager {
     try {
       const profile = await getUserProfile(user.uid);
       if (profile) {
-        document.getElementById('navUsername').textContent = profile.username;
-        document.getElementById('navAvatar').textContent = profile.username.charAt(0).toUpperCase();
+        const nameEl = document.getElementById('navUsername');
+        if (nameEl) nameEl.textContent = profile.username;
+        const avEl = document.getElementById('navAvatar');
+        if (avEl) avEl.textContent = profile.username.charAt(0).toUpperCase();
         // Balance would be loaded from wallets collection in a real implementation
       }
     } catch (err) {

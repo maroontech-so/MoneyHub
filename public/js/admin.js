@@ -42,16 +42,26 @@ async function initDashboard() {
         const res = await getStats();
         const stats = res.data;
 
-        document.getElementById('stat-users').innerText = stats.totalUsers;
-        document.getElementById('stat-active-users').innerText = stats.activeUsers;
-        document.getElementById('stat-registrations').innerText = stats.todayRegistrations;
-        document.getElementById('stat-revenue').innerText = `KES ${stats.todayRevenue}`;
-        document.getElementById('stat-rewards').innerText = `KES ${stats.todayRewards}`;
-        document.getElementById('stat-withdrawals-vol').innerText = `KES ${stats.todayWithdrawals}`;
-        document.getElementById('stat-pending-tasks').innerText = stats.pendingTasks;
-        document.getElementById('stat-pending-withdrawals').innerText = stats.pendingWithdrawals;
-        document.getElementById('stat-pending-reviews').innerText = stats.pendingReviews;
-        document.getElementById('stat-failed-payments').innerText = stats.failedPayments;
+        const sUsers = document.getElementById('stat-users');
+        if (sUsers) sUsers.innerText = stats.totalUsers;
+        const sActive = document.getElementById('stat-active-users');
+        if (sActive) sActive.innerText = stats.activeUsers;
+        const sRegs = document.getElementById('stat-registrations');
+        if (sRegs) sRegs.innerText = stats.todayRegistrations;
+        const sRev = document.getElementById('stat-revenue');
+        if (sRev) sRev.innerText = `KES ${stats.todayRevenue}`;
+        const sRew = document.getElementById('stat-rewards');
+        if (sRew) sRew.innerText = `KES ${stats.todayRewards}`;
+        const sWith = document.getElementById('stat-withdrawals-vol');
+        if (sWith) sWith.innerText = `KES ${stats.todayWithdrawals}`;
+        const sTasks = document.getElementById('stat-pending-tasks');
+        if (sTasks) sTasks.innerText = stats.pendingTasks;
+        const sPendWith = document.getElementById('stat-pending-withdrawals');
+        if (sPendWith) sPendWith.innerText = stats.pendingWithdrawals;
+        const sRevPend = document.getElementById('stat-pending-reviews');
+        if (sRevPend) sRevPend.innerText = stats.pendingReviews;
+        const sFailPay = document.getElementById('stat-failed-payments');
+        if (sFailPay) sFailPay.innerText = stats.failedPayments;
     } catch (e) {
         console.error("Error loading dashboard stats", e);
     }
@@ -152,15 +162,20 @@ async function initUsersPage() {
         const uDoc = await getDoc(doc(db, 'users', id));
         if (uDoc.exists()) {
             const d = uDoc.data();
-            document.getElementById('drawer-username').innerText = d.username || 'N/A';
-            document.getElementById('drawer-email').innerText = d.email || 'N/A';
-            document.getElementById('drawer-phone').innerText = d.phone || 'N/A';
-            document.getElementById('drawer-status').innerText = d.status || 'ACTIVE';
+            const dUser = document.getElementById('drawer-username');
+            if (dUser) dUser.innerText = d.username || 'N/A';
+            const dEmail = document.getElementById('drawer-email');
+            if (dEmail) dEmail.innerText = d.email || 'N/A';
+            const dPhone = document.getElementById('drawer-phone');
+            if (dPhone) dPhone.innerText = d.phone || 'N/A';
+            const dStatus = document.getElementById('drawer-status');
+            if (dStatus) dStatus.innerText = d.status || 'ACTIVE';
             
             const wDoc = await getDoc(doc(db, 'wallets', id));
-            document.getElementById('drawer-balance').innerText = wDoc.exists() ? `KES ${wDoc.data().availableBalance}` : 'KES 0';
+            const dBal = document.getElementById('drawer-balance');
+            if (dBal) dBal.innerText = wDoc.exists() ? `KES ${wDoc.data().availableBalance}` : 'KES 0';
             
-            drawer.classList.remove('hidden');
+            if (drawer) drawer.classList.remove('hidden');
         }
     };
 

@@ -152,13 +152,15 @@
                 if (auth.currentUser) {
                     const myEntry = entries.findIndex(e => e.userId === auth.currentUser.uid);
                     const sticky = document.getElementById('stickyUser');
+                    const rankEl = document.getElementById('myRank');
+                    const earnEl = document.getElementById('myEarnings');
                     if (myEntry >= 0) {
-                        sticky.style.display = myEntry > 9 ? 'block' : 'none';
-                        document.getElementById('myRank').textContent = `#${myEntry + 1}`;
-                        document.getElementById('myEarnings').textContent = `KES ${entries[myEntry].verifiedEarnings}`;
+                        if (sticky) sticky.style.display = myEntry > 9 ? 'block' : 'none';
+                        if (rankEl) rankEl.textContent = `#${myEntry + 1}`;
+                        if (earnEl) earnEl.textContent = `KES ${entries[myEntry].verifiedEarnings}`;
                     } else {
-                        sticky.style.display = 'block';
-                        document.getElementById('myRank').textContent = '--';
+                        if (sticky) sticky.style.display = 'block';
+                        if (rankEl) rankEl.textContent = '--';
                         // Fetch my specific earnings ideally, for now just show 0
                     }
                 }

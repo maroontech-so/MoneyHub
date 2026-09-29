@@ -1,0 +1,29 @@
+{
+  "accounts": {
+    "usr_default": {
+      "accountNumber": "FX-DEMO-88294",
+      "currency": "USD",
+      "initialBalance": 10000,
+      "balance": 10000,
+      "equity": 9998,
+      "freeMargin": 9898,
+      "marginUsed": 100,
+      "leverage": 100,
+      "positions": [
+        {
+          "id": "pos_mun0yi3n_999e",
+          "pair": "EUR/USD",
+          "type": "BUY",
+          "lotSize": 0.1,
+          "openPrice": 1.0845,
+          "currentPrice": 1.0843,
+          "stopLoss": 20,
+          "takeProfit": 40,
+          "pnl": -2,
+          "openedAt": "2026-09-29T18:43:32.003Z"
+        }
+      ],
+      "history": []
+    }
+  }
+}

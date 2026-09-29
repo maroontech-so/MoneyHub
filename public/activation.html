@@ -63,23 +63,27 @@
             // Load system settings for activation fee
             try {
                 const settingsDoc = await getDoc(doc(db, 'systemSettings', 'general'));
+                const amtEl = document.getElementById('activationAmount');
                 if (settingsDoc.exists()) {
                     const data = settingsDoc.data();
                     if (data.activation && data.activation.amount) {
-                        document.getElementById('activationAmount').textContent = data.activation.amount;
+                        if (amtEl) amtEl.textContent = data.activation.amount;
                     } else {
-                        document.getElementById('activationAmount').textContent = "500"; // default fallback
+                        if (amtEl) amtEl.textContent = "500"; // default fallback
                     }
+                } else {
+                    if (amtEl) amtEl.textContent = "500";
                 }
             } catch(e) {
                 console.error("Error loading settings", e);
-                document.getElementById('activationAmount').textContent = "500";
+                const amtEl = document.getElementById('activationAmount');
+                if (amtEl) amtEl.textContent = "500";
             }
         }
 
-        document.getElementById('btnActivate').addEventListener('click', async () => {
+        document.getElementById('btnActivate')?.addEventListener('click', async () => {
             const overlay = document.getElementById('loadingOverlay');
-            overlay.style.display = 'flex';
+            if (overlay) overlay.style.display = 'flex';
             
             try {
                 // Call Cloud Function to initiate STK Push
@@ -88,7 +92,8 @@
                 const initiateActivation = httpsCallable(functions, 'payments-initiateActivation');
                 await initiateActivation();
                 
-                document.getElementById('loadingText').textContent = "Waiting for payment confirmation...";
+                const loadEl = document.getElementById('loadingText');
+                if (loadEl) loadEl.textContent = "Waiting for payment confirmation...";
                 
                 // Listen to user document for status change
                 const unsub = onSnapshot(doc(db, 'users', auth.currentUser.uid), (docSnap) => {

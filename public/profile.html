@@ -73,12 +73,18 @@
       
       const profile = await getUserProfile(user.uid);
       if (profile) {
-        document.getElementById('profileName').textContent = profile.displayName || profile.username;
-        document.getElementById('profileUsername').textContent = profile.username;
-        document.getElementById('profileEmail').textContent = profile.email;
-        document.getElementById('profilePhone').textContent = profile.phone || 'Not set';
-        document.getElementById('profileAvatar').textContent = profile.username.charAt(0).toUpperCase();
-        document.getElementById('profileStatus').textContent = profile.status;
+        const nameEl = document.getElementById('profileName');
+        if (nameEl) nameEl.textContent = profile.displayName || profile.username;
+        const uEl = document.getElementById('profileUsername');
+        if (uEl) uEl.textContent = profile.username;
+        const eEl = document.getElementById('profileEmail');
+        if (eEl) eEl.textContent = profile.email;
+        const pEl = document.getElementById('profilePhone');
+        if (pEl) pEl.textContent = profile.phone || 'Not set';
+        const avEl = document.getElementById('profileAvatar');
+        if (avEl) avEl.textContent = (profile.username || 'U').charAt(0).toUpperCase();
+        const stEl = document.getElementById('profileStatus');
+        if (stEl) stEl.textContent = profile.status || 'ACTIVE';
       }
     });
   </script>

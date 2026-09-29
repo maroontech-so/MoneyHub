@@ -120,13 +120,15 @@ export class TaskRunner {
 
   handleSubmit() {
     const errorDiv = document.getElementById('runnerError');
-    errorDiv.style.display = 'none';
+    if (errorDiv) errorDiv.style.display = 'none';
 
     try {
       const submissionData = this.collectFormData();
       const submitBtn = document.getElementById('runnerSubmitBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Verifying & Recording...';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying & Recording...';
+      }
 
       setTimeout(() => {
         // Record in store & immutable ledger
@@ -147,8 +149,10 @@ export class TaskRunner {
         }
       }, 700);
     } catch (err) {
-      errorDiv.textContent = err.message;
-      errorDiv.style.display = 'block';
+      if (errorDiv) {
+        errorDiv.textContent = err.message;
+        errorDiv.style.display = 'block';
+      }
     }
   }
 

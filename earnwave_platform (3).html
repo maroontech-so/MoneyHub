@@ -673,6 +673,7 @@
 
             showToast(message, type = 'info') {
                 const container = document.getElementById('toast-container');
+                if (!container) return;
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
                 toast.textContent = message;
@@ -699,10 +700,10 @@
                 const text = document.getElementById('pwd-strength-text');
                 
                 if (!pwd) {
-                    container.classList.add('hidden');
+                    if (container) container.classList.add('hidden');
                     return false;
                 }
-                container.classList.remove('hidden');
+                if (container) container.classList.remove('hidden');
                 
                 let score = 0;
                 let issues = [];
@@ -712,22 +713,28 @@
                 if (pwd.match(/[a-z]/)) score += 25; else issues.push("Lowercase");
                 if (pwd.match(/[\d\W]/)) score += 25; else issues.push("Number/Symbol");
                 
-                bar.style.width = score + '%';
+                if (bar) bar.style.width = score + '%';
                 
                 if (score < 50) {
-                    bar.style.background = 'var(--danger-accent)';
-                    text.textContent = "Weak: Need " + issues.join(", ");
-                    text.style.color = 'var(--danger-accent)';
+                    if (bar) bar.style.background = 'var(--danger-accent)';
+                    if (text) {
+                        text.textContent = "Weak: Need " + issues.join(", ");
+                        text.style.color = 'var(--danger-accent)';
+                    }
                     return false;
                 } else if (score < 100) {
-                    bar.style.background = '#f59e0b'; // warning yellow/orange
-                    text.textContent = "Medium: Need " + issues.join(", ");
-                    text.style.color = '#f59e0b';
+                    if (bar) bar.style.background = '#f59e0b'; // warning yellow/orange
+                    if (text) {
+                        text.textContent = "Medium: Need " + issues.join(", ");
+                        text.style.color = '#f59e0b';
+                    }
                     return false;
                 } else {
-                    bar.style.background = 'var(--success-accent)';
-                    text.textContent = "Strong & Secure";
-                    text.style.color = 'var(--success-accent)';
+                    if (bar) bar.style.background = 'var(--success-accent)';
+                    if (text) {
+                        text.textContent = "Strong & Secure";
+                        text.style.color = 'var(--success-accent)';
+                    }
                     return true;
                 }
             }
@@ -904,10 +911,14 @@
                 this.showView('main-view');
                 
                 // Populate Profile Data
-                document.getElementById('prof-username').textContent = this.currentUser.username;
-                document.getElementById('prof-email').textContent = this.currentUser.email;
-                document.getElementById('prof-phone').textContent = this.currentUser.phone;
-                document.getElementById('user-mpesa-number').textContent = this.currentUser.phone;
+                const uEl = document.getElementById('prof-username');
+                if (uEl) uEl.textContent = this.currentUser.username;
+                const eEl = document.getElementById('prof-email');
+                if (eEl) eEl.textContent = this.currentUser.email;
+                const pEl = document.getElementById('prof-phone');
+                if (pEl) pEl.textContent = this.currentUser.phone;
+                const mEl = document.getElementById('user-mpesa-number');
+                if (mEl) mEl.textContent = this.currentUser.phone;
                 
                 this.updateWalletUI();
                 this.navigate('dashboard-section');
@@ -917,10 +928,14 @@
                 const wallet = this.db.getWallet();
                 const formatted = this.formatCurrency(wallet.balance);
                 
-                document.getElementById('header-balance').textContent = formatted;
-                document.getElementById('dash-balance').textContent = formatted;
-                document.getElementById('wallet-full-balance').textContent = formatted;
-                document.getElementById('prof-lifetime').textContent = this.formatCurrency(wallet.lifetime);
+                const hBal = document.getElementById('header-balance');
+                if (hBal) hBal.textContent = formatted;
+                const dBal = document.getElementById('dash-balance');
+                if (dBal) dBal.textContent = formatted;
+                const wBal = document.getElementById('wallet-full-balance');
+                if (wBal) wBal.textContent = formatted;
+                const pLife = document.getElementById('prof-lifetime');
+                if (pLife) pLife.textContent = this.formatCurrency(wallet.lifetime);
             }
 
             // --- Views Rendering ---
@@ -1056,10 +1071,14 @@
                 this.activeTask = task;
                 
                 // Populate Execution View
-                document.getElementById('active-task-type').textContent = task.type;
-                document.getElementById('active-task-reward').textContent = this.formatCurrency(task.reward);
-                document.getElementById('active-task-title').textContent = task.title;
-                document.getElementById('active-task-desc').textContent = task.description;
+                const tType = document.getElementById('active-task-type');
+                if (tType) tType.textContent = task.type;
+                const tReward = document.getElementById('active-task-reward');
+                if (tReward) tReward.textContent = this.formatCurrency(task.reward);
+                const tTitle = document.getElementById('active-task-title');
+                if (tTitle) tTitle.textContent = task.title;
+                const tDesc = document.getElementById('active-task-desc');
+                if (tDesc) tDesc.textContent = task.description;
 
                 const interactArea = document.getElementById('interactive-area');
                 

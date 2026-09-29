@@ -114,35 +114,39 @@
       const errorDiv = document.getElementById('globalError');
       
       if (password !== confirmPassword) {
-        errorDiv.textContent = 'Passwords do not match.';
-        errorDiv.style.display = 'block';
+        if (errorDiv) {
+          errorDiv.textContent = 'Passwords do not match.';
+          errorDiv.style.display = 'block';
+        }
         return;
       }
 
       const userData = {
-        fullName: document.getElementById('fullName').value.trim(),
-        username: document.getElementById('username').value.trim().toLowerCase(),
-        email: document.getElementById('email').value.trim(),
-        phone: normalizePhone(document.getElementById('phone').value.trim()),
+        fullName: document.getElementById('fullName')?.value?.trim() || '',
+        username: document.getElementById('username')?.value?.trim().toLowerCase() || '',
+        email: document.getElementById('email')?.value?.trim() || '',
+        phone: normalizePhone(document.getElementById('phone')?.value?.trim() || ''),
         password: password,
-        referralCode: document.getElementById('referralCode').value.trim()
+        referralCode: document.getElementById('referralCode')?.value?.trim() || ''
       };
       
       const btnText = document.querySelector('.btn-text');
       const spinner = document.getElementById('registerSpinner');
       
-      btnText.classList.add('hidden');
-      spinner.classList.remove('hidden');
-      errorDiv.style.display = 'none';
+      if (btnText) btnText.classList.add('hidden');
+      if (spinner) spinner.classList.remove('hidden');
+      if (errorDiv) errorDiv.style.display = 'none';
       
       try {
         await registerUser(userData);
         // Auth listener handles redirect
       } catch (err) {
-        errorDiv.textContent = err.message || 'Registration failed.';
-        errorDiv.style.display = 'block';
-        btnText.classList.remove('hidden');
-        spinner.classList.add('hidden');
+        if (errorDiv) {
+          errorDiv.textContent = err.message || 'Registration failed.';
+          errorDiv.style.display = 'block';
+        }
+        if (btnText) btnText.classList.remove('hidden');
+        if (spinner) spinner.classList.add('hidden');
       }
     });
   </script>

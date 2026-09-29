@@ -24,19 +24,25 @@ async function loadHotels(options = {}) {
 }
 
 async function loadHotel(hotelId) {
-    document.getElementById('hotelName').innerText = "Loaded Hotel";
-    document.getElementById('hotelLocation').innerText = "Nairobi, Kenya";
-    document.getElementById('hotelBrief').innerText = "Please write a detailed review.";
-    document.getElementById('reviewFormSection').style.display = 'block';
+    const nameEl = document.getElementById('hotelName');
+    if (nameEl) nameEl.innerText = "Loaded Hotel";
+    const locEl = document.getElementById('hotelLocation');
+    if (locEl) locEl.innerText = "Nairobi, Kenya";
+    const briefEl = document.getElementById('hotelBrief');
+    if (briefEl) briefEl.innerText = "Please write a detailed review.";
+    const sectionEl = document.getElementById('reviewFormSection');
+    if (sectionEl) sectionEl.style.display = 'block';
 
     const bodyInput = document.getElementById('bodyInput');
     const wordCount = document.getElementById('wordCount');
     const submitBtn = document.getElementById('submitReviewBtn');
-    bodyInput.addEventListener('input', () => {
-        const words = bodyInput.value.trim().split(/\s+/).filter(w => w.length > 0).length;
-        wordCount.innerText = words;
-        submitBtn.disabled = words < 100;
-    });
+    if (bodyInput && wordCount && submitBtn) {
+        bodyInput.addEventListener('input', () => {
+            const words = bodyInput.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            wordCount.innerText = words;
+            submitBtn.disabled = words < 100;
+        });
+    }
 }
 
 async function unlockHotelReview(hotelId) {

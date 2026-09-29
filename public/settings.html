@@ -129,14 +129,21 @@
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                document.getElementById('currentPhone').textContent = data.phoneNumber ? 
-                    data.phoneNumber.substring(0,6) + '****' + data.phoneNumber.substring(10) : 'Not set';
+                const phoneEl = document.getElementById('currentPhone');
+                if (phoneEl) {
+                    phoneEl.textContent = data.phoneNumber ? 
+                        data.phoneNumber.substring(0,6) + '****' + data.phoneNumber.substring(10) : 'Not set';
+                }
                 
                 if (data.settings) {
-                    document.getElementById('pushToggle').checked = !!data.settings.pushEnabled;
-                    document.getElementById('taskToggle').checked = data.settings.taskUpdates !== false;
-                    document.getElementById('withdrawToggle').checked = data.settings.withdrawUpdates !== false;
-                    document.getElementById('leaderboardToggle').checked = data.settings.showInLeaderboard !== false;
+                    const pushEl = document.getElementById('pushToggle');
+                    if (pushEl) pushEl.checked = !!data.settings.pushEnabled;
+                    const taskEl = document.getElementById('taskToggle');
+                    if (taskEl) taskEl.checked = data.settings.taskUpdates !== false;
+                    const withdrawEl = document.getElementById('withdrawToggle');
+                    if (withdrawEl) withdrawEl.checked = data.settings.withdrawUpdates !== false;
+                    const boardEl = document.getElementById('leaderboardToggle');
+                    if (boardEl) boardEl.checked = data.settings.showInLeaderboard !== false;
                 }
             }
         }

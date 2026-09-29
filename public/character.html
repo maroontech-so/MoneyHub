@@ -94,35 +94,48 @@
             if (!charDoc.exists()) { alert('Character not found'); return; }
             character = charDoc.data();
 
-            document.getElementById('charName').textContent = character.name;
-            document.getElementById('charDetails').textContent = `${character.countryFlag || ''} ${character.country} • ${character.age} yrs - ${character.bio}`;
-            if(character.avatar) document.getElementById('charAvatar').src = character.avatar;
+            const nameEl = document.getElementById('charName');
+            if (nameEl) nameEl.textContent = character.name;
+            const detEl = document.getElementById('charDetails');
+            if (detEl) detEl.textContent = `${character.countryFlag || ''} ${character.country} • ${character.age} yrs - ${character.bio}`;
+            const avEl = document.getElementById('charAvatar');
+            if (character.avatar && avEl) avEl.src = character.avatar;
 
             // Check unlock status
             const unlocksSnap = await getDoc(doc(db, 'chatUnlocks', `${auth.currentUser.uid}_${charId}`));
             
             if (!unlocksSnap.exists() && character.unlockFee > 0) {
-                document.getElementById('unlockOverlay').style.display = 'flex';
-                document.getElementById('unlockMessage').textContent = `Unlock for KES ${character.unlockFee} to start chatting`;
-                document.getElementById('inputArea').style.pointerEvents = 'none';
-                document.getElementById('inputArea').style.opacity = '0.5';
+                const overlay = document.getElementById('unlockOverlay');
+                if (overlay) overlay.style.display = 'flex';
+                const unlockMsg = document.getElementById('unlockMessage');
+                if (unlockMsg) unlockMsg.textContent = `Unlock for KES ${character.unlockFee} to start chatting`;
+                const inputArea = document.getElementById('inputArea');
+                if (inputArea) {
+                    inputArea.style.pointerEvents = 'none';
+                    inputArea.style.opacity = '0.5';
+                }
             } else {
                 loadMessages();
             }
         }
 
-        document.getElementById('btnUnlock').addEventListener('click', async () => {
+        document.getElementById('btnUnlock')?.addEventListener('click', async () => {
             const unlockFn = httpsCallable(functions, 'chat-unlockCharacter');
+            const btnUnlock = document.getElementById('btnUnlock');
             try {
-                document.getElementById('btnUnlock').disabled = true;
-                document.getElementById('btnUnlock').textContent = 'Processing...';
+                if (btnUnlock) {
+                    btnUnlock.disabled = true;
+                    btnUnlock.textContent = 'Processing...';
+                }
                 await unlockFn({ characterId: charId });
                 alert('Unlock initiated. Please check your phone for M-Pesa prompt.');
                 // In reality, wait for webhook/status change.
             } catch (err) {
                 alert('Unlock failed: ' + err.message);
-                document.getElementById('btnUnlock').disabled = false;
-                document.getElementById('btnUnlock').textContent = 'Pay via M-Pesa';
+                if (btnUnlock) {
+                    btnUnlock.disabled = false;
+                    btnUnlock.textContent = 'Pay via M-Pesa';
+                }
             }
         });
 
@@ -148,9 +161,10 @@
             });
         }
 
-        messageInput.addEventListener('input', () => {
+        messageInput?.addEventListener('input', () => {
             const len = messageInput.value.length;
-            document.getElementById('charCounter').textContent = `${len} chars (Min 20 for reward)`;
+            const counter = document.getElementById('charCounter');
+            if (counter) counter.textContent = `${len} chars (Min 20 for reward)`;
         });
 
         btnSend.addEventListener('click', async () => {

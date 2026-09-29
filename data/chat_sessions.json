@@ -1,0 +1,20 @@
+{
+  "sessions": {
+    "usr_default_char_zara": {
+      "turns": 1,
+      "rewarded": false,
+      "messages": [
+        {
+          "role": "user",
+          "content": "What SACCO strategies should I use to beat inflation?",
+          "timestamp": "2026-09-29T18:43:32.012Z"
+        },
+        {
+          "role": "assistant",
+          "content": "As your Financial Literacy Coach, I recommend setting aside at least 20% into an interest-bearing Tier-1 SACCO or money market fund (MMF) before discretionary spending. In Kenya, compounding 10-14% p.a. through licensed SACCOs preserves your capital far better than passive bank accounts. What is your current monthly saving target?",
+          "timestamp": "2026-09-29T18:43:32.145Z"
+        }
+      ]
+    }
+  }
+}

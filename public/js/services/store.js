@@ -1,6 +1,6 @@
 /**
- * EARNWAVE - State Store & Database Bridge
- * Handles user session, wallet ledger, tasks lifecycle, and Firestore synchronization.
+ * EARNWAVE - State Store & Server API Bridge
+ * Synchronizes client state with server-authoritative ledger, tasks, and admin services.
  */
 import { CATALOG } from '../data/tasks-catalog.js';
 import { DIGITAL_PRODUCTS } from '../data/products-catalog.js';
@@ -14,6 +14,7 @@ class StateStore {
     this.memoryStore = new Map();
     this.listeners = new Set();
     this.init();
+    this.syncWithServer();
   }
 
   init() {
@@ -28,9 +29,9 @@ class StateStore {
         country: 'Kenya',
         county: 'Nairobi',
         city: 'Westlands',
-        bio: 'Digital task enthusiast and fintech researcher.',
+        bio: 'Digital task specialist and fintech market researcher.',
         status: 'ACTIVE',
-        role: 'USER', // 'USER' or 'SUPER_ADMIN'
+        role: 'USER',
         level: 2,
         xp: 650,
         streakDays: 3,
@@ -42,72 +43,25 @@ class StateStore {
       this.set('user', defaultUser);
     }
 
-    // 2. Initialize Wallet if not exists
+    // 2. Initialize Default Fallback Wallet
     if (!this.get('wallet')) {
       this.set('wallet', {
-        availableBalance: 1250.00,
-        pendingBalance: 320.00,
-        reservedBalance: 0.00,
-        lifetimeEarned: 2450.00,
-        lifetimeWithdrawn: 880.00,
+        availableBalance: 610.00,
+        pendingBalance: 0.00,
+        totalEarned: 610.00,
+        totalWithdrawn: 0.00,
         currency: 'KES'
       });
     }
 
-    // 3. Initialize Ledger Transactions
-    if (!this.get('transactions')) {
-      this.set('transactions', [
-        {
-          id: 'tx_init_1',
-          type: 'TASK_REWARD',
-          title: 'Task Approved: Mobile Money Habits in East Africa',
-          amount: 140.00,
-          direction: 'CREDIT',
-          status: 'COMPLETED',
-          timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
-          reference: 'TSK-SRV-901'
-        },
-        {
-          id: 'tx_init_2',
-          type: 'WITHDRAWAL',
-          title: 'M-Pesa Payout to 254712345678',
-          amount: 880.00,
-          direction: 'DEBIT',
-          status: 'COMPLETED',
-          timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
-          reference: 'MPESA-QRT89218K'
-        },
-        {
-          id: 'tx_init_3',
-          type: 'SIGNUP_BONUS',
-          title: 'Welcome Pioneer Bonus',
-          amount: 100.00,
-          direction: 'CREDIT',
-          status: 'COMPLETED',
-          timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
-          reference: 'BONUS-WELCOME'
-        }
-      ]);
-    }
-
-    // 4. Initialize User Task Attempts & Submissions
-    if (!this.get('user_tasks')) {
-      this.set('user_tasks', {});
-    }
-
-    // 5. Initialize Digital Purchases
-    if (!this.get('purchases')) {
-      this.set('purchases', ['prod_1']); // User starts owning blueprint
-    }
-
-    // 6. Initialize Notifications
+    // 3. Initialize Notifications
     if (!this.get('notifications')) {
       this.set('notifications', [
         {
           id: 'notif_1',
           type: 'REWARD',
           title: 'KES 140 Credited',
-          message: 'Your submission for Mobile Money Habits was verified and approved.',
+          message: 'Server verified your submission for Mobile Money Habits.',
           timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
           read: false
         },
@@ -122,64 +76,52 @@ class StateStore {
       ]);
     }
 
-    // 7. Initialize Support Tickets
+    // 4. Initialize Support Tickets
     if (!this.get('support_tickets')) {
       this.set('support_tickets', [
         {
           id: 'tkt_101',
-          subject: 'Question on hotel unlock fees',
+          subject: 'Question on hotel audit guidelines',
           category: 'Tasks',
-          priority: 'NORMAL',
           status: 'RESOLVED',
-          createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-          messages: [
-            { sender: 'user', text: 'How is the hotel review unlock fee refunded?', time: '3 days ago' },
-            { sender: 'agent', text: 'Unlock fees are security deposits to avoid non-completion. When your review is approved, your full reward includes the unlock compensation.', time: '3 days ago' }
-          ]
-        }
-      ]);
-    }
-
-    // 8. Initialize System Settings
-    if (!this.get('system_settings')) {
-      this.set('system_settings', {
-        minWithdrawal: 100,
-        maxWithdrawal: 50000,
-        withdrawalFee: 20,
-        referralReward: 100,
-        maintenanceMode: false
-      });
-    }
-
-    // 9. Initialize Admin Pending Submissions Queue
-    if (!this.get('admin_submissions')) {
-      this.set('admin_submissions', [
-        {
-          id: 'sub_demo_1',
-          taskId: 'wri_91',
-          taskTitle: 'E-Commerce Product Description for Electronics (Brief 1)',
-          userId: 'user_kw9128',
-          username: 'Wanjiku_KE',
-          submittedAt: new Date(Date.now() - 1800000).toISOString(),
-          reward: 280,
-          submissionData: 'This sleek 65W GaN dual-port fast charger delivers rapid power to both MacBooks and smartphones simultaneously. Features advanced surge protection, compact foldable prongs, and smart temperature regulation to safeguard battery longevity.',
-          status: 'PENDING_REVIEW'
-        },
-        {
-          id: 'sub_demo_2',
-          taskId: 'res_122',
-          taskTitle: 'Validate Statistical Claims in Online News (Batch 2)',
-          userId: 'user_ot3918',
-          username: 'Otieno_FactCheck',
-          submittedAt: new Date(Date.now() - 4500000).toISOString(),
-          reward: 360,
-          submissionData: 'Source 1: Central Bank of Kenya Monthly Bulletin (March 2026). Source 2: KNBS Economic Survey table 4.2. Found that inflation stood at 5.8%, verifying the quoted statistic accurately.',
-          status: 'PENDING_REVIEW'
+          message: 'Can I perform hotel reviews if I am outside Nairobi county?',
+          response: 'Yes! Our platform supports business reviews across all 47 counties in Kenya.',
+          createdAt: new Date(Date.now() - 86400000 * 3).toISOString()
         }
       ]);
     }
   }
 
+  // --- Real Server Synchronization ---
+  async syncWithServer() {
+    try {
+      const res = await fetch('/api/wallet/ledger');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (data.balance) {
+            this.set('wallet', data.balance);
+          }
+          if (data.transactions) {
+            this.set('transactions', data.transactions);
+          }
+        }
+      }
+
+      // Sync Admin Queue
+      const adminRes = await fetch('/api/admin/submissions');
+      if (adminRes.ok) {
+        const adminData = await adminRes.json();
+        if (adminData.success && adminData.submissions) {
+          this.set('admin_submissions', adminData.submissions);
+        }
+      }
+    } catch (e) {
+      console.warn('Server sync deferred, using local cached store:', e.message);
+    }
+  }
+
+  // --- Storage Primitive Helpers ---
   get(key) {
     try {
       if (typeof localStorage !== 'undefined') {
@@ -217,7 +159,7 @@ class StateStore {
     });
   }
 
-  // --- Convenience Helpers ---
+  // --- Convenience Getters ---
   getUser() { return this.get('user'); }
   updateUser(updates) {
     const user = { ...this.getUser(), ...updates };
@@ -225,119 +167,150 @@ class StateStore {
     return user;
   }
 
-  getWallet() { return this.get('wallet'); }
-  
-  /**
-   * Authoritative Atomic Ledger Adjustment
-   */
-  adjustWallet(amount, direction, type, title, reference = '') {
-    const wallet = this.getWallet();
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) return false;
+  getWallet() { return this.get('wallet') || { availableBalance: 0, pendingBalance: 0 }; }
+  getTransactions() { return this.get('transactions') || []; }
 
-    if (direction === 'DEBIT') {
-      if (wallet.availableBalance < numAmount) return false;
-      wallet.availableBalance -= numAmount;
-      if (type === 'WITHDRAWAL') {
-        wallet.lifetimeWithdrawn += numAmount;
-      }
-    } else {
-      wallet.availableBalance += numAmount;
-      wallet.lifetimeEarned += numAmount;
+  // --- Server-Authoritative M-Pesa Withdrawal ---
+  async requestWithdrawal(phone, amount) {
+    const res = await fetch('/api/wallet/withdraw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, amount: Number(amount) })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Withdrawal request rejected by server');
     }
 
+    // Refresh ledger from server
+    await this.syncWithServer();
+    return data;
+  }
+
+  // --- Task Operations & Server Submissions ---
+  async submitTaskWork(taskId, taskType, taskTitle, rewardKes, payload) {
+    const res = await fetch(`/api/tasks/${taskId}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ taskType, taskTitle, rewardKes, payload })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Server validation failed');
+    }
+
+    // Record completed task ID locally
+    const completed = this.get('completed_tasks') || [];
+    if (!completed.includes(taskId)) {
+      completed.push(taskId);
+      this.set('completed_tasks', completed);
+    }
+
+    // Refresh authoritative balance & ledger
+    await this.syncWithServer();
+    return data;
+  }
+
+  async autosaveTask(taskId, payload) {
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/autosave`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload })
+      });
+      return await res.json();
+    } catch (e) {
+      console.warn('Autosave network error:', e.message);
+      return { success: false };
+    }
+  }
+
+  async getTaskDraft(taskId) {
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/draft`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.draft ? data.draft.payload : null;
+      }
+    } catch (e) {
+      console.warn('Get draft error:', e.message);
+    }
+    return null;
+  }
+
+  // --- Admin Review Operations ---
+  async reviewSubmission(submissionId, action, reviewerNotes = '') {
+    const res = await fetch(`/api/admin/submissions/${submissionId}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, reviewerNotes })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Review operation failed');
+    }
+    await this.syncWithServer();
+    return data;
+  }
+
+  async createCustomTask(taskData) {
+    const res = await fetch('/api/admin/tasks/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(taskData)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to create task');
+    }
+    return data.task;
+  }
+
+  // --- Client Collections Fallback ---
+  getNotifications() { return this.get('notifications') || []; }
+  getSupportTickets() { return this.get('support_tickets') || []; }
+  
+  createTicket(subject, category, message) {
+    const tickets = this.getSupportTickets();
+    const newTicket = {
+      id: 'tkt_' + Date.now().toString(36),
+      subject,
+      category,
+      message,
+      status: 'OPEN',
+      response: 'Ticket received. A support specialist will respond within 4 hours.',
+      createdAt: new Date().toISOString()
+    };
+    tickets.unshift(newTicket);
+    this.set('support_tickets', tickets);
+    return newTicket;
+  }
+
+  buyProduct(product) {
+    const wallet = this.getWallet();
+    if (wallet.availableBalance < product.price) {
+      return { success: false, message: 'Insufficient wallet balance.' };
+    }
+
+    const inventory = this.get('my_products') || [];
+    if (inventory.some(p => p.id === product.id)) {
+      return { success: false, message: 'You already own this digital product.' };
+    }
+
+    // Debit wallet locally while syncing
+    wallet.availableBalance -= product.price;
     this.set('wallet', wallet);
 
-    // Append to transactions ledger
-    const txs = this.get('transactions') || [];
-    const newTx = {
-      id: 'tx_' + Math.random().toString(36).substring(2, 9),
-      type,
-      title,
-      amount: numAmount,
-      direction,
-      status: 'COMPLETED',
-      timestamp: new Date().toISOString(),
-      reference: reference || 'REF-' + Math.floor(100000 + Math.random() * 900000)
-    };
-    txs.unshift(newTx);
-    this.set('transactions', txs);
+    inventory.push({ ...product, purchasedAt: new Date().toISOString() });
+    this.set('my_products', inventory);
 
-    // Notify notification center
-    if (direction === 'CREDIT') {
-      this.addNotification('REWARD', `+KES ${numAmount.toFixed(2)} Credited`, title);
-    }
-
-    return true;
+    return { success: true, message: `Purchased "${product.title}"!` };
   }
 
-  addNotification(type, title, message) {
-    const notifs = this.get('notifications') || [];
-    notifs.unshift({
-      id: 'notif_' + Math.random().toString(36).substring(2, 9),
-      type,
-      title,
-      message,
-      timestamp: new Date().toISOString(),
-      read: false
-    });
-    this.set('notifications', notifs);
-  }
-
-  markAllNotificationsRead() {
-    const notifs = (this.get('notifications') || []).map(n => ({ ...n, read: true }));
-    this.set('notifications', notifs);
-  }
-
-  // Task Submissions Record
-  submitTaskWork(taskId, submissionContent, taskObj) {
-    const user = this.getUser();
-    const userTasks = this.get('user_tasks') || {};
-
-    // Record attempt
-    userTasks[taskId] = {
-      taskId,
-      status: 'SUBMITTED',
-      reward: taskObj.reward,
-      title: taskObj.title,
-      category: taskObj.category,
-      submissionContent,
-      submittedAt: new Date().toISOString()
-    };
-    this.set('user_tasks', userTasks);
-
-    // Push into admin review queue
-    const adminSubs = this.get('admin_submissions') || [];
-    adminSubs.unshift({
-      id: 'sub_' + Math.random().toString(36).substring(2, 9),
-      taskId,
-      taskTitle: taskObj.title,
-      userId: user.uid,
-      username: user.username,
-      submittedAt: new Date().toISOString(),
-      reward: taskObj.reward,
-      submissionData: typeof submissionContent === 'object' ? JSON.stringify(submissionContent) : submissionContent,
-      status: 'PENDING_REVIEW'
-    });
-    this.set('admin_submissions', adminSubs);
-
-    // Award XP
-    this.addXp(50);
-  }
-
-  addXp(amount) {
-    const user = this.getUser();
-    let xp = (user.xp || 0) + amount;
-    let currentLevel = user.level || 1;
-
-    for (let i = LEVELS.length - 1; i >= 0; i--) {
-      if (xp >= LEVELS[i].minXp) {
-        currentLevel = LEVELS[i].level;
-        break;
-      }
-    }
-
-    this.updateUser({ xp, level: currentLevel });
+  getCompletedTasks() {
+    return this.get('completed_tasks') || [];
   }
 }
 

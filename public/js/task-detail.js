@@ -27,42 +27,61 @@ async function init() {
   }
   task = task || fallbackTask;
 
-  document.getElementById('t-type').textContent = task.type || 'TASK';
-  document.getElementById('t-diff').textContent = (task.difficulty || 'MEDIUM').toUpperCase();
-  document.getElementById('t-time').textContent = `${task.estimatedMinutes || 10} min`;
-  document.getElementById('t-title').textContent = task.title;
-  document.getElementById('t-reward').textContent = `KES ${task.reward || task.rewardAmount || 0}`;
-  document.getElementById('t-instructions').textContent = task.instructions || task.description || '';
+  const typeEl = document.getElementById('t-type');
+  if (typeEl) typeEl.textContent = task.type || 'TASK';
+  const diffEl = document.getElementById('t-diff');
+  if (diffEl) diffEl.textContent = (task.difficulty || 'MEDIUM').toUpperCase();
+  const timeEl = document.getElementById('t-time');
+  if (timeEl) timeEl.textContent = `${task.estimatedMinutes || 10} min`;
+  const titleEl = document.getElementById('t-title');
+  if (titleEl) titleEl.textContent = task.title;
+  const rewardEl = document.getElementById('t-reward');
+  if (rewardEl) rewardEl.textContent = `KES ${task.reward || task.rewardAmount || 0}`;
+  const instEl = document.getElementById('t-instructions');
+  if (instEl) instEl.textContent = task.instructions || task.description || '';
 
   const unlockSection = document.getElementById('unlock-section');
   const taskForm = document.getElementById('task-form');
+  const unlockText = document.getElementById('unlock-text');
 
   if (task.unlockFee && task.unlockFee > 0) {
-    unlockSection.style.display = 'block';
-    document.getElementById('unlock-text').textContent = `This task requires a KES ${task.unlockFee} unlock fee`;
-    document.getElementById('btn-unlock').onclick = async () => {
-      unlockSection.innerHTML = '<p style="color:var(--accent-green)">Task unlocked!</p>';
-      taskForm.style.display = 'block';
-    };
+    if (unlockSection) unlockSection.style.display = 'block';
+    if (unlockText) unlockText.textContent = `This task requires a KES ${task.unlockFee} unlock fee`;
+    const btnUnlock = document.getElementById('btn-unlock');
+    if (btnUnlock) {
+      btnUnlock.onclick = async () => {
+        if (unlockSection) unlockSection.innerHTML = '<p style="color:var(--accent-green)">Task unlocked!</p>';
+        if (taskForm) taskForm.style.display = 'block';
+      };
+    }
   } else {
-    taskForm.style.display = 'block';
+    if (taskForm) taskForm.style.display = 'block';
   }
 
   document.getElementById('btn-submit')?.addEventListener('click', async () => {
-    const text = document.getElementById('task-submission').value.trim();
+    const textInput = document.getElementById('task-submission');
+    const text = textInput ? textInput.value.trim() : '';
     if (!text) {
       alert('Please enter your submission before submitting.');
       return;
     }
     const btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+    }
 
     const statusDisplay = document.getElementById('status-display');
-    statusDisplay.style.display = 'block';
-    statusDisplay.innerHTML = `<h3 style="color:var(--accent-green)">Task Submitted!</h3><p>Your submission has been received and will be reviewed shortly. Reward: KES ${task.reward || 0}</p><a href="/tasks.html" class="btn-full" style="display:inline-block; margin-top:12px; text-decoration:none;">Back to Tasks</a>`;
-    taskForm.style.display = 'none';
+    if (statusDisplay) {
+      statusDisplay.style.display = 'block';
+      statusDisplay.innerHTML = `<h3 style="color:var(--accent-green)">Task Submitted!</h3><p>Your submission has been received and will be reviewed shortly. Reward: KES ${task.reward || 0}</p><a href="/tasks.html" class="btn-full" style="display:inline-block; margin-top:12px; text-decoration:none;">Back to Tasks</a>`;
+    }
+    if (taskForm) taskForm.style.display = 'none';
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

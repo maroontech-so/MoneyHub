@@ -10,15 +10,28 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/marketplace.css">
   <link rel="manifest" href="/manifest.json">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('earnwave_theme');
+        var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        if (saved === 'system') {
+          theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+        if (theme === 'light') {
+          document.documentElement.classList.add('light-theme');
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
   <div class="app-layout">
     <!-- Desktop Sidebar (>= 1024px) -->
     <aside class="desktop-sidebar">
       <div class="brand-logo" style="margin-bottom: 2rem;">
-        <span class="brand-logo-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </span>
+        <img src="/images/logo.png" alt="EARNWAVE Logo" class="brand-logo-img" style="height:32px; width:auto; max-width:36px; object-fit:contain; border-radius:6px; flex-shrink:0;" onerror="this.src='https://i.ibb.co/nN9yMZnF/gpt-image-2-The-Money-Hub-logo-stands-out-as-a-striking-symbol-of-financial-prowess-and-innov-0-remo.png'">
         EARNWAVE
       </div>
 
@@ -61,7 +74,7 @@
         </button>
         <button class="sidebar-nav-btn" data-view="profile">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Account</span>
+          <span>Account & Theme</span>
         </button>
       </nav>
 
@@ -76,18 +89,21 @@
       <!-- Top Navbar -->
       <header class="top-navbar">
         <div class="brand-logo" id="brandLogoBtn" style="cursor:pointer;">
-          <span class="brand-logo-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          </span>
+          <img src="/images/logo.png" alt="EARNWAVE Logo" class="brand-logo-img" style="height:28px; width:auto; max-width:32px; object-fit:contain; border-radius:5px; flex-shrink:0;" onerror="this.src='https://i.ibb.co/nN9yMZnF/gpt-image-2-The-Money-Hub-logo-stands-out-as-a-striking-symbol-of-financial-prowess-and-innov-0-remo.png'">
           EARNWAVE
         </div>
 
         <div class="user-quick-stats">
+          <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle Light / Dark Theme" title="Toggle Light / Dark Theme">
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
           <div class="badge-wallet-pill" id="navWalletPill" title="Click to view wallet">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
             <span id="navBalanceAmount">KES 0.00</span>
           </div>
-          <div class="user-avatar-btn" id="navUserAvatar" onclick="app.switchView('profile')" title="My Profile">
+          <div class="user-avatar-btn" id="navUserAvatar" onclick="app.switchView('profile')" title="My Profile & Settings">
             U
           </div>
         </div>
@@ -142,7 +158,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-orange);"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
                 Active Daily Streak
               </div>
-              <div style="font-size:1.6rem; font-weight:700; color:#fff; letter-spacing:-0.02em;" id="dashStreakDays">3 Days</div>
+              <div style="font-size:1.6rem; font-weight:700; color:var(--text-primary); letter-spacing:-0.02em;" id="dashStreakDays">3 Days</div>
               <div style="font-size:0.8rem; color:var(--accent-green); margin-top:0.2rem;">Consecutive active streak bonus enabled</div>
             </div>
             <div style="flex:1; min-width:200px; max-width:400px;">
@@ -150,7 +166,7 @@
                 <span>Weekly Milestone</span>
                 <span id="dashUserXp" style="color:var(--text-primary); font-weight:600;">650 XP</span>
               </div>
-              <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:var(--radius-full); overflow:hidden;">
+              <div style="height:6px; background:var(--pill-btn-bg); border-radius:var(--radius-full); overflow:hidden;">
                 <div id="dashStreakBar" style="width:40%; height:100%; background:linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); border-radius:var(--radius-full);"></div>
               </div>
             </div>
@@ -190,7 +206,7 @@
           <!-- Featured Opportunities -->
           <div style="margin-bottom:2.25rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-              <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em;">Recommended Opportunities</h3>
+              <h3 style="font-size:1.15rem; color:var(--text-primary); font-weight:600; letter-spacing:-0.015em;">Recommended Opportunities</h3>
               <a href="javascript:void(0)" onclick="app.switchView('tasks')" style="font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
                 View All Opportunities
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -202,7 +218,7 @@
           <!-- Recent Transactions -->
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-              <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em;">Wallet Activity</h3>
+              <h3 style="font-size:1.15rem; color:var(--text-primary); font-weight:600; letter-spacing:-0.015em;">Wallet Activity</h3>
               <a href="javascript:void(0)" onclick="app.switchView('wallet')" style="font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
                 Statement
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -229,7 +245,7 @@
         <!-- ========================================== -->
         <section id="section-tasks" class="view-section">
           <div style="margin-bottom:1.5rem;">
-            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.35rem;">Marketplace Inventory</h2>
+            <h2 style="font-size:1.55rem; color:var(--text-primary); font-weight:700; letter-spacing:-0.02em; margin-bottom:0.35rem;">Marketplace Inventory</h2>
             <p style="color:var(--text-secondary); font-size:0.88rem;">
               Over 300+ verified task opportunities with automated validation and instant balance credit.
             </p>
@@ -323,22 +339,22 @@
         <!-- VIEW 3: WALLET & WITHDRAWALS -->
         <!-- ========================================== -->
         <section id="section-wallet" class="view-section">
-          <div style="background:linear-gradient(135deg, #101c18, #0e1724); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-xl); padding:2rem; margin-bottom:2rem; position:relative; overflow:hidden; box-shadow:var(--shadow-card);">
+          <div style="background:var(--banner-bg); border:1px solid var(--border); border-radius:var(--radius-xl); padding:2rem; margin-bottom:2rem; position:relative; overflow:hidden; box-shadow:var(--shadow-card);">
             <div style="font-size:0.75rem; color:var(--accent-green); text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:0.4rem;">
               Primary Earning Wallet
             </div>
-            <div style="font-size:2.6rem; font-weight:800; color:#fff; letter-spacing:-0.03em; margin-bottom:1.5rem;" id="walletHeroBalance">
+            <div style="font-size:2.6rem; font-weight:800; color:var(--text-primary); letter-spacing:-0.03em; margin-bottom:1.5rem;" id="walletHeroBalance">
               KES 0.00
             </div>
 
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:1.5rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; margin-bottom:1.5rem;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem; margin-bottom:1.5rem;">
               <div>
                 <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Pending Approval</div>
                 <div style="font-size:1.15rem; font-weight:700; color:var(--warning);" id="walletHeroPending">KES 0.00</div>
               </div>
               <div>
                 <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Lifetime Earned</div>
-                <div style="font-size:1.15rem; font-weight:700; color:#fff;" id="walletHeroLifetime">KES 0.00</div>
+                <div style="font-size:1.15rem; font-weight:700; color:var(--text-primary);" id="walletHeroLifetime">KES 0.00</div>
               </div>
               <div>
                 <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Total Disbursed</div>
@@ -352,7 +368,7 @@
             </button>
           </div>
 
-          <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Audit Ledger</h3>
+          <h3 style="font-size:1.15rem; color:var(--text-primary); font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Audit Ledger</h3>
           <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; box-shadow:var(--shadow-card);">
             <table class="transactions-table">
               <thead>
@@ -375,10 +391,10 @@
         <section id="section-store" class="view-section">
           <div style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
             <div>
-              <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Digital Store</h2>
+              <h2 style="font-size:1.55rem; color:var(--text-primary); font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Digital Store</h2>
               <p style="color:var(--text-secondary); font-size:0.88rem;">Invest task earnings in software starter kits, ATS templates, and guides.</p>
             </div>
-            <div style="display:flex; gap:0.4rem; background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:0.25rem; border-radius:var(--radius-sm);">
+            <div style="display:flex; gap:0.4rem; background:var(--chip-scroll-bg); border:1px solid var(--border); padding:0.25rem; border-radius:var(--radius-sm);">
               <button class="chip-btn store-tab-btn active" data-tab="browse">Catalog</button>
               <button class="chip-btn store-tab-btn" data-tab="library">My Library</button>
             </div>
@@ -393,7 +409,7 @@
         <!-- ========================================== -->
         <section id="section-chat" class="view-section">
           <div style="margin-bottom:1.5rem;">
-            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">AI Mentorship & Conversational Tasks</h2>
+            <h2 style="font-size:1.55rem; color:var(--text-primary); font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">AI Mentorship & Conversational Tasks</h2>
             <p style="color:var(--text-secondary); font-size:0.88rem;">Select from over 50 specialized AI mentors across technical mock interviews, finance, academics, and customer simulations.</p>
           </div>
 
@@ -403,9 +419,9 @@
           <div class="tasks-grid" id="chatCharactersList" style="margin-bottom:2rem;"></div>
 
           <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:520px; box-shadow:var(--shadow-card);">
-            <div style="padding:1.1rem 1.35rem; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+            <div style="padding:1.1rem 1.35rem; border-bottom:1px solid var(--border); background:var(--bg-secondary); display:flex; justify-content:space-between; align-items:center;">
               <div>
-                <h4 style="color:#fff; margin:0; font-size:1rem; display:flex; align-items:center;" id="activeCharName">AI Mentor</h4>
+                <h4 style="color:var(--text-primary); margin:0; font-size:1rem; display:flex; align-items:center;" id="activeCharName">AI Mentor</h4>
                 <div style="font-size:0.75rem; color:var(--accent-green); margin-top:0.2rem;" id="activeCharRole">Advisor</div>
               </div>
               <div style="font-size:0.8rem; font-weight:600; color:var(--accent-cyan);" id="activeCharTurnsProgress">
@@ -413,14 +429,14 @@
               </div>
             </div>
 
-            <div style="padding:0.65rem 1.35rem; background:rgba(255,255,255,0.015); font-size:0.75rem; color:var(--text-muted); border-bottom:1px solid var(--border);" id="activeCharDisclaimer">
+            <div style="padding:0.65rem 1.35rem; background:var(--bg-elevated); font-size:0.75rem; color:var(--text-muted); border-bottom:1px solid var(--border);" id="activeCharDisclaimer">
               Notice: All AI personas are automated assistants for simulation.
             </div>
 
             <div id="chatMessagesBox" style="flex:1; padding:1.25rem; overflow-y:auto; display:flex; flex-direction:column;"></div>
 
-            <div style="padding:1rem 1.25rem; border-top:1px solid var(--border); background:rgba(255,255,255,0.02); display:flex; gap:0.65rem;">
-              <input type="text" id="chatInputMessage" placeholder="Ask a question or reply thoughtfully to advance your session..." style="flex:1; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+            <div style="padding:1rem 1.25rem; border-top:1px solid var(--border); background:var(--bg-secondary); display:flex; gap:0.65rem;">
+              <input type="text" id="chatInputMessage" placeholder="Ask a question or reply thoughtfully to advance your session..." style="flex:1; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
               <button class="btn btn-primary" id="sendChatMessageBtn" style="padding:0.75rem 1.25rem; display:inline-flex; align-items:center; gap:0.4rem;">
                 <span>Send</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -434,11 +450,11 @@
         <!-- ========================================== -->
         <section id="section-leaderboard" class="view-section">
           <div style="margin-bottom:1.5rem;">
-            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Community Rankings & Milestones</h2>
+            <h2 style="font-size:1.55rem; color:var(--text-primary); font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Community Rankings & Milestones</h2>
             <p style="color:var(--text-secondary); font-size:0.88rem;">Advance your tier to unlock higher task quotas and verified badges.</p>
           </div>
 
-          <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Top Verified Contributors</h3>
+          <h3 style="font-size:1.15rem; color:var(--text-primary); font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Top Verified Contributors</h3>
           <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; margin-bottom:2.5rem; box-shadow:var(--shadow-card);">
             <table class="transactions-table">
               <thead>
@@ -454,7 +470,7 @@
             </table>
           </div>
 
-          <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Verified Milestones</h3>
+          <h3 style="font-size:1.15rem; color:var(--text-primary); font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Verified Milestones</h3>
           <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;" id="leaderboardAchievementsList"></div>
         </section>
 
@@ -464,7 +480,7 @@
         <section id="section-referrals" class="view-section">
           <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-xl); padding:2rem; margin-bottom:2rem; box-shadow:var(--shadow-card);">
             <div style="font-size:0.75rem; font-weight:700; color:var(--accent-green); text-transform:uppercase; letter-spacing:0.05em;">Affiliate Network</div>
-            <h2 style="font-size:1.75rem; color:#fff; letter-spacing:-0.025em; margin:0.4rem 0 0.65rem 0;">Earn KES 100 for Every Active Referral</h2>
+            <h2 style="font-size:1.75rem; color:var(--text-primary); letter-spacing:-0.025em; margin:0.4rem 0 0.65rem 0;">Earn KES 100 for Every Active Referral</h2>
             <p style="color:var(--text-secondary); font-size:0.9rem; max-width:620px; line-height:1.5; margin-bottom:1.5rem;">
               Invite colleagues, students, or fellow freelancers. When they register and successfully complete their first verified task, KES 100 is automatically credited to your ledger.
             </p>
@@ -475,7 +491,7 @@
                 <strong style="font-size:1.2rem; color:var(--accent-cyan); font-family:monospace;" id="referralCodeDisplay">WAVE1000</strong>
               </div>
               <div style="flex:1; min-width:250px;">
-                <input type="text" id="referralLinkInput" readonly style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem; font-family:monospace;">
+                <input type="text" id="referralLinkInput" readonly style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem; font-family:monospace;">
               </div>
               <button class="btn btn-primary" id="copyReferralBtn" style="padding:0.75rem 1.35rem; display:inline-flex; align-items:center; gap:0.45rem;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -486,7 +502,7 @@
             <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; border-top:1px solid var(--border); padding-top:1.5rem;">
               <div>
                 <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Invited Members</div>
-                <div style="font-size:1.35rem; font-weight:700; color:#fff;">8 Members</div>
+                <div style="font-size:1.35rem; font-weight:700; color:var(--text-primary);">8 Members</div>
               </div>
               <div>
                 <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Qualified Referrals</div>
@@ -505,7 +521,7 @@
         <!-- ========================================== -->
         <section id="section-support" class="view-section">
           <div style="margin-bottom:1.5rem;">
-            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Knowledge Base & Support</h2>
+            <h2 style="font-size:1.55rem; color:var(--text-primary); font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Knowledge Base & Support</h2>
             <p style="color:var(--text-secondary); font-size:0.88rem;">Search policy guidelines or submit an appeal to our review desk.</p>
           </div>
 
@@ -521,15 +537,15 @@
 
           <div style="display:grid; grid-template-columns:1fr; gap:1.5rem; margin-top:2rem;">
             <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; box-shadow:var(--shadow-card);">
-              <h3 style="color:#fff; font-size:1.15rem; font-weight:600; margin-bottom:1rem;">Open a Ticket</h3>
+              <h3 style="color:var(--text-primary); font-size:1.15rem; font-weight:600; margin-bottom:1rem;">Open a Ticket</h3>
               <form id="newTicketForm">
                 <div style="margin-bottom:1rem;">
                   <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Subject</label>
-                  <input type="text" id="ticketSubjectInput" required placeholder="Concise summary of your inquiry..." style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+                  <input type="text" id="ticketSubjectInput" required placeholder="Concise summary of your inquiry..." style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
                 </div>
                 <div style="margin-bottom:1rem;">
                   <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Category</label>
-                  <select id="ticketCategorySelect" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+                  <select id="ticketCategorySelect" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
                     <option>Task Review Appeal</option>
                     <option>Withdrawal Delayed</option>
                     <option>Account Verification</option>
@@ -538,14 +554,14 @@
                 </div>
                 <div style="margin-bottom:1.25rem;">
                   <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Details & References</label>
-                  <textarea id="ticketMessageInput" rows="4" required placeholder="Include task titles, transaction IDs, or timestamp information..." style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;"></textarea>
+                  <textarea id="ticketMessageInput" rows="4" required placeholder="Include task titles, transaction IDs, or timestamp information..." style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Dispatch Ticket</button>
               </form>
             </div>
 
             <div>
-              <h3 style="color:#fff; font-size:1.15rem; font-weight:600; margin-bottom:1rem;">Active Inquiries</h3>
+              <h3 style="color:var(--text-primary); font-size:1.15rem; font-weight:600; margin-bottom:1rem;">Active Inquiries</h3>
               <div id="supportTicketsContainer"></div>
             </div>
           </div>
@@ -558,9 +574,9 @@
           <div style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
             <div>
               <div style="font-size:0.75rem; font-weight:700; color:var(--accent-green); text-transform:uppercase; letter-spacing:0.05em;">Staff Console</div>
-              <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-top:0.25rem;">Operations Desk</h2>
+              <h2 style="font-size:1.55rem; color:var(--text-primary); font-weight:700; letter-spacing:-0.02em; margin-top:0.25rem;">Operations Desk</h2>
             </div>
-            <div style="display:flex; gap:0.35rem; background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:0.25rem; border-radius:var(--radius-sm);">
+            <div style="display:flex; gap:0.35rem; background:var(--chip-scroll-bg); border:1px solid var(--border); padding:0.25rem; border-radius:var(--radius-sm);">
               <button class="chip-btn admin-tab-btn active" data-tab="overview">Overview</button>
               <button class="chip-btn admin-tab-btn" data-tab="queue">Audit Queue</button>
               <button class="chip-btn admin-tab-btn" data-tab="settings">Parameters</button>
@@ -595,7 +611,7 @@
 
           <!-- Admin Queue Tab -->
           <div id="adminQueueTab" style="display:none;">
-            <h3 style="font-size:1.15rem; color:#fff; font-weight:600; margin-bottom:1rem;">Worker Submissions Requiring Human Review</h3>
+            <h3 style="font-size:1.15rem; color:var(--text-primary); font-weight:600; margin-bottom:1rem;">Worker Submissions Requiring Human Review</h3>
             <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; box-shadow:var(--shadow-card);">
               <table class="transactions-table">
                 <thead>
@@ -615,18 +631,18 @@
           <!-- Admin Settings Tab -->
           <div id="adminSettingsTab" style="display:none;">
             <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; max-width:600px; box-shadow:var(--shadow-card);">
-              <h3 style="color:#fff; margin-bottom:1rem; font-size:1.1rem;">Financial & Security Parameters</h3>
+              <h3 style="color:var(--text-primary); margin-bottom:1rem; font-size:1.1rem;">Financial & Security Parameters</h3>
               <div style="margin-bottom:1rem;">
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Minimum Withdrawal Ceiling (KES)</label>
-                <input type="number" value="100" readonly style="width:100%; padding:0.65rem; background:var(--bg-primary); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">
+                <input type="number" value="100" readonly style="width:100%; padding:0.65rem; background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); border-radius:var(--radius-sm); font-size:0.88rem;">
               </div>
               <div style="margin-bottom:1rem;">
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">M-Pesa B2C Network Fee (KES)</label>
-                <input type="number" value="20" readonly style="width:100%; padding:0.65rem; background:var(--bg-primary); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">
+                <input type="number" value="20" readonly style="width:100%; padding:0.65rem; background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); border-radius:var(--radius-sm); font-size:0.88rem;">
               </div>
               <div>
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Referral Qualifying Task Milestone</label>
-                <input type="text" value="First Approved Submission" readonly style="width:100%; padding:0.65rem; background:var(--bg-primary); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">
+                <input type="text" value="First Approved Submission" readonly style="width:100%; padding:0.65rem; background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); border-radius:var(--radius-sm); font-size:0.88rem;">
               </div>
             </div>
           </div>
@@ -636,13 +652,60 @@
         <!-- VIEW 10: PROFILE & SETTINGS -->
         <!-- ========================================== -->
         <section id="section-profile" class="view-section">
+          <!-- Theme & Interface Appearance -->
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.75rem; max-width:640px; box-shadow:var(--shadow-card); margin-bottom:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <div>
+                <h3 style="color:var(--text-primary); margin:0; font-size:1.15rem; font-weight:700;">Appearance & Theme</h3>
+                <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:0.25rem;">
+                  Customize your workspace interface with light or dark styling.
+                </p>
+              </div>
+            </div>
+
+            <div class="theme-picker-grid">
+              <button type="button" class="theme-choice-btn" data-theme-mode="light" id="themeBtnLight">
+                <div class="theme-choice-preview light">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                  <span>Light</span>
+                </div>
+                <div class="theme-choice-meta">
+                  <span class="theme-choice-title">Light Mode</span>
+                  <span class="theme-choice-badge theme-choice-indicator">Active</span>
+                </div>
+              </button>
+
+              <button type="button" class="theme-choice-btn" data-theme-mode="dark" id="themeBtnDark">
+                <div class="theme-choice-preview dark">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                  <span>Dark</span>
+                </div>
+                <div class="theme-choice-meta">
+                  <span class="theme-choice-title">Dark Mode</span>
+                  <span class="theme-choice-badge theme-choice-indicator">Active</span>
+                </div>
+              </button>
+
+              <button type="button" class="theme-choice-btn" data-theme-mode="system" id="themeBtnSystem">
+                <div class="theme-choice-preview system">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  <span>Auto</span>
+                </div>
+                <div class="theme-choice-meta">
+                  <span class="theme-choice-title">System Auto</span>
+                  <span class="theme-choice-badge theme-choice-indicator">Active</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
           <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.75rem; max-width:640px; box-shadow:var(--shadow-card);">
             <div style="display:flex; align-items:center; gap:1.15rem; margin-bottom:1.75rem;">
-              <div style="width:58px; height:58px; border-radius:50%; background:var(--bg-elevated); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:#fff;">
+              <div style="width:58px; height:58px; border-radius:50%; background:var(--bg-elevated); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:var(--text-primary);">
                 E
               </div>
               <div>
-                <h3 style="color:#fff; margin:0; font-size:1.15rem;" id="profUsername">User</h3>
+                <h3 style="color:var(--text-primary); margin:0; font-size:1.15rem;" id="profUsername">User</h3>
                 <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.15rem;" id="profEmail">user@earnwave.co.ke</div>
                 <span class="status-pill status-completed" style="margin-top:0.4rem;" id="profRoleBadge">
                   <span class="status-dot"></span> ACTIVE MEMBER
@@ -653,19 +716,19 @@
             <form id="profileForm">
               <div style="margin-bottom:1rem;">
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Full Display Name</label>
-                <input type="text" id="profDisplayName" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+                <input type="text" id="profDisplayName" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
               </div>
               <div style="margin-bottom:1rem;">
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">M-Pesa Payout Number</label>
-                <input type="text" id="profPhone" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+                <input type="text" id="profPhone" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
               </div>
               <div style="margin-bottom:1rem;">
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">County / Location</label>
-                <input type="text" id="profCounty" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+                <input type="text" id="profCounty" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
               </div>
               <div style="margin-bottom:1.5rem;">
                 <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Bio & Skill Specializations</label>
-                <textarea id="profBio" rows="3" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;"></textarea>
+                <textarea id="profBio" rows="3" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;"></textarea>
               </div>
               <button type="submit" class="btn btn-primary">Save Profile Details</button>
             </form>
@@ -721,19 +784,19 @@
         <div class="modal-body">
           <div style="margin-bottom:1.15rem;">
             <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Safaricom M-Pesa Phone Number</label>
-            <input type="text" id="withdrawPhoneInput" required placeholder="2547XXXXXXXX or 07XXXXXXXX" style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem; font-family:monospace;">
+            <input type="text" id="withdrawPhoneInput" required placeholder="2547XXXXXXXX or 07XXXXXXXX" style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem; font-family:monospace;">
           </div>
           <div style="margin-bottom:1.15rem;">
             <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Withdrawal Amount (KES)</label>
-            <input type="number" id="withdrawAmountInput" min="100" step="10" required placeholder="Minimum KES 100.00" style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+            <input type="number" id="withdrawAmountInput" min="100" step="10" required placeholder="Minimum KES 100.00" style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-size:0.88rem;">
           </div>
 
-          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; font-size:0.85rem; margin-bottom:1.25rem;">
+          <div style="background:var(--pill-btn-bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; font-size:0.85rem; margin-bottom:1.25rem;">
             <div style="display:flex; justify-content:space-between; margin-bottom:0.45rem; color:var(--text-secondary);">
               <span>M-Pesa B2C Gateway Fee</span>
-              <strong id="withdrawFeePreview" style="color:#fff;">KES 20.00</strong>
+              <strong id="withdrawFeePreview" style="color:var(--text-primary);">KES 20.00</strong>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.95rem; font-weight:600; color:#fff;">
+            <div style="display:flex; justify-content:space-between; font-size:0.95rem; font-weight:600; color:var(--text-primary);">
               <span>Net Disbursement</span>
               <strong style="color:var(--accent-green);" id="withdrawNetPreview">KES 0.00</strong>
             </div>

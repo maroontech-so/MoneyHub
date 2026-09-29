@@ -127,16 +127,19 @@
                 const querySnapshot = await getDocs(q);
                 
                 let codeData = null;
+                const refCodeEl = document.getElementById('refCode');
+                const statClicksEl = document.getElementById('statClicks');
+                const statRegsEl = document.getElementById('statRegs');
                 if (!querySnapshot.empty) {
                     codeData = querySnapshot.docs[0].data();
                     const code = codeData.code;
-                    document.getElementById('refCode').textContent = code;
+                    if (refCodeEl) refCodeEl.textContent = code;
                     referralLink = `${window.location.origin}/register.html?ref=${code}`;
                     
-                    document.getElementById('statClicks').textContent = codeData.clickCount || 0;
-                    document.getElementById('statRegs').textContent = codeData.registrationCount || 0;
+                    if (statClicksEl) statClicksEl.textContent = codeData.clickCount || 0;
+                    if (statRegsEl) statRegsEl.textContent = codeData.registrationCount || 0;
                 } else {
-                    document.getElementById('refCode').textContent = "Not found";
+                    if (refCodeEl) refCodeEl.textContent = "Not found";
                 }
 
                 // 2. Get referrals
@@ -145,51 +148,57 @@
                 const refSnap = await getDocs(refQ);
                 
                 const table = document.getElementById('referralsTable');
-                table.innerHTML = '';
+                if (table) table.innerHTML = '';
                 
                 let qualifiedCount = 0;
                 let totalCommission = 0;
 
-                if(refSnap.empty) {
-                    table.innerHTML = '<tr><td colspan="4" style="text-align: center;">No referrals yet.</td></tr>';
-                } else {
-                    refSnap.forEach(docSnap => {
-                        const ref = docSnap.data();
-                        if(ref.status === 'QUALIFIED') {
-                            qualifiedCount++;
-                            totalCommission += (ref.commissionAmount || 0);
-                        }
-                        
-                        const tr = document.createElement('tr');
-                        const dateStr = ref.createdAt ? new Date(ref.createdAt.toDate()).toLocaleDateString() : 'N/A';
-                        const statusClass = ref.status === 'QUALIFIED' ? 'status-qualified' : 'status-pending';
-                        
-                        tr.innerHTML = `
-                            <td>User_${ref.referredId.substring(0,5)}***</td>
-                            <td>${dateStr}</td>
-                            <td><span class="status-badge ${statusClass}">${ref.status}</span></td>
-                            <td>KES ${ref.commissionAmount || 0}</td>
-                        `;
-                        table.appendChild(tr);
-                    });
+                if (table) {
+                    if(refSnap.empty) {
+                        table.innerHTML = '<tr><td colspan="4" style="text-align: center;">No referrals yet.</td></tr>';
+                    } else {
+                        refSnap.forEach(docSnap => {
+                            const ref = docSnap.data();
+                            if(ref.status === 'QUALIFIED') {
+                                qualifiedCount++;
+                                totalCommission += (ref.commissionAmount || 0);
+                            }
+                            
+                            const tr = document.createElement('tr');
+                            const dateStr = ref.createdAt ? new Date(ref.createdAt.toDate()).toLocaleDateString() : 'N/A';
+                            const statusClass = ref.status === 'QUALIFIED' ? 'status-qualified' : 'status-pending';
+                            
+                            tr.innerHTML = `
+                                <td>User_${ref.referredId.substring(0,5)}***</td>
+                                <td>${dateStr}</td>
+                                <td><span class="status-badge ${statusClass}">${ref.status}</span></td>
+                                <td>KES ${ref.commissionAmount || 0}</td>
+                            `;
+                            table.appendChild(tr);
+                        });
+                    }
                 }
                 
-                document.getElementById('statQualified').textContent = qualifiedCount;
-                document.getElementById('statCommission').textContent = `KES ${totalCommission}`;
+                const qualEl = document.getElementById('statQualified');
+                if (qualEl) qualEl.textContent = qualifiedCount;
+                const commEl = document.getElementById('statCommission');
+                if (commEl) commEl.textContent = `KES ${totalCommission}`;
 
             } catch (err) {
                 console.error("Error loading affiliate data", err);
             }
         }
 
-        document.getElementById('btnCopy').addEventListener('click', () => {
-            navigator.clipboard.writeText(referralLink);
+        document.getElementById('btnCopy')?.addEventListener('click', () => {
+            if (referralLink) navigator.clipboard?.writeText(referralLink);
             const btn = document.getElementById('btnCopy');
-            btn.textContent = 'Copied!';
-            setTimeout(() => btn.textContent = 'Copy Link', 2000);
+            if (btn) {
+                btn.textContent = 'Copied!';
+                setTimeout(() => { if (btn) btn.textContent = 'Copy Link'; }, 2000);
+            }
         });
 
-        document.getElementById('btnWa').addEventListener('click', () => {
+        document.getElementById('btnWa')?.addEventListener('click', () => {
             const text = encodeURIComponent(`Join EARNWAVE and start earning! Use my link: ${referralLink}`);
             window.open(`https://wa.me/?text=${text}`, '_blank');
         });

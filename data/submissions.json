@@ -1,0 +1,21 @@
+{
+  "submissions": [
+    {
+      "id": "sub_mun0yi2t_709b43",
+      "userId": "usr_default",
+      "taskId": "test_wri_1",
+      "taskType": "writing",
+      "taskTitle": "Fintech in Kenya Analysis",
+      "rewardKes": 180,
+      "payload": {
+        "content": "Financial technology adoption in Kenya has dramatically accelerated over the past decade, driven primarily by mobile money ecosystems and expanding digital SACCO integrations. Micro, small, and medium enterprises throughout rural counties now access inventory financing directly via automated algorithmic underwriting, bypassing traditional collateral bottlenecks. Furthermore, decentralized agency banking networks ensure round-the-clock liquidity management, enhancing merchant cashflow resilience across regional distribution hubs.",
+        "targetWords": 60
+      },
+      "status": "APPROVED",
+      "validationNotes": "Word count verified: 61 words.",
+      "submittedAt": "2026-09-29T18:43:31.973Z",
+      "reviewedAt": "2026-09-29T18:43:31.988Z",
+      "reviewerNotes": "Verified source depth and quality."
+    }
+  ]
+}

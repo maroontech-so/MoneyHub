@@ -10,6 +10,7 @@ import { ACHIEVEMENTS, INITIAL_LEADERBOARD, LEVELS } from './data/gamification-d
 import { KNOWLEDGE_BASE } from './data/knowledge-base.js';
 import { TaskEngine } from './components/task-engine.js';
 import { ICONS } from './utils/icons.js';
+import { themeManager } from './utils/theme.js';
 
 class EarnWaveApp {
   constructor() {
@@ -31,8 +32,10 @@ class EarnWaveApp {
   }
 
   init() {
+    themeManager.init();
     this.initTaskRunner();
     this.bindNavigation();
+    this.bindThemeEvents();
     this.bindMarketplaceControls();
     this.bindWalletEvents();
     this.bindStoreEvents();
@@ -250,7 +253,7 @@ class EarnWaveApp {
       } else {
         recentTxContainer.innerHTML = txs.slice(0, 5).map(tx => `
           <tr>
-            <td style="font-weight:600; color:#fff;">${tx.title}</td>
+            <td style="font-weight:600; color:var(--text-primary);">${tx.title}</td>
             <td><span class="status-pill status-${tx.status.toLowerCase()}">${tx.status}</span></td>
             <td>${new Date(tx.timestamp).toLocaleDateString()}</td>
             <td class="${tx.direction === 'CREDIT' ? 'tx-credit' : 'tx-debit'}">
@@ -360,7 +363,7 @@ class EarnWaveApp {
       grid.innerHTML = `
         <div style="grid-column: 1/-1; text-align:center; padding: 4rem 1rem; color:var(--text-muted); background:var(--bg-card); border-radius:var(--radius-md); border:1px solid var(--border);">
           <div style="margin-bottom:0.75rem; color:var(--text-muted);">${ICONS.search}</div>
-          <h3 style="color:#fff; font-size:1.1rem; margin-bottom:0.25rem;">No matching tasks found</h3>
+          <h3 style="color:var(--text-primary); font-size:1.1rem; margin-bottom:0.25rem;">No matching tasks found</h3>
           <p style="font-size:0.85rem;">Try refining your search query or selecting another category.</p>
         </div>
       `;
@@ -528,7 +531,7 @@ class EarnWaveApp {
       } else {
         tableBody.innerHTML = txs.map(tx => `
           <tr>
-            <td style="font-weight:700; color:#fff;">${tx.title}</td>
+            <td style="font-weight:700; color:var(--text-primary);">${tx.title}</td>
             <td style="font-family:monospace; font-size:0.8rem; color:var(--text-muted);">${tx.reference || '-'}</td>
             <td><span class="status-pill status-${tx.status.toLowerCase()}">${tx.status}</span></td>
             <td>${new Date(tx.timestamp).toLocaleString()}</td>
@@ -568,7 +571,7 @@ class EarnWaveApp {
           <div class="task-card">
             <div class="task-card-header">
               <span class="task-card-type">${p.category}</span>
-              <span class="task-card-reward" style="color:#fff;">KES ${p.price.toFixed(2)}</span>
+              <span class="task-card-reward" style="color:var(--text-primary);">KES ${p.price.toFixed(2)}</span>
             </div>
             <h3 class="task-card-title">${p.title}</h3>
             <p class="task-card-desc">${p.description}</p>
@@ -735,11 +738,11 @@ class EarnWaveApp {
       charList.innerHTML = filteredChars.map(c => `
         <div class="task-card" style="cursor:pointer; border-color:${c.id === this.activeCharacter.id ? 'var(--accent-green)' : 'var(--border)'};" onclick="app.selectCharacter('${c.id}')">
           <div class="character-avatar-badge" style="background:${c.accentColor}18; color:${c.accentColor}; border:1px solid ${c.accentColor}35;">${c.initials}</div>
-          <h4 style="color:#fff; font-size:1rem; margin-bottom:0.25rem;">${c.name}</h4>
+          <h4 style="color:var(--text-primary); font-size:1rem; margin-bottom:0.25rem;">${c.name}</h4>
           <div style="font-size:0.75rem; color:var(--accent-green); font-weight:600; margin-bottom:0.5rem;">${c.role}</div>
           <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">${c.tagline}</p>
           <div style="margin-top:0.75rem; font-size:0.75rem; color:var(--text-muted);">
-            Session Reward: <strong style="color:#fff;">+KES ${c.rewardPerSession}</strong> · ${c.turnsRequired} turns
+            Session Reward: <strong style="color:var(--text-primary);">+KES ${c.rewardPerSession}</strong> · ${c.turnsRequired} turns
           </div>
         </div>
       `).join('');
@@ -765,7 +768,7 @@ class EarnWaveApp {
 
     box.innerHTML = this.chatMessages.map(m => `
       <div style="display:flex; justify-content:${m.sender === 'user' ? 'flex-end' : 'flex-start'}; margin-bottom:0.75rem;">
-        <div style="max-width:80%; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-size:0.9rem; line-height:1.45; background:${m.sender === 'user' ? 'var(--accent-green)' : 'var(--bg-card)'}; color:${m.sender === 'user' ? '#000' : '#fff'}; border:1px solid ${m.sender === 'user' ? 'transparent' : 'var(--border)'};">
+        <div style="max-width:80%; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-size:0.9rem; line-height:1.45; background:${m.sender === 'user' ? 'var(--accent-green)' : 'var(--bg-elevated)'}; color:${m.sender === 'user' ? '#fff' : 'var(--text-primary)'}; border:1px solid ${m.sender === 'user' ? 'transparent' : 'var(--border)'};">
           ${m.text}
         </div>
       </div>
@@ -789,7 +792,7 @@ class EarnWaveApp {
             ${ICONS[ach.iconKey] || ICONS.bolt}
           </div>
           <div style="flex:1;">
-            <div style="font-weight:600; color:#fff; font-size:0.95rem;">${ach.name}</div>
+            <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">${ach.name}</div>
             <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.25rem;">${ach.desc}</div>
             <div style="font-size:0.75rem; color:var(--accent-green); font-weight:600;">+${ach.xp} XP · +KES ${ach.rewardKes}</div>
           </div>
@@ -800,11 +803,11 @@ class EarnWaveApp {
     // Render Rankings
     if (boardContainer) {
       boardContainer.innerHTML = INITIAL_LEADERBOARD.map(row => `
-        <tr style="${row.username === user.username ? 'background:rgba(255,255,255,0.04); font-weight:600;' : ''}">
+        <tr style="${row.username === user.username ? 'background:var(--pill-btn-bg); font-weight:600;' : ''}">
           <td style="font-size:0.95rem; font-weight:700; color:${row.rank <= 3 ? 'var(--accent-green)' : 'var(--text-muted)'};">
             #${row.rank}
           </td>
-          <td style="display:flex; align-items:center; gap:0.65rem; color:#fff;">
+          <td style="display:flex; align-items:center; gap:0.65rem; color:var(--text-primary);">
             <span class="user-initials-avatar">${row.initials}</span>
             <span>${row.username}</span>
           </td>
@@ -887,7 +890,7 @@ class EarnWaveApp {
         container.innerHTML = tickets.map(t => `
           <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin-bottom:0.75rem;">
             <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-              <strong style="color:#fff;">#${t.id}: ${t.subject}</strong>
+              <strong style="color:var(--text-primary);">#${t.id}: ${t.subject}</strong>
               <span class="status-pill status-${t.status === 'RESOLVED' ? 'completed' : 'pending'}">${t.status}</span>
             </div>
             <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">Category: ${t.category} • Created ${new Date(t.createdAt).toLocaleDateString()}</div>
@@ -912,7 +915,7 @@ class EarnWaveApp {
         html += `<h4 style="color:var(--accent-green); margin:1.25rem 0 0.5rem 0; font-size:0.95rem;">${cat.category}</h4>`;
         html += filteredArticles.map(a => `
           <details style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.85rem; margin-bottom:0.5rem; cursor:pointer;">
-            <summary style="font-weight:600; color:#fff; font-size:0.9rem; outline:none;">${a.title}</summary>
+            <summary style="font-weight:600; color:var(--text-primary); font-size:0.9rem; outline:none;">${a.title}</summary>
             <p style="margin-top:0.6rem; font-size:0.85rem; color:var(--text-secondary); line-height:1.5;">${a.content}</p>
           </details>
         `).join('');
@@ -955,7 +958,7 @@ class EarnWaveApp {
       } else {
         queueBody.innerHTML = queue.map(item => `
           <tr>
-            <td style="font-weight:700; color:#fff;">${item.taskTitle}</td>
+            <td style="font-weight:700; color:var(--text-primary);">${item.taskTitle}</td>
             <td>${item.username}</td>
             <td style="max-width:240px; font-size:0.8rem; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
               ${item.submissionData}
@@ -995,6 +998,30 @@ class EarnWaveApp {
     this.renderAdmin();
   }
 
+  bindThemeEvents() {
+    // Quick topbar toggle
+    document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+      const nextTheme = themeManager.toggleTheme();
+      this.showToast(`Switched to ${nextTheme === 'light' ? 'Light' : 'Dark'} Theme`, 'success');
+    });
+
+    // Profile & settings theme selection buttons
+    document.querySelectorAll('.theme-choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.themeMode;
+        if (mode) {
+          themeManager.setTheme(mode);
+          this.showToast(`Interface set to ${mode.toUpperCase()} mode`, 'success');
+        }
+      });
+    });
+
+    // Listen to theme changes from anywhere
+    window.addEventListener('earnwave:themechange', () => {
+      themeManager.updateUI();
+    });
+  }
+
   // ==========================================
   // VIEW 10: PROFILE & SETTINGS
   // ==========================================
@@ -1021,6 +1048,8 @@ class EarnWaveApp {
     document.getElementById('profCounty').value = user.county || 'Nairobi';
     document.getElementById('profBio').value = user.bio || '';
     document.getElementById('profRoleBadge').textContent = user.role;
+
+    themeManager.updateUI();
   }
 }
 
