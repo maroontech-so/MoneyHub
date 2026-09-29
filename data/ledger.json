@@ -77,6 +77,51 @@
         "feeFor": "tx_mun0yi3g_d66a62"
       },
       "timestamp": "2026-09-29T18:43:31.996Z"
+    },
+    {
+      "id": "tx_mun4le50_d12ca7",
+      "userId": "usr_default",
+      "type": "WITHDRAWAL",
+      "amount": 200,
+      "direction": "DEBIT",
+      "status": "COMPLETED",
+      "description": "M-Pesa Payout to 254712345678",
+      "referenceId": "MPESA_B2C_MUN4LE4Z",
+      "metadata": {
+        "phone": "254712345678",
+        "payoutChannel": "Safaricom Daraja B2C",
+        "fee": 15
+      },
+      "timestamp": "2026-09-29T20:25:18.804Z"
+    },
+    {
+      "id": "tx_mun4le51_667bdd",
+      "userId": "usr_default",
+      "type": "PENALTY",
+      "amount": 15,
+      "direction": "DEBIT",
+      "status": "COMPLETED",
+      "description": "M-Pesa Network B2C Disbursement Fee",
+      "referenceId": "tx_mun4le50_d12ca7",
+      "metadata": {
+        "feeFor": "tx_mun4le50_d12ca7"
+      },
+      "timestamp": "2026-09-29T20:25:18.805Z"
+    },
+    {
+      "id": "tx_mun4lgkl_cc1986",
+      "userId": "usr_default",
+      "type": "AI_TRAINING_REWARD",
+      "amount": 100,
+      "direction": "CREDIT",
+      "status": "COMPLETED",
+      "description": "Task Verified: Evaluation Task",
+      "referenceId": "sub_mun4lgkk_dda675",
+      "metadata": {
+        "taskId": "task_ai_1",
+        "submissionId": "sub_mun4lgkk_dda675"
+      },
+      "timestamp": "2026-09-29T20:25:21.957Z"
     }
   ]
 }

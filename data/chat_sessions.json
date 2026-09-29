@@ -15,6 +15,22 @@
           "timestamp": "2026-09-29T18:43:32.145Z"
         }
       ]
+    },
+    "usr_default_c1": {
+      "turns": 1,
+      "rewarded": false,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello, how should I invest in Kenya?",
+          "timestamp": "2026-09-29T20:25:15.687Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello! I'm Amina, your Financial Planner. I'm here to help you evaluate real-world scenarios and sharpen your domain skills. Let's dig deeper: what specific challenge or project are you working through today?",
+          "timestamp": "2026-09-29T20:25:15.823Z"
+        }
+      ]
     }
   }
 }

@@ -10,7 +10,14 @@ import { JsonStore } from './storage.js';
 let geminiClient = null;
 try {
   if (process.env.GEMINI_API_KEY) {
-    geminiClient = new GoogleGenAI();
+    geminiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
   }
 } catch (e) {
   console.warn('Gemini client initialization deferred:', e.message);
