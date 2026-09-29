@@ -5,7 +5,7 @@ async function loadHotels(options = {}) {
     // Mock load
     setTimeout(() => {
         document.getElementById('loadingState').style.display = 'none';
-        const hotels = [{id:'1', name:'Test Hotel', location:'Nairobi 🇰🇪', rating: 4, unlockFee: 0, reward: 500, status: 'AVAILABLE', description: 'Nice hotel.'}];
+        const hotels = [{id:'1', name:'Test Hotel', location:'Nairobi, Kenya', rating: 4, unlockFee: 0, reward: 500, status: 'AVAILABLE', description: 'Nice hotel.'}];
         const list = document.getElementById('hotelsList');
         if(hotels.length === 0) document.getElementById('emptyState').style.display = 'block';
         
@@ -25,7 +25,7 @@ async function loadHotels(options = {}) {
 
 async function loadHotel(hotelId) {
     document.getElementById('hotelName').innerText = "Loaded Hotel";
-    document.getElementById('hotelLocation').innerText = "Nairobi 🇰🇪";
+    document.getElementById('hotelLocation').innerText = "Nairobi, Kenya";
     document.getElementById('hotelBrief').innerText = "Please write a detailed review.";
     document.getElementById('reviewFormSection').style.display = 'block';
 

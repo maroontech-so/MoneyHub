@@ -74,7 +74,9 @@ export async function loadSocialProof() {
 export function getTransactionDisplay(type, direction) {
     const out = ['WITHDRAWAL', 'PRODUCT_PURCHASE', 'TASK_UNLOCK_PAYMENT', 'PENALTY'].includes(type);
     return {
-        icon: out ? '💸' : '💰',
+        icon: out
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="7" x2="7" y2="17"/><polyline points="17 17 7 17 7 7"/></svg>',
         colorClass: out ? 'out' : 'in'
     };
 }

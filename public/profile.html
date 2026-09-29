@@ -20,8 +20,14 @@
             <span class="badge badge-success" id="profileStatus">ACTIVE</span>
           </div>
           <p class="text-secondary mb-1">@<span id="profileUsername">...</span></p>
-          <p class="text-secondary mb-1">📧 <span id="profileEmail">...</span></p>
-          <p class="text-secondary mb-3">📱 <span id="profilePhone">...</span></p>
+          <p class="text-secondary mb-1" style="display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span id="profileEmail">...</span>
+          </p>
+          <p class="text-secondary mb-3" style="display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            <span id="profilePhone">...</span>
+          </p>
           <button class="btn btn-secondary btn-sm">Edit Profile</button>
         </div>
       </div>

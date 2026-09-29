@@ -21,10 +21,10 @@ async function initDashboard() {
 
     // Populate Opportunities (Mocked for UI demo, normally from Firestore config)
     const opps = [
-        { title: 'Microtasks', reward: 'Up to KES 500', icon: '📝', link: 'tasks.html?type=MICROTASK' },
-        { title: 'Surveys', reward: 'Up to KES 200', icon: '📊', link: 'tasks.html?type=SURVEY' },
-        { title: 'Hotel Reviews', reward: 'Up to KES 1000', icon: '🏨', link: 'tasks.html?type=HOTEL_REVIEW' },
-        { title: 'AI Training', reward: 'Up to KES 800', icon: '🤖', link: 'tasks.html?type=AI_TRAINING' }
+        { title: 'Microtasks', reward: 'Up to KES 500', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>', link: 'tasks.html?type=MICROTASK' },
+        { title: 'Surveys', reward: 'Up to KES 200', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>', link: 'tasks.html?type=SURVEY' },
+        { title: 'Hotel Reviews', reward: 'Up to KES 1000', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M9 8h1"/><path d="M9 12h1"/><path d="M9 16h1"/><path d="M14 8h1"/><path d="M14 12h1"/><path d="M14 16h1"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>', link: 'tasks.html?type=HOTEL_REVIEW' },
+        { title: 'AI Training', reward: 'Up to KES 800', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>', link: 'tasks.html?type=AI_TRAINING' }
     ];
     
     const oppContainer = document.getElementById('opportunities-list');
@@ -59,9 +59,12 @@ async function initDashboard() {
             const iconCls = tx.isOut ? 'out' : 'in';
             const valCls = tx.isOut ? 'negative' : 'positive';
             const sign = tx.isOut ? '-' : '+';
+            const iconSvg = tx.isOut
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="7" x2="7" y2="17"/><polyline points="17 17 7 17 7 7"/></svg>';
             
             el.innerHTML = `
-                <div class="tx-icon ${iconCls}">${tx.isOut ? '💸' : '💰'}</div>
+                <div class="tx-icon ${iconCls}">${iconSvg}</div>
                 <div class="tx-details">
                     <div class="tx-title">${tx.desc}</div>
                     <div class="tx-date">${tx.date}</div>

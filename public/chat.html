@@ -25,8 +25,9 @@
     </style>
 </head>
 <body>
-    <div class="banner">
-        ⚠️ IMPORTANT: All characters are AI-powered assistants, not real humans.
+    <div class="banner" style="display:flex; align-items:center; justify-content:center; gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        IMPORTANT: All characters are AI-powered assistants, not real humans.
     </div>
     
     <header>
@@ -103,7 +104,7 @@
                     <div class="status-dot"></div>
                     <img src="${char.avatar || '/assets/default-avatar.png'}" alt="${char.name}" class="avatar">
                     <div class="char-name">${char.name}</div>
-                    <div class="char-info">${char.countryFlag || '🌍'} ${char.country} • ${char.age} yrs</div>
+                    <div class="char-info">${char.country || 'Global'} • ${char.age} yrs</div>
                     <div class="char-bio">${char.bio}</div>
                     <div class="unlock-fee">${isUnlocked ? 'Unlocked' : 'KES ' + char.unlockFee + ' to unlock'}</div>
                     <button class="btn-chat" onclick="window.location.href='/character.html?id=${char.id}'">

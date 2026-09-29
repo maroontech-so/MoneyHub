@@ -83,6 +83,22 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--border);
 }
 
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
 .btn-danger {
   background-color: rgba(248, 81, 73, 0.1);
   color: var(--danger);

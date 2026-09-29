@@ -32,8 +32,9 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="ai-disclaimer">
-            ⚠️ You are chatting with an AI. Responses are computer-generated.
+        <div class="ai-disclaimer" style="display:flex; align-items:center; justify-content:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            You are chatting with an AI. Responses are computer-generated.
         </div>
         
         <div class="chat-header">
@@ -41,7 +42,7 @@
             <div class="header-info">
                 <div class="char-name">
                     <span id="charName">Loading...</span>
-                    <span class="ai-label">🤖 AI Character</span>
+                    <span class="ai-label">AI Character</span>
                 </div>
                 <div class="char-details" id="charDetails">Loading details...</div>
             </div>

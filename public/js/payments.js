@@ -75,7 +75,9 @@ const payments = {
             .then(result => {
                 if (result.status === 'SUCCESS') {
                     statusContent.innerHTML = `
-                        <div class="text-green-500 text-4xl mb-4">✓</div>
+                        <div class="mb-4" style="display:flex; justify-content:center;">
+                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 9 10 15 7 12"/></svg>
+                        </div>
                         <p class="text-gray-800 font-bold mb-2">Payment Confirmed!</p>
                         <p class="text-sm text-gray-500">${result.resultDescription || 'Success'}</p>
                     `;
@@ -85,7 +87,9 @@ const payments = {
                     }, 2000);
                 } else {
                     statusContent.innerHTML = `
-                        <div class="text-red-500 text-4xl mb-4">✗</div>
+                        <div class="mb-4" style="display:flex; justify-content:center;">
+                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        </div>
                         <p class="text-gray-800 font-bold mb-2">Payment Failed</p>
                         <p class="text-sm text-gray-500">${result.resultDescription || 'Please try again'}</p>
                     `;
@@ -95,7 +99,9 @@ const payments = {
             })
             .catch(error => {
                 statusContent.innerHTML = `
-                    <div class="text-red-500 text-4xl mb-4">✗</div>
+                    <div class="mb-4" style="display:flex; justify-content:center;">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    </div>
                     <p class="text-gray-800 font-bold mb-2">Error</p>
                     <p class="text-sm text-gray-500">${error.message || 'An error occurred'}</p>
                 `;

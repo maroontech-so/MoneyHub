@@ -1,1211 +1,758 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EARNWAVE</title>
-    <meta name="description" content="EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
-    <meta property="og:title" content="EARNWAVE">
-    <meta property="og:description" content="EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-dark: #f4f7fb;
-            --bg-surface: #ffffff;
-            --bg-surface-hover: #f9fafc;
-            --primary-accent: #0066ff; /* Professional Blue */
-            --success-accent: #00c853; /* Emerald Green */
-            --danger-accent: #ff3d00;
-            --text-main: #1a1d20;
-            --text-muted: #6c757d;
-            --border-color: #e5e7eb;
-            
-            --font-main: 'Inter', sans-serif;
-            --border-radius: 16px;
-            --transition: all 0.2s ease;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            line-height: 1.5;
-            overflow-x: hidden;
-        }
-
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .justify-center { justify-content: center; }
-        .gap-2 { gap: 0.5rem; }
-        .gap-4 { gap: 1rem; }
-        .mt-2 { margin-top: 0.5rem; }
-        .mt-4 { margin-top: 1rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .text-center { text-align: center; }
-        .text-muted { color: var(--text-muted); font-size: 0.875rem; }
-        .text-success { color: var(--success-accent); }
-        .text-danger { color: var(--danger-accent); }
-        .font-bold { font-weight: 700; }
-        .font-semibold { font-weight: 600; }
-
-        /* Typography */
-        h1, h2, h3 { color: var(--text-main); margin-bottom: 0.5rem; }
-        h1 { font-size: 1.5rem; }
-        
-        /* Buttons */
-        button {
-            font-family: var(--font-main);
-            border: none;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: var(--transition);
-            padding: 0.75rem 1rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-        }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-accent), #0052cc);
-            color: #ffffff;
-        }
-        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
-        .btn-secondary {
-            background: var(--bg-surface-hover);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-        }
-        .btn-secondary:active:not(:disabled) { background: var(--border-color); }
-        
-        /* Forms */
-        input, select, textarea {
-            width: 100%;
-            padding: 0.875rem;
-            border-radius: 8px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-family: var(--font-main);
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-accent);
-        }
-
-        /* Layout & Cards */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        #auth-view, #activation-view {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-        .auth-box { width: 100%; max-width: 400px; }
-        
-        #main-view {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .header {
-            padding: 1rem 1.5rem;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .header-logo {
-            font-weight: 700;
-            font-size: 1.25rem;
-            background: linear-gradient(135deg, var(--primary-accent), var(--success-accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            padding-bottom: 80px;
-        }
-        .view-section {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .view-section.active { display: block; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Wallet & Tasks Specifics */
-        .wallet-card {
-            background: #ffffff;
-            border-left: 4px solid var(--primary-accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .balance-amount {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0.5rem 0;
-            letter-spacing: -1px;
-        }
-        
-        .task-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        .task-card { display: flex; flex-direction: column; justify-content: space-between; }
-        .task-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .task-badge {
-            background: rgba(0, 229, 255, 0.1);
-            color: var(--primary-accent);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        /* Transactions */
-        .tx-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1rem 0; border-bottom: 1px solid var(--border-color);
-        }
-        .tx-item:last-child { border-bottom: none; }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--bg-surface); border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around; padding: 0.75rem 0; z-index: 20;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            color: var(--text-muted); text-decoration: none; font-size: 0.75rem;
-            gap: 0.25rem; cursor: pointer; transition: color 0.2s;
-        }
-        .nav-item.active { color: var(--primary-accent); }
-        .nav-icon { width: 20px; height: 20px; }
-
-        /* Desktop Adjustments */
-        @media (min-width: 768px) {
-            #main-view { flex-direction: row; }
-            .bottom-nav {
-                position: static; flex-direction: column; justify-content: flex-start;
-                width: 250px; border-top: none; border-right: 1px solid var(--border-color);
-                padding: 2rem 1rem; gap: 1rem;
-            }
-            .nav-item { flex-direction: row; font-size: 1rem; padding: 0.75rem 1rem; border-radius: 8px; }
-            .nav-item:hover { background: var(--bg-surface-hover); }
-            .content-area { padding: 2rem; max-width: 1000px; margin: 0 auto; width: 100%; }
-            .task-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-        }
-
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed; top: 1rem; right: 1rem; z-index: 9999;
-            display: flex; flex-direction: column; gap: 0.5rem;
-        }
-        .toast {
-            background: #ffffff; border-left: 4px solid var(--primary-accent);
-            padding: 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            animation: slideIn 0.3s ease; color: var(--text-main); font-weight: 500;
-        }
-        .toast.error { border-left-color: var(--danger-accent); }
-        .toast.success { border-left-color: var(--success-accent); }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        /* Loader */
-        .loader {
-            border: 3px solid var(--border-color); border-top: 3px solid var(--primary-accent);
-            border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Task Interactive UI Elements */
-        .captcha-box {
-            background: var(--bg-surface-hover); border: 2px dashed var(--border-color);
-            border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 1rem;
-            font-size: 1.5rem; font-weight: bold; letter-spacing: 5px;
-            user-select: none;
-        }
-        .survey-option {
-            background: var(--bg-surface); border: 1px solid var(--border-color);
-            padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .survey-option:hover { border-color: var(--primary-accent); }
-        .survey-option.selected { 
-            background: rgba(0, 102, 255, 0.05); 
-            border-color: var(--primary-accent); 
-            color: var(--primary-accent);
-            font-weight: 600;
-        }
-        
-        /* Task States */
-        .task-card.closed {
-            opacity: 0.6;
-            pointer-events: none;
-            filter: grayscale(100%);
-        }
-        .status-badge {
-            font-size: 0.7rem; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 600; text-transform: uppercase;
-        }
-        .status-available { background: rgba(0, 200, 83, 0.1); color: var(--success-accent); }
-        .status-opened { background: rgba(0, 102, 255, 0.1); color: var(--primary-accent); }
-        .status-closed { background: rgba(108, 117, 125, 0.1); color: var(--text-muted); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EARNWAVE - Kenya Digital Earning Marketplace</title>
+  <meta name="description" content="EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
+  <meta property="og:title" content="EARNWAVE">
+  <meta property="og:description" content="EARNWAVE rewards platform for microtasks, surveys, hotel reviews, AI training, writing, and M-Pesa payouts.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/marketplace.css">
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body>
+  <div class="app-layout">
+    <!-- Desktop Sidebar (>= 1024px) -->
+    <aside class="desktop-sidebar">
+      <div class="brand-logo" style="margin-bottom: 2rem;">
+        <span class="brand-logo-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </span>
+        EARNWAVE
+      </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-btn active" data-view="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="tasks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Marketplace</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="wallet">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+          <span>Wallet & Payouts</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="store">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Digital Store</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="chat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>AI Mentors</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="leaderboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"/><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"/><path d="M6 4h12v7a6 6 0 0 1-12 0V4z"/></svg>
+          <span>Leaderboard</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="referrals">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Referrals</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="support">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Support Desk</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="admin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          <span>Staff Portal</span>
+        </button>
+        <button class="sidebar-nav-btn" data-view="profile">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Account</span>
+        </button>
+      </nav>
 
-    <!-- AUTHENTICATION VIEW -->
-    <div id="auth-view" class="app-container">
-        <div class="auth-box card">
-            <div class="text-center mb-4">
-                <h1 class="header-logo" style="font-size: 2rem;">EARNWAVE</h1>
-                <p class="text-muted">Interactive Demo Environment</p>
-            </div>
-            
-            <form id="login-form">
-                <input type="text" id="login-identifier" placeholder="Email or Username" required value="demo@test.com">
-                <input type="password" id="login-password" placeholder="Password" required value="password123">
-                <button type="submit" class="btn-primary" style="width: 100%;" id="login-btn">
-                    <span>Sign In</span>
-                </button>
-                <p class="text-center text-muted mt-4" style="font-size: 0.85rem;">
-                    Don't have an account? <a href="#" id="show-register" style="color: var(--primary-accent);">Register here</a>
-                </p>
-            </form>
+      <div style="padding-top:1.25rem; border-top:1px solid var(--border); font-size:0.75rem; color:var(--text-muted);">
+        EARNWAVE Platform 2026<br>
+        Safaricom Daraja B2C
+      </div>
+    </aside>
 
-            <form id="register-form" class="hidden">
-                <input type="text" id="reg-username" placeholder="Username" required>
-                <input type="email" id="reg-email" placeholder="Email Address" required>
-                <input type="tel" id="reg-phone" placeholder="M-Pesa Phone (e.g. 2547...)" required>
-                
-                <input type="password" id="reg-password" placeholder="Password (Min 8 chars, 1 uppercase, 1 number)" required>
-                <div id="pwd-strength-container" class="hidden text-left mb-4" style="font-size: 0.75rem; margin-top: -0.5rem;">
-                    <div style="height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; margin-bottom: 4px;">
-                        <div id="pwd-strength-bar" style="height: 100%; width: 0%; transition: all 0.3s ease;"></div>
-                    </div>
-                    <span id="pwd-strength-text" class="text-muted">Password strength</span>
-                </div>
-                <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required>
-                
-                <div class="flex items-center gap-2 mb-4 text-left" style="margin-top: 0.5rem;">
-                    <input type="checkbox" id="reg-terms" required style="width: auto; margin-bottom: 0; cursor: pointer;">
-                    <label for="reg-terms" class="text-muted" style="font-size: 0.85rem; cursor: pointer;">I agree to the <a href="#" style="color: var(--primary-accent);">Terms & Conditions</a></label>
-                </div>
-                
-                <button type="submit" class="btn-primary" style="width: 100%;" id="reg-btn">
-                    <span>Create Account</span>
-                </button>
-                <p class="text-center text-muted mt-4" style="font-size: 0.85rem;">
-                    Already have an account? <a href="#" id="show-login" style="color: var(--primary-accent);">Sign In</a>
-                </p>
-            </form>
+    <!-- Main Content Area -->
+    <main class="main-viewport">
+      <!-- Top Navbar -->
+      <header class="top-navbar">
+        <div class="brand-logo" id="brandLogoBtn" style="cursor:pointer;">
+          <span class="brand-logo-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </span>
+          EARNWAVE
         </div>
-    </div>
 
-    <!-- ACTIVATION VIEW -->
-    <div id="activation-view" class="app-container hidden">
-        <div class="auth-box card text-center">
-            <h1 class="header-logo mb-2">EARNWAVE</h1>
-            <p class="text-muted mb-4">Account Activation Required</p>
-            <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <h3 class="mb-2">Verify M-Pesa Payment</h3>
-                <p class="text-muted mb-4" style="font-size: 0.9rem;">To prevent bots and secure your account, a one-time activation fee of KES 150 is required.</p>
-                <div style="background: var(--bg-surface-hover); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                    <p class="text-muted mb-2">Simulated Payment Flow:</p>
-                    <button class="btn-primary mb-2" style="width: 100%;" onclick="app.simulatePayment()">1. Simulate PayHero Payment</button>
-                </div>
-                <button class="btn-secondary" style="width: 100%;" onclick="app.checkActivationStatus(event)" id="verify-btn">
-                    2. I have paid - Verify
-                </button>
+        <div class="user-quick-stats">
+          <div class="badge-wallet-pill" id="navWalletPill" title="Click to view wallet">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+            <span id="navBalanceAmount">KES 0.00</span>
+          </div>
+          <div class="user-avatar-btn" id="navUserAvatar" onclick="app.switchView('profile')" title="My Profile">
+            U
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: DASHBOARD -->
+        <!-- ========================================== -->
+        <section id="section-dashboard" class="view-section active">
+          <!-- Metrics Banner -->
+          <div class="metrics-banner">
+            <div class="metric-card">
+              <div class="label">
+                <span>Available Balance</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+              </div>
+              <div class="value" id="dashAvailableBalance">KES 0.00</div>
+              <div class="sub-value">Ready for M-Pesa payout</div>
             </div>
-            <button class="btn-secondary" style="border: none; color: var(--danger-accent); background: transparent;" onclick="app.logout()">
-                Cancel & Sign Out
+            <div class="metric-card">
+              <div class="label">
+                <span>Pending Earnings</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="value" id="dashPendingEarnings">KES 0.00</div>
+              <div class="sub-value">Under quality review</div>
+            </div>
+            <div class="metric-card">
+              <div class="label">
+                <span>Lifetime Earned</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div class="value" id="dashLifetimeEarned">KES 0.00</div>
+              <div class="sub-value">Verified cumulative total</div>
+            </div>
+            <div class="metric-card">
+              <div class="label">
+                <span>Completed Tasks</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="value" id="dashTasksCompleted">0 Tasks</div>
+              <div class="sub-value" id="dashLevelName">Level 1: Novice Earner</div>
+            </div>
+          </div>
+
+          <!-- Streak & Level Progress -->
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem 1.5rem; margin-bottom:1.5rem; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1.25rem; box-shadow:var(--shadow-card);">
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600; letter-spacing:0.04em; display:flex; align-items:center; gap:0.35rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-orange);"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                Active Daily Streak
+              </div>
+              <div style="font-size:1.6rem; font-weight:700; color:#fff; letter-spacing:-0.02em;" id="dashStreakDays">3 Days</div>
+              <div style="font-size:0.8rem; color:var(--accent-green); margin-top:0.2rem;">Consecutive active streak bonus enabled</div>
+            </div>
+            <div style="flex:1; min-width:200px; max-width:400px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-muted); margin-bottom:0.45rem;">
+                <span>Weekly Milestone</span>
+                <span id="dashUserXp" style="color:var(--text-primary); font-weight:600;">650 XP</span>
+              </div>
+              <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:var(--radius-full); overflow:hidden;">
+                <div id="dashStreakBar" style="width:40%; height:100%; background:linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); border-radius:var(--radius-full);"></div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="app.switchView('tasks')" style="padding:0.6rem 1.25rem;">
+              Explore Marketplace
             </button>
-        </div>
-    </div>
+          </div>
 
-    <!-- MAIN APP VIEW -->
-    <div id="main-view" class="app-container hidden">
-        
-        <!-- Navigation -->
-        <nav class="bottom-nav" id="main-nav">
-            <a class="nav-item active" data-target="dashboard-section">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-                <span>Dashboard</span>
-            </a>
-            <a class="nav-item" data-target="tasks-section">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span>Earn</span>
-            </a>
-            <a class="nav-item" data-target="wallet-section">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                <span>Wallet</span>
-            </a>
-            <a class="nav-item" data-target="profile-section">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <span>Profile</span>
-            </a>
-        </nav>
+          <!-- Quick Action Row -->
+          <div class="quick-action-strip">
+            <button class="action-pill-btn" onclick="app.switchView('tasks')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Browse Tasks</span>
+            </button>
+            <button class="action-pill-btn" onclick="app.switchView('wallet')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+              <span>M-Pesa Payout</span>
+            </button>
+            <button class="action-pill-btn" onclick="app.switchView('chat')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>AI Mentors</span>
+            </button>
+            <button class="action-pill-btn" onclick="app.switchView('store')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span>Digital Store</span>
+            </button>
+            <button class="action-pill-btn" onclick="app.switchView('referrals')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Referrals</span>
+            </button>
+            <button class="action-pill-btn" onclick="app.switchView('leaderboard')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"/><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"/><path d="M6 4h12v7a6 6 0 0 1-12 0V4z"/></svg>
+              <span>Leaderboard</span>
+            </button>
+          </div>
 
-        <div style="display: flex; flex-direction: column; flex: 1; width: 100%;">
-            <!-- Header -->
-            <header class="header">
-                <div class="header-logo">EARNWAVE</div>
-                <div class="flex items-center gap-2">
-                    <div class="text-success font-bold" id="header-balance">KES 0.00</div>
-                    <div style="width: 32px; height: 32px; background: var(--bg-surface-hover); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);" onclick="app.navigate('profile-section')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
+          <!-- Featured Opportunities -->
+          <div style="margin-bottom:2.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em;">Recommended Opportunities</h3>
+              <a href="javascript:void(0)" onclick="app.switchView('tasks')" style="font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
+                View All Opportunities
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+            </div>
+            <div class="tasks-grid" id="dashFeaturedTasks"></div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em;">Wallet Activity</h3>
+              <a href="javascript:void(0)" onclick="app.switchView('wallet')" style="font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
+                Statement
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+            </div>
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; box-shadow:var(--shadow-card);">
+              <table class="transactions-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentTransactions"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: TASK MARKETPLACE (300+ TASKS) -->
+        <!-- ========================================== -->
+        <section id="section-tasks" class="view-section">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.35rem;">Marketplace Inventory</h2>
+            <p style="color:var(--text-secondary); font-size:0.88rem;">
+              Over 300+ verified task opportunities with automated validation and instant balance credit.
+            </p>
+          </div>
+
+          <div class="catalog-filters">
+            <!-- Category Chips -->
+            <div class="category-chips-scroll">
+              <button class="chip-btn active" data-category="all">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>All Tasks</span>
+              </button>
+              <button class="chip-btn" data-category="surveys">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>Surveys</span>
+              </button>
+              <button class="chip-btn" data-category="ai_data">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+                <span>AI Annotation</span>
+              </button>
+              <button class="chip-btn" data-category="writing">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>Writing</span>
+              </button>
+              <button class="chip-btn" data-category="testing">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                <span>Testing</span>
+              </button>
+              <button class="chip-btn" data-category="research">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                <span>Fact-Checking</span>
+              </button>
+              <button class="chip-btn" data-category="local">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Local Reviews</span>
+              </button>
+              <button class="chip-btn" data-category="transcription">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span>Audio</span>
+              </button>
+              <button class="chip-btn" data-category="data_entry">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                <span>Data Entry</span>
+              </button>
+              <button class="chip-btn" data-category="knowledge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg>
+                <span>Logic & Code</span>
+              </button>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="filter-bar-row">
+              <div class="search-input-box">
+                <span class="search-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </span>
+                <input type="text" id="taskSearchInput" placeholder="Filter 300+ opportunities by keyword, dataset, or topic...">
+              </div>
+
+              <select class="select-filter" id="taskDiffSelect">
+                <option value="all">Any Difficulty</option>
+                <option value="easy">Easy (5-10 min)</option>
+                <option value="medium">Medium (10-20 min)</option>
+                <option value="hard">Hard (20+ min)</option>
+              </select>
+
+              <select class="select-filter" id="taskSortSelect">
+                <option value="recommended">Sort: Recommended</option>
+                <option value="highest_reward">Sort: Highest Reward</option>
+                <option value="fastest">Sort: Fastest Completion</option>
+              </select>
+            </div>
+
+            <div style="font-size:0.78rem; color:var(--text-muted);" id="marketplaceCountLabel">
+              Loading 300+ opportunities...
+            </div>
+          </div>
+
+          <!-- Tasks Grid -->
+          <div class="tasks-grid" id="marketplaceGrid"></div>
+
+          <!-- Pagination -->
+          <div class="pagination-controls">
+            <button class="pagination-btn" id="taskPrevPage">&larr; Previous</button>
+            <span style="font-size:0.85rem; color:var(--text-secondary);" id="taskPageIndicator">Page 1</span>
+            <button class="pagination-btn" id="taskNextPage">Next &rarr;</button>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: WALLET & WITHDRAWALS -->
+        <!-- ========================================== -->
+        <section id="section-wallet" class="view-section">
+          <div style="background:linear-gradient(135deg, #101c18, #0e1724); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-xl); padding:2rem; margin-bottom:2rem; position:relative; overflow:hidden; box-shadow:var(--shadow-card);">
+            <div style="font-size:0.75rem; color:var(--accent-green); text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:0.4rem;">
+              Primary Earning Wallet
+            </div>
+            <div style="font-size:2.6rem; font-weight:800; color:#fff; letter-spacing:-0.03em; margin-bottom:1.5rem;" id="walletHeroBalance">
+              KES 0.00
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:1.5rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; margin-bottom:1.5rem;">
+              <div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Pending Approval</div>
+                <div style="font-size:1.15rem; font-weight:700; color:var(--warning);" id="walletHeroPending">KES 0.00</div>
+              </div>
+              <div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Lifetime Earned</div>
+                <div style="font-size:1.15rem; font-weight:700; color:#fff;" id="walletHeroLifetime">KES 0.00</div>
+              </div>
+              <div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Total Disbursed</div>
+                <div style="font-size:1.15rem; font-weight:700; color:var(--accent-green);" id="walletHeroWithdrawn">KES 0.00</div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="openWithdrawModalBtn" style="padding:0.75rem 1.5rem; font-size:0.95rem; display:inline-flex; align-items:center; gap:0.5rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              Request M-Pesa Withdrawal
+            </button>
+          </div>
+
+          <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Audit Ledger</h3>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; box-shadow:var(--shadow-card);">
+            <table class="transactions-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="walletTransactionsTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: DIGITAL STORE -->
+        <!-- ========================================== -->
+        <section id="section-store" class="view-section">
+          <div style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Digital Store</h2>
+              <p style="color:var(--text-secondary); font-size:0.88rem;">Invest task earnings in software starter kits, ATS templates, and guides.</p>
+            </div>
+            <div style="display:flex; gap:0.4rem; background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:0.25rem; border-radius:var(--radius-sm);">
+              <button class="chip-btn store-tab-btn active" data-tab="browse">Catalog</button>
+              <button class="chip-btn store-tab-btn" data-tab="library">My Library</button>
+            </div>
+          </div>
+
+          <div class="tasks-grid" id="storeBrowseSection"></div>
+          <div class="tasks-grid" id="storeLibrarySection" style="display:none;"></div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: AI CHAT & EARN -->
+        <!-- ========================================== -->
+        <section id="section-chat" class="view-section">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">AI Mentorship & Conversational Tasks</h2>
+            <p style="color:var(--text-secondary); font-size:0.88rem;">Select from over 50 specialized AI mentors across technical mock interviews, finance, academics, and customer simulations.</p>
+          </div>
+
+          <!-- Character Category Filter Chips -->
+          <div class="category-chips-scroll" id="chatCategoryChips" style="margin-bottom:1.25rem;"></div>
+
+          <div class="tasks-grid" id="chatCharactersList" style="margin-bottom:2rem;"></div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:520px; box-shadow:var(--shadow-card);">
+            <div style="padding:1.1rem 1.35rem; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h4 style="color:#fff; margin:0; font-size:1rem; display:flex; align-items:center;" id="activeCharName">AI Mentor</h4>
+                <div style="font-size:0.75rem; color:var(--accent-green); margin-top:0.2rem;" id="activeCharRole">Advisor</div>
+              </div>
+              <div style="font-size:0.8rem; font-weight:600; color:var(--accent-cyan);" id="activeCharTurnsProgress">
+                Session Progress: 0 / 4 turns
+              </div>
+            </div>
+
+            <div style="padding:0.65rem 1.35rem; background:rgba(255,255,255,0.015); font-size:0.75rem; color:var(--text-muted); border-bottom:1px solid var(--border);" id="activeCharDisclaimer">
+              Notice: All AI personas are automated assistants for simulation.
+            </div>
+
+            <div id="chatMessagesBox" style="flex:1; padding:1.25rem; overflow-y:auto; display:flex; flex-direction:column;"></div>
+
+            <div style="padding:1rem 1.25rem; border-top:1px solid var(--border); background:rgba(255,255,255,0.02); display:flex; gap:0.65rem;">
+              <input type="text" id="chatInputMessage" placeholder="Ask a question or reply thoughtfully to advance your session..." style="flex:1; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+              <button class="btn btn-primary" id="sendChatMessageBtn" style="padding:0.75rem 1.25rem; display:inline-flex; align-items:center; gap:0.4rem;">
+                <span>Send</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: LEADERBOARD & XP -->
+        <!-- ========================================== -->
+        <section id="section-leaderboard" class="view-section">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Community Rankings & Milestones</h2>
+            <p style="color:var(--text-secondary); font-size:0.88rem;">Advance your tier to unlock higher task quotas and verified badges.</p>
+          </div>
+
+          <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Top Verified Contributors</h3>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; margin-bottom:2.5rem; box-shadow:var(--shadow-card);">
+            <table class="transactions-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Contributor</th>
+                  <th>Level</th>
+                  <th>Completed Tasks</th>
+                  <th>Cumulative Payout</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardTableBody"></tbody>
+            </table>
+          </div>
+
+          <h3 style="font-size:1.15rem; color:#fff; font-weight:600; letter-spacing:-0.015em; margin-bottom:1rem;">Verified Milestones</h3>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;" id="leaderboardAchievementsList"></div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 7: REFERRALS -->
+        <!-- ========================================== -->
+        <section id="section-referrals" class="view-section">
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-xl); padding:2rem; margin-bottom:2rem; box-shadow:var(--shadow-card);">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--accent-green); text-transform:uppercase; letter-spacing:0.05em;">Affiliate Network</div>
+            <h2 style="font-size:1.75rem; color:#fff; letter-spacing:-0.025em; margin:0.4rem 0 0.65rem 0;">Earn KES 100 for Every Active Referral</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem; max-width:620px; line-height:1.5; margin-bottom:1.5rem;">
+              Invite colleagues, students, or fellow freelancers. When they register and successfully complete their first verified task, KES 100 is automatically credited to your ledger.
+            </p>
+
+            <div style="display:flex; flex-wrap:wrap; gap:0.85rem; align-items:center; margin-bottom:1.75rem;">
+              <div style="background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.65rem 1.15rem;">
+                <span style="font-size:0.7rem; color:var(--text-muted); display:block; text-transform:uppercase; letter-spacing:0.04em;">Invite Code</span>
+                <strong style="font-size:1.2rem; color:var(--accent-cyan); font-family:monospace;" id="referralCodeDisplay">WAVE1000</strong>
+              </div>
+              <div style="flex:1; min-width:250px;">
+                <input type="text" id="referralLinkInput" readonly style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem; font-family:monospace;">
+              </div>
+              <button class="btn btn-primary" id="copyReferralBtn" style="padding:0.75rem 1.35rem; display:inline-flex; align-items:center; gap:0.45rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Link
+              </button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; border-top:1px solid var(--border); padding-top:1.5rem;">
+              <div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Invited Members</div>
+                <div style="font-size:1.35rem; font-weight:700; color:#fff;">8 Members</div>
+              </div>
+              <div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Qualified Referrals</div>
+                <div style="font-size:1.35rem; font-weight:700; color:var(--accent-green);">5 Verified</div>
+              </div>
+              <div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Total Commission</div>
+                <div style="font-size:1.35rem; font-weight:700; color:var(--accent-cyan);">KES 500.00</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 8: SUPPORT & KNOWLEDGE BASE -->
+        <!-- ========================================== -->
+        <section id="section-support" class="view-section">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.25rem;">Knowledge Base & Support</h2>
+            <p style="color:var(--text-secondary); font-size:0.88rem;">Search policy guidelines or submit an appeal to our review desk.</p>
+          </div>
+
+          <div style="margin-bottom:2rem;">
+            <div class="search-input-box" style="margin-bottom:1rem;">
+              <span class="search-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </span>
+              <input type="text" id="supportSearchInput" placeholder="Search topics (e.g. withdrawal turnaround, M-Pesa statements, appeal rules)...">
+            </div>
+            <div id="supportFaqContainer"></div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr; gap:1.5rem; margin-top:2rem;">
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; box-shadow:var(--shadow-card);">
+              <h3 style="color:#fff; font-size:1.15rem; font-weight:600; margin-bottom:1rem;">Open a Ticket</h3>
+              <form id="newTicketForm">
+                <div style="margin-bottom:1rem;">
+                  <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Subject</label>
+                  <input type="text" id="ticketSubjectInput" required placeholder="Concise summary of your inquiry..." style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
                 </div>
-            </header>
+                <div style="margin-bottom:1rem;">
+                  <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Category</label>
+                  <select id="ticketCategorySelect" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+                    <option>Task Review Appeal</option>
+                    <option>Withdrawal Delayed</option>
+                    <option>Account Verification</option>
+                    <option>Bug Report</option>
+                  </select>
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                  <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Details & References</label>
+                  <textarea id="ticketMessageInput" rows="4" required placeholder="Include task titles, transaction IDs, or timestamp information..." style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Dispatch Ticket</button>
+              </form>
+            </div>
 
-            <!-- Content Area -->
-            <main class="content-area">
-                
-                <!-- DASHBOARD SECTION -->
-                <section id="dashboard-section" class="view-section active">
-                    <div class="card wallet-card">
-                        <p class="text-muted">Available Balance</p>
-                        <h2 class="balance-amount" id="dash-balance">KES 0.00</h2>
-                        <div class="flex gap-2 mt-4">
-                            <button class="btn-primary" style="flex: 1;" onclick="app.navigate('wallet-section')">Withdraw</button>
-                            <button class="btn-secondary" style="flex: 1;" onclick="app.navigate('tasks-section')">Earn Money</button>
-                        </div>
-                    </div>
+            <div>
+              <h3 style="color:#fff; font-size:1.15rem; font-weight:600; margin-bottom:1rem;">Active Inquiries</h3>
+              <div id="supportTicketsContainer"></div>
+            </div>
+          </div>
+        </section>
 
-                    <div class="flex justify-between items-center mt-4 mb-2">
-                        <h3>Recommended Tasks</h3>
-                        <a href="#" class="text-primary text-muted" onclick="app.navigate('tasks-section')">View All</a>
-                    </div>
-                    <div class="task-grid" id="featured-tasks-container">
-                        <!-- Populated dynamically -->
-                    </div>
+        <!-- ========================================== -->
+        <!-- VIEW 9: ADMIN PORTAL -->
+        <!-- ========================================== -->
+        <section id="section-admin" class="view-section">
+          <div style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <div style="font-size:0.75rem; font-weight:700; color:var(--accent-green); text-transform:uppercase; letter-spacing:0.05em;">Staff Console</div>
+              <h2 style="font-size:1.55rem; color:#fff; font-weight:700; letter-spacing:-0.02em; margin-top:0.25rem;">Operations Desk</h2>
+            </div>
+            <div style="display:flex; gap:0.35rem; background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:0.25rem; border-radius:var(--radius-sm);">
+              <button class="chip-btn admin-tab-btn active" data-tab="overview">Overview</button>
+              <button class="chip-btn admin-tab-btn" data-tab="queue">Audit Queue</button>
+              <button class="chip-btn admin-tab-btn" data-tab="settings">Parameters</button>
+            </div>
+          </div>
 
-                    <h3 class="mt-4 mb-2">Recent Transactions</h3>
-                    <div class="card" id="recent-tx-container">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
+          <!-- Admin Overview Tab -->
+          <div id="adminOverviewTab">
+            <div class="metrics-banner">
+              <div class="metric-card">
+                <div class="label">Verified Workers</div>
+                <div class="value" id="adminMetricUsers">1,420</div>
+                <div class="sub-value">98.2% compliance rate</div>
+              </div>
+              <div class="metric-card">
+                <div class="label">Active Tasks</div>
+                <div class="value" id="adminMetricActiveTasks">310</div>
+                <div class="sub-value">10 categories live</div>
+              </div>
+              <div class="metric-card">
+                <div class="label">Pending Audit</div>
+                <div class="value" id="adminMetricPendingReviews" style="color:var(--warning);">2</div>
+                <div class="sub-value">Awaiting second review</div>
+              </div>
+              <div class="metric-card">
+                <div class="label">Disbursed (Month)</div>
+                <div class="value" id="adminMetricDisbursed" style="color:var(--accent-green);">KES 285,400</div>
+                <div class="sub-value">100% Daraja B2C reconciled</div>
+              </div>
+            </div>
+          </div>
 
-                <!-- TASKS LIST SECTION -->
-                <section id="tasks-section" class="view-section">
-                    <h2>Earn Rewards</h2>
-                    <p class="text-muted mb-4">Complete available micro-tasks below to earn instant rewards.</p>
-                    
-                    <div class="flex gap-2 mb-4" style="overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none;">
-                        <button class="btn-secondary" style="border-color: var(--primary-accent); color: var(--primary-accent);" onclick="app.filterTasks('All', this)">All Tasks</button>
-                        <button class="btn-secondary" onclick="app.filterTasks('Surveys', this)">Surveys</button>
-                        <button class="btn-secondary" onclick="app.filterTasks('Hotel Reviews', this)">Hotel Reviews</button>
-                        <button class="btn-secondary" onclick="app.filterTasks('AI Training', this)">AI Training</button>
-                        <button class="btn-secondary" onclick="app.filterTasks('Write & Earn', this)">Write & Earn</button>
-                        <button class="btn-secondary" onclick="app.filterTasks('Data Entry', this)">Data Entry</button>
-                    </div>
+          <!-- Admin Queue Tab -->
+          <div id="adminQueueTab" style="display:none;">
+            <h3 style="font-size:1.15rem; color:#fff; font-weight:600; margin-bottom:1rem;">Worker Submissions Requiring Human Review</h3>
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto; box-shadow:var(--shadow-card);">
+              <table class="transactions-table">
+                <thead>
+                  <tr>
+                    <th>Task Name</th>
+                    <th>Worker</th>
+                    <th>Submitted Content</th>
+                    <th>Reward</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminSubmissionsQueue"></tbody>
+              </table>
+            </div>
+          </div>
 
-                    <div class="task-grid" id="all-tasks-container">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
+          <!-- Admin Settings Tab -->
+          <div id="adminSettingsTab" style="display:none;">
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; max-width:600px; box-shadow:var(--shadow-card);">
+              <h3 style="color:#fff; margin-bottom:1rem; font-size:1.1rem;">Financial & Security Parameters</h3>
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Minimum Withdrawal Ceiling (KES)</label>
+                <input type="number" value="100" readonly style="width:100%; padding:0.65rem; background:var(--bg-primary); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">
+              </div>
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">M-Pesa B2C Network Fee (KES)</label>
+                <input type="number" value="20" readonly style="width:100%; padding:0.65rem; background:var(--bg-primary); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">
+              </div>
+              <div>
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Referral Qualifying Task Milestone</label>
+                <input type="text" value="First Approved Submission" readonly style="width:100%; padding:0.65rem; background:var(--bg-primary); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">
+              </div>
+            </div>
+          </div>
+        </section>
 
-                <!-- TASK EXECUTION (INTERACTIVE) SECTION -->
-                <section id="task-execution-section" class="view-section">
-                    <button class="btn-secondary mb-4" onclick="app.navigate('tasks-section')" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;">
-                        <svg width="14" height="14" style="margin-right: 4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        Back to Tasks
-                    </button>
-                    
-                    <div class="card" id="active-task-container">
-                        <div class="task-header mb-2">
-                            <span class="task-badge" id="active-task-type">Task</span>
-                            <span class="text-success font-bold" id="active-task-reward">KES 0.00</span>
-                        </div>
-                        <h2 id="active-task-title">Loading Task...</h2>
-                        <p class="text-muted mb-4" id="active-task-desc">Please complete the instructions below.</p>
-                        
-                        <!-- Interactive Area -->
-                        <div id="interactive-area" class="mb-4">
-                            <!-- Populated based on task type -->
-                        </div>
+        <!-- ========================================== -->
+        <!-- VIEW 10: PROFILE & SETTINGS -->
+        <!-- ========================================== -->
+        <section id="section-profile" class="view-section">
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.75rem; max-width:640px; box-shadow:var(--shadow-card);">
+            <div style="display:flex; align-items:center; gap:1.15rem; margin-bottom:1.75rem;">
+              <div style="width:58px; height:58px; border-radius:50%; background:var(--bg-elevated); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:#fff;">
+                E
+              </div>
+              <div>
+                <h3 style="color:#fff; margin:0; font-size:1.15rem;" id="profUsername">User</h3>
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.15rem;" id="profEmail">user@earnwave.co.ke</div>
+                <span class="status-pill status-completed" style="margin-top:0.4rem;" id="profRoleBadge">
+                  <span class="status-dot"></span> ACTIVE MEMBER
+                </span>
+              </div>
+            </div>
 
-                        <button class="btn-primary" id="submit-task-btn" style="width: 100%;" onclick="app.submitActiveTask()">
-                            Submit Work & Claim Reward
-                        </button>
-                    </div>
-                </section>
+            <form id="profileForm">
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Full Display Name</label>
+                <input type="text" id="profDisplayName" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+              </div>
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">M-Pesa Payout Number</label>
+                <input type="text" id="profPhone" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+              </div>
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">County / Location</label>
+                <input type="text" id="profCounty" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+              </div>
+              <div style="margin-bottom:1.5rem;">
+                <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Bio & Skill Specializations</label>
+                <textarea id="profBio" rows="3" style="width:100%; padding:0.75rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Profile Details</button>
+            </form>
+          </div>
+        </section>
 
-                <!-- WALLET / WITHDRAW SECTION -->
-                <section id="wallet-section" class="view-section">
-                    <h2>Wallet</h2>
-                    
-                    <div class="card wallet-card">
-                        <p class="text-muted">Available Balance</p>
-                        <h2 class="balance-amount" id="wallet-full-balance">KES 0.00</h2>
-                    </div>
+      </div>
+    </main>
 
-                    <div class="card">
-                        <h3>Withdraw Funds</h3>
-                        <p class="text-muted mb-4">Funds will be deposited to your M-Pesa number: <span id="user-mpesa-number" class="font-bold text-main">...</span></p>
-                        <form id="withdraw-form">
-                            <label class="text-muted" style="display:block; margin-bottom: 0.5rem;">Amount (KES)</label>
-                            <input type="number" id="withdraw-amount" placeholder="Min withdrawal: KES 100" min="100" required>
-                            
-                            <div class="flex justify-between text-muted mb-4" style="font-size: 0.85rem;">
-                                <span>Network Fee:</span>
-                                <span>KES 20.00</span>
-                            </div>
+    <!-- Mobile Bottom Navigation (< 1024px) (Apple Tab Bar) -->
+    <nav class="mobile-bottom-nav">
+      <button class="bottom-nav-link active" data-view="dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="bottom-nav-link" data-view="tasks">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Tasks</span>
+      </button>
+      <button class="bottom-nav-link" data-view="wallet">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+        <span>Wallet</span>
+      </button>
+      <button class="bottom-nav-link" data-view="chat">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>AI</span>
+      </button>
+      <button class="bottom-nav-link" data-view="profile">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+  </div>
 
-                            <button type="submit" class="btn-primary" style="width: 100%;" id="withdraw-btn">
-                                Request Withdrawal
-                            </button>
-                        </form>
-                    </div>
+  <!-- Task Runner Modal Dialog -->
+  <div class="modal-overlay" id="taskRunnerModal">
+    <div class="modal-content-box" id="taskRunnerContent"></div>
+  </div>
 
-                    <h3 class="mt-4 mb-2">Transaction History</h3>
-                    <div class="card" id="full-tx-container" style="padding: 0 1.5rem;">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
+  <!-- Withdrawal Modal Dialog -->
+  <div class="modal-overlay" id="withdrawModal">
+    <div class="modal-content-box" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-green);"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+          M-Pesa Payout Request
+        </h3>
+        <button class="modal-close-btn" id="closeWithdrawModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="withdrawForm">
+        <div class="modal-body">
+          <div style="margin-bottom:1.15rem;">
+            <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Safaricom M-Pesa Phone Number</label>
+            <input type="text" id="withdrawPhoneInput" required placeholder="2547XXXXXXXX or 07XXXXXXXX" style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem; font-family:monospace;">
+          </div>
+          <div style="margin-bottom:1.15rem;">
+            <label style="display:block; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem;">Withdrawal Amount (KES)</label>
+            <input type="number" id="withdrawAmountInput" min="100" step="10" required placeholder="Minimum KES 100.00" style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-sm); background:var(--bg-primary); border:1px solid var(--border); color:#fff; font-size:0.88rem;">
+          </div>
 
-                <!-- PROFILE SECTION -->
-                <section id="profile-section" class="view-section">
-                    <h2>Account Profile</h2>
-                    <div class="card">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div style="width: 60px; height: 60px; background: var(--bg-surface-hover); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            </div>
-                            <div>
-                                <h3 id="prof-username">User</h3>
-                                <p class="text-muted" id="prof-email">user@email.com</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-4 mt-4">
-                            <div class="flex justify-between" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                                <span class="text-muted">M-Pesa Number</span>
-                                <span id="prof-phone" class="font-bold">...</span>
-                            </div>
-                            <div class="flex justify-between" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                                <span class="text-muted">Total Lifetime Earnings</span>
-                                <span id="prof-lifetime" class="font-bold text-success">KES 0.00</span>
-                            </div>
-                            <div class="flex justify-between" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                                <span class="text-muted">Account Status</span>
-                                <span class="text-success font-bold" id="prof-status">ACTIVE</span>
-                            </div>
-                        </div>
-                        <button class="btn-secondary mt-6" style="width: 100%; color: var(--danger-accent); border-color: var(--danger-accent);" onclick="app.logout()">
-                            Sign Out Securely
-                        </button>
-                        <button class="btn-secondary mt-2" style="width: 100%; border: none; font-size: 0.8rem;" onclick="app.resetData()">
-                            [Developer] Reset App Data
-                        </button>
-                    </div>
-                </section>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; font-size:0.85rem; margin-bottom:1.25rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.45rem; color:var(--text-secondary);">
+              <span>M-Pesa B2C Gateway Fee</span>
+              <strong id="withdrawFeePreview" style="color:#fff;">KES 20.00</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.95rem; font-weight:600; color:#fff;">
+              <span>Net Disbursement</span>
+              <strong style="color:var(--accent-green);" id="withdrawNetPreview">KES 0.00</strong>
+            </div>
+          </div>
 
-            </main>
+          <div id="withdrawErrorMsg" style="display:none; color:var(--danger); font-size:0.85rem; padding:0.75rem; background:rgba(255,69,58,0.1); border-radius:var(--radius-sm); margin-bottom:1rem;"></div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="document.getElementById('withdrawModal').classList.remove('active')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm Payout</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <script>
-        // ==========================================
-        // LOCAL DATABASE SIMULATION
-        // ==========================================
-        class LocalDB {
-            constructor() {
-                this.prefix = 'earnwave_app_';
-                this.initDefaultData();
-            }
+  <!-- Global Toast Notifications Container -->
+  <div class="toast-container" id="globalToastContainer"></div>
 
-            initDefaultData() {
-                if (!this.get('tasks')) {
-                    this.set('tasks', [
-                        // Hotel Reviews (Premium, requires unlock fee)
-                        { id: 't1', type: 'Hotel Reviews', title: 'Review Soneva Jani Noonu Atoll, Maldives', description: 'Write a comprehensive 5-star review highlighting the water villas and oceanic views.', reward: 1500.00, unlockFee: 100.00, interactType: 'write_review', status: 'AVAILABLE' },
-                        { id: 't2', type: 'Hotel Reviews', title: 'Review Gleneagles Hotel', description: 'Review the historic Scottish estate focusing on golf amenities.', reward: 1200.00, unlockFee: 50.00, interactType: 'write_review', status: 'OPENED' },
-                        { id: 't3', type: 'Hotel Reviews', title: 'Review The Plaza, New York', description: 'Write a review about the luxury dining experience at The Plaza.', reward: 950.00, unlockFee: 30.00, interactType: 'write_review', status: 'AVAILABLE' },
-                        { id: 't4', type: 'Hotel Reviews', title: 'Review Burj Al Arab, Dubai', description: 'Detail the 7-star luxury service and architectural beauty.', reward: 2000.00, unlockFee: 150.00, interactType: 'write_review', status: 'CLOSED' },
-                        
-                        // Surveys
-                        { id: 't5', type: 'Surveys', title: 'Consumer Shopping Habits 2026', description: 'Answer 5 questions about your online grocery shopping preferences.', reward: 45.50, interactType: 'survey', status: 'AVAILABLE' },
-                        { id: 't6', type: 'Surveys', title: 'Fintech Adoption in Kenya', description: 'Share your experience using mobile lending applications.', reward: 60.00, interactType: 'survey', status: 'AVAILABLE' },
-                        { id: 't7', type: 'Surveys', title: 'Streaming Services Usage', description: 'Which platforms do you use for entertainment?', reward: 35.00, interactType: 'survey', status: 'CLOSED' },
-                        { id: 't8', type: 'Surveys', title: 'Remote Work Trends', description: 'Provide feedback on post-pandemic work environments.', reward: 50.00, interactType: 'survey', status: 'OPENED' },
-
-                        // AI Training
-                        { id: 't9', type: 'AI Training', title: 'Sentiment Analysis: Tech Reviews', description: 'Classify whether the text is positive, negative, or neutral.', reward: 12.50, interactType: 'sentiment', status: 'AVAILABLE' },
-                        { id: 't10', type: 'AI Training', title: 'Image Captcha Tagging v4.2', description: 'Type the alphanumeric characters shown in the image.', reward: 20.00, interactType: 'captcha', status: 'AVAILABLE' },
-                        { id: 't11', type: 'AI Training', title: 'LLM Prompt Evaluation', description: 'Which AI response is more accurate regarding Kenyan tax laws?', reward: 85.00, interactType: 'survey', status: 'AVAILABLE' },
-                        { id: 't12', type: 'AI Training', title: 'Audio Transcription Check', description: 'Verify if the AI correctly transcribed the short audio clip.', reward: 30.00, interactType: 'survey', status: 'CLOSED' },
-
-                        // Write & Earn
-                        { id: 't13', type: 'Write & Earn', title: 'Write Product Description: Smart Watch', description: 'Write a 50-word engaging description for a new fitness tracker.', reward: 150.00, interactType: 'write_article', status: 'AVAILABLE' },
-                        { id: 't14', type: 'Write & Earn', title: 'Draft an SEO Blog Intro', description: 'Write an introduction about "Benefits of Solar Energy in Africa".', reward: 250.00, interactType: 'write_article', status: 'AVAILABLE' },
-                        { id: 't15', type: 'Write & Earn', title: 'Social Media Ad Copy', description: 'Create a catchy 2-line caption for a coffee brand.', reward: 100.00, interactType: 'write_article', status: 'OPENED' },
-                        { id: 't16', type: 'Write & Earn', title: 'Rewrite Legal Disclaimer', description: 'Simplify the provided terms into plain English.', reward: 300.00, interactType: 'write_article', status: 'CLOSED' },
-
-                        // Data Entry
-                        { id: 't17', type: 'Data Entry', title: 'Receipt Transcription', description: 'Extract the total amount from the provided retail receipt.', reward: 15.00, interactType: 'transcribe', status: 'AVAILABLE' },
-                        { id: 't18', type: 'Data Entry', title: 'Business Card Digitization', description: 'Type out the email and phone number from the image.', reward: 25.00, interactType: 'transcribe', status: 'AVAILABLE' },
-                        { id: 't19', type: 'Data Entry', title: 'Invoice Number Extraction', description: 'Locate and enter the 8-digit invoice code.', reward: 10.00, interactType: 'transcribe', status: 'OPENED' },
-                        { id: 't20', type: 'Data Entry', title: 'Menu Pricing Update', description: 'Transcribe the prices for 3 coffee items.', reward: 18.50, interactType: 'transcribe', status: 'CLOSED' }
-                    ]);
-                }
-            }
-
-            get(key) {
-                const data = localStorage.getItem(this.prefix + key);
-                return data ? JSON.parse(data) : null;
-            }
-
-            set(key, value) {
-                localStorage.setItem(this.prefix + key, JSON.stringify(value));
-            }
-
-            remove(key) {
-                localStorage.removeItem(this.prefix + key);
-            }
-
-            // DB Operations
-            getUser() { return this.get('user'); }
-            getWallet() { return this.get('wallet') || { balance: 0, lifetime: 0 }; }
-            getTransactions() { return this.get('transactions') || []; }
-            getTasks() { return this.get('tasks') || []; }
-
-            saveUser(userData) { this.set('user', userData); }
-            
-            updateWallet(amount, isCredit) {
-                let wallet = this.getWallet();
-                if (isCredit) {
-                    wallet.balance += amount;
-                    wallet.lifetime += amount;
-                } else {
-                    wallet.balance -= amount;
-                }
-                this.set('wallet', wallet);
-                return wallet;
-            }
-
-            addTransaction(type, amount, direction, status) {
-                let txs = this.getTransactions();
-                txs.unshift({
-                    id: 'tx_' + Math.random().toString(36).substr(2, 9),
-                    type, amount, direction, status,
-                    date: new Date().toLocaleString()
-                });
-                this.set('transactions', txs);
-            }
-        }
-
-        // ==========================================
-        // CORE APPLICATION LOGIC
-        // ==========================================
-        class EarnWaveApp {
-            constructor() {
-                this.db = new LocalDB();
-                this.currentUser = null;
-                this.activeTask = null; // Stores task being executed
-                this.currentTaskFilter = 'All'; // Track active filter
-                
-                this.initUI();
-                this.checkAuthState();
-            }
-
-            // --- UI Setup & Navigation ---
-            initUI() {
-                // Auth toggles
-                document.getElementById('show-register').onclick = (e) => { e.preventDefault(); this.toggleAuthView('register'); };
-                document.getElementById('show-login').onclick = (e) => { e.preventDefault(); this.toggleAuthView('login'); };
-
-                // Forms
-                document.getElementById('login-form').onsubmit = (e) => this.handleLogin(e);
-                document.getElementById('register-form').onsubmit = (e) => this.handleRegister(e);
-                document.getElementById('withdraw-form').onsubmit = (e) => this.handleWithdraw(e);
-
-                const regPassword = document.getElementById('reg-password');
-                if(regPassword) {
-                    regPassword.addEventListener('input', (e) => this.checkPasswordStrength(e.target.value));
-                }
-
-                // Navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.onclick = () => this.navigate(item.dataset.target);
-                });
-            }
-
-            showToast(message, type = 'info') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.textContent = message;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            }
-
-            toggleAuthView(view) {
-                if (view === 'register') {
-                    document.getElementById('login-form').classList.add('hidden');
-                    document.getElementById('register-form').classList.remove('hidden');
-                } else {
-                    document.getElementById('register-form').classList.add('hidden');
-                    document.getElementById('login-form').classList.remove('hidden');
-                }
-            }
-
-            checkPasswordStrength(pwd) {
-                const container = document.getElementById('pwd-strength-container');
-                const bar = document.getElementById('pwd-strength-bar');
-                const text = document.getElementById('pwd-strength-text');
-                
-                if (!pwd) {
-                    container.classList.add('hidden');
-                    return false;
-                }
-                container.classList.remove('hidden');
-                
-                let score = 0;
-                let issues = [];
-                
-                if (pwd.length >= 8) score += 25; else issues.push("8+ chars");
-                if (pwd.match(/[A-Z]/)) score += 25; else issues.push("Uppercase");
-                if (pwd.match(/[a-z]/)) score += 25; else issues.push("Lowercase");
-                if (pwd.match(/[\d\W]/)) score += 25; else issues.push("Number/Symbol");
-                
-                bar.style.width = score + '%';
-                
-                if (score < 50) {
-                    bar.style.background = 'var(--danger-accent)';
-                    text.textContent = "Weak: Need " + issues.join(", ");
-                    text.style.color = 'var(--danger-accent)';
-                    return false;
-                } else if (score < 100) {
-                    bar.style.background = '#f59e0b'; // warning yellow/orange
-                    text.textContent = "Medium: Need " + issues.join(", ");
-                    text.style.color = '#f59e0b';
-                    return false;
-                } else {
-                    bar.style.background = 'var(--success-accent)';
-                    text.textContent = "Strong & Secure";
-                    text.style.color = 'var(--success-accent)';
-                    return true;
-                }
-            }
-
-            navigate(sectionId) {
-                // Update active nav icon
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                const activeNav = document.querySelector(`.nav-item[data-target="${sectionId}"]`);
-                if(activeNav) activeNav.classList.add('active');
-
-                // Toggle sections
-                document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-                document.getElementById(sectionId).classList.add('active');
-
-                // Scroll to top
-                document.querySelector('.content-area').scrollTop = 0;
-
-                // Load contextual data
-                if(sectionId === 'dashboard-section') {
-                    this.renderTasks(true);
-                    this.renderTransactions(true);
-                }
-                if(sectionId === 'tasks-section') this.renderTasks(false);
-                if(sectionId === 'wallet-section') this.renderTransactions(false);
-                
-                this.updateWalletUI();
-            }
-
-            formatCurrency(amount) {
-                return `KES ${parseFloat(amount).toFixed(2)}`;
-            }
-
-            // --- Authentication & Initialization ---
-            checkAuthState() {
-                const user = this.db.getUser();
-                if (user) {
-                    this.currentUser = user;
-                    if (user.status === 'PENDING') {
-                        this.showView('activation-view');
-                    } else {
-                        this.initAppSession();
-                    }
-                } else {
-                    this.showView('auth-view');
-                }
-            }
-
-            showView(viewId) {
-                ['auth-view', 'activation-view', 'main-view'].forEach(id => {
-                    document.getElementById(id).classList.add('hidden');
-                });
-                document.getElementById(viewId).classList.remove('hidden');
-            }
-
-            async handleLogin(e) {
-                e.preventDefault();
-                const btn = document.getElementById('login-btn');
-                const identifier = document.getElementById('login-identifier').value.trim();
-                const pass = document.getElementById('login-password').value;
-                
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loader"></div>';
-                
-                // Simulate network request
-                await new Promise(r => setTimeout(r, 800));
-                
-                // Demo logic: Accept any login or create a demo user if DB empty
-                let user = this.db.getUser();
-                if (!user) {
-                    const isEmail = identifier.includes('@');
-                    user = { 
-                        username: isEmail ? identifier.split('@')[0] : identifier, 
-                        email: isEmail ? identifier : `${identifier}@test.com`, 
-                        phone: "254712345678", 
-                        status: "ACTIVE" 
-                    };
-                    this.db.saveUser(user);
-                    // Add signup bonus
-                    this.db.updateWallet(50, true);
-                    this.db.addTransaction('Signup Bonus', 50, 'CREDIT', 'COMPLETED');
-                } else {
-                    const inputId = identifier.toLowerCase();
-                    const storedEmail = (user.email || '').toLowerCase();
-                    const storedUser = (user.username || '').toLowerCase();
-                    
-                    if (inputId !== storedEmail && inputId !== storedUser) {
-                        this.showToast("Account not found. Please check your credentials.", "error");
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>Sign In</span>';
-                        return;
-                    }
-                }
-
-                this.currentUser = user;
-                this.showToast("Logged in successfully!", "success");
-                btn.disabled = false;
-                btn.innerHTML = '<span>Sign In</span>';
-                
-                this.checkAuthState();
-            }
-
-            async handleRegister(e) {
-                e.preventDefault();
-                const btn = document.getElementById('reg-btn');
-                const username = document.getElementById('reg-username').value;
-                const email = document.getElementById('reg-email').value;
-                const phone = document.getElementById('reg-phone').value;
-                
-                const password = document.getElementById('reg-password').value;
-                const confirmPassword = document.getElementById('reg-confirm-password').value;
-                
-                if (password !== confirmPassword) {
-                    return this.showToast("Passwords do not match.", "error");
-                }
-                
-                if (!this.checkPasswordStrength(password)) {
-                    return this.showToast("Please strengthen your password.", "error");
-                }
-
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loader"></div>';
-                await new Promise(r => setTimeout(r, 1000));
-
-                const newUser = { username, email, phone, status: "PENDING" };
-                this.db.saveUser(newUser);
-                this.db.set('wallet', { balance: 0, lifetime: 0 }); // reset wallet
-                this.db.set('transactions', []); // reset txs
-
-                this.currentUser = newUser;
-                this.showToast("Account created. Activation required.", "success");
-                btn.disabled = false;
-                btn.innerHTML = '<span>Create Account</span>';
-                
-                this.checkAuthState();
-            }
-
-            simulatePayment() {
-                this.showToast("Simulating payment processing via PayHero...", "info");
-                setTimeout(() => {
-                    this.paymentReceived = true; // Temporary flag
-                    this.showToast("Payment simulation successful! You can now verify.", "success");
-                }, 1500);
-            }
-
-            async checkActivationStatus(event) {
-                const btn = event.target;
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loader"></div>';
-                await new Promise(r => setTimeout(r, 1200));
-
-                if (this.paymentReceived) {
-                    this.currentUser.status = 'ACTIVE';
-                    this.db.saveUser(this.currentUser);
-                    this.showToast("Account activated successfully!", "success");
-                    this.checkAuthState();
-                } else {
-                    this.showToast("Payment not detected. Please simulate payment first.", "error");
-                }
-                btn.disabled = false;
-                btn.innerHTML = '2. I have paid - Verify';
-            }
-
-            logout() {
-                this.currentUser = null;
-                this.showView('auth-view');
-            }
-
-            resetData() {
-                localStorage.clear();
-                window.location.reload();
-            }
-
-            initAppSession() {
-                this.showView('main-view');
-                
-                // Populate Profile Data
-                document.getElementById('prof-username').textContent = this.currentUser.username;
-                document.getElementById('prof-email').textContent = this.currentUser.email;
-                document.getElementById('prof-phone').textContent = this.currentUser.phone;
-                document.getElementById('user-mpesa-number').textContent = this.currentUser.phone;
-                
-                this.updateWalletUI();
-                this.navigate('dashboard-section');
-            }
-
-            updateWalletUI() {
-                const wallet = this.db.getWallet();
-                const formatted = this.formatCurrency(wallet.balance);
-                
-                document.getElementById('header-balance').textContent = formatted;
-                document.getElementById('dash-balance').textContent = formatted;
-                document.getElementById('wallet-full-balance').textContent = formatted;
-                document.getElementById('prof-lifetime').textContent = this.formatCurrency(wallet.lifetime);
-            }
-
-            // --- Views Rendering ---
-            filterTasks(category, btnElement) {
-                this.currentTaskFilter = category;
-                // Update button styles
-                const buttons = btnElement.parentElement.querySelectorAll('button');
-                buttons.forEach(btn => {
-                    btn.style.borderColor = 'transparent';
-                    btn.style.color = 'var(--text-main)';
-                });
-                btnElement.style.borderColor = 'var(--primary-accent)';
-                btnElement.style.color = 'var(--primary-accent)';
-                
-                this.renderTasks(false);
-            }
-
-            renderTasks(featured = false) {
-                const containerId = featured ? 'featured-tasks-container' : 'all-tasks-container';
-                const container = document.getElementById(containerId);
-                let allTasks = this.db.getTasks();
-                
-                if (!featured && this.currentTaskFilter !== 'All') {
-                    allTasks = allTasks.filter(t => t.type === this.currentTaskFilter);
-                }
-
-                // For featured, show 3 AVAILABLE high-reward tasks
-                let tasks = featured ? allTasks.filter(t => t.status === 'AVAILABLE').sort((a,b) => b.reward - a.reward).slice(0, 3) : allTasks;
-
-                if (tasks.length === 0) {
-                    container.innerHTML = `<div class="card text-center text-muted">No tasks available in this category.</div>`;
-                    return;
-                }
-
-                container.innerHTML = tasks.map(task => {
-                    const isClosed = task.status === 'CLOSED';
-                    const isOpened = task.status === 'OPENED';
-                    const statusClass = task.status === 'AVAILABLE' ? 'status-available' : (isOpened ? 'status-opened' : 'status-closed');
-                    let btnText = isClosed ? 'Task Closed' : (isOpened ? 'Continue Task' : 'Start Task');
-                    let btnStyle = isClosed ? '' : 'border-color: var(--primary-accent); color: var(--primary-accent);';
-                    
-                    // Display Unlock Fee if applicable and not already opened
-                    let unlockHtml = '';
-                    if (task.unlockFee && task.status === 'AVAILABLE') {
-                        btnText = `Unlock (KES ${task.unlockFee.toFixed(2)})`;
-                        unlockHtml = `<div class="text-danger mt-2 mb-2" style="font-size: 0.8rem; font-weight: 600;">Requires Unlock Fee</div>`;
-                    }
-
-                    return `
-                    <div class="card task-card ${isClosed ? 'closed' : ''}">
-                        <div>
-                            <div class="task-header mb-2">
-                                <span class="task-badge">${task.type}</span>
-                                <span class="text-success font-bold">+${this.formatCurrency(task.reward)}</span>
-                            </div>
-                            <h3 style="font-size: 1.1rem;">${task.title}</h3>
-                            <div class="mb-2"><span class="status-badge ${statusClass}">${task.status}</span></div>
-                            <p class="text-muted mb-2" style="font-size: 0.9rem;">${task.description}</p>
-                            ${unlockHtml}
-                        </div>
-                        <button class="btn-secondary" style="width: 100%; ${btnStyle}" onclick="app.startTask('${task.id}')" ${isClosed ? 'disabled' : ''}>
-                            ${btnText}
-                        </button>
-                    </div>
-                `}).join('');
-            }
-
-            renderTransactions(dashboard = false) {
-                const containerId = dashboard ? 'recent-tx-container' : 'full-tx-container';
-                const container = document.getElementById(containerId);
-                let txs = this.db.getTransactions();
-                
-                if (dashboard) txs = txs.slice(0, 3);
-
-                if (txs.length === 0) {
-                    container.innerHTML = `<div class="text-center text-muted" style="padding: 2rem;">No transaction history.</div>`;
-                    return;
-                }
-
-                container.innerHTML = txs.map(tx => {
-                    const isCredit = tx.direction === 'CREDIT';
-                    const sign = isCredit ? '+' : '-';
-                    const colorClass = isCredit ? 'text-success' : 'text-main';
-                    let statusColor = 'text-muted';
-                    if (tx.status === 'COMPLETED') statusColor = 'text-success';
-                    if (tx.status === 'FAILED') statusColor = 'text-danger';
-
-                    return `
-                        <div class="tx-item">
-                            <div>
-                                <div class="font-semibold">${tx.type}</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">${tx.date} • <span class="${statusColor}">${tx.status}</span></div>
-                            </div>
-                            <div class="font-bold ${colorClass}">
-                                ${sign}${this.formatCurrency(tx.amount)}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            // --- Interactive Task Engine ---
-            async startTask(taskId) {
-                const task = this.db.getTasks().find(t => t.id === taskId);
-                if (!task) return this.showToast("Task not found.", "error");
-                
-                // Handle Unlock Fee logic for AVAILABLE premium tasks
-                if (task.unlockFee && task.status === 'AVAILABLE') {
-                    const wallet = this.db.getWallet();
-                    if (wallet.balance < task.unlockFee) {
-                        return this.showToast(`Insufficient balance to unlock. You need KES ${task.unlockFee}.`, "error");
-                    }
-                    
-                    // Process unlock fee
-                    this.db.updateWallet(task.unlockFee, false);
-                    this.db.addTransaction(`${task.type} unlock fee: ${task.title.replace('Review ', '')}`, task.unlockFee, 'DEBIT', 'COMPLETED');
-                    
-                    // Update task status to OPENED
-                    let tasks = this.db.getTasks();
-                    const taskIndex = tasks.findIndex(t => t.id === task.id);
-                    tasks[taskIndex].status = 'OPENED';
-                    this.db.set('tasks', tasks);
-                    task.status = 'OPENED';
-                    
-                    this.updateWalletUI();
-                    this.showToast("Task Unlocked Successfully!", "success");
-                }
-
-                this.activeTask = task;
-                
-                // Populate Execution View
-                document.getElementById('active-task-type').textContent = task.type;
-                document.getElementById('active-task-reward').textContent = this.formatCurrency(task.reward);
-                document.getElementById('active-task-title').textContent = task.title;
-                document.getElementById('active-task-desc').textContent = task.description;
-
-                const interactArea = document.getElementById('interactive-area');
-                
-                // Generate specific interactive UI based on task type
-                if (task.interactType === 'survey') {
-                    interactArea.innerHTML = `
-                        <div class="survey-option" onclick="app.selectSurveyOption(this)">Option A (Strongly Agree / Most Accurate)</div>
-                        <div class="survey-option" onclick="app.selectSurveyOption(this)">Option B (Neutral / Somewhat Accurate)</div>
-                        <div class="survey-option" onclick="app.selectSurveyOption(this)">Option C (Disagree / Least Accurate)</div>
-                    `;
-                } else if (task.interactType === 'captcha') {
-                    const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                    interactArea.innerHTML = `
-                        <div class="text-muted mb-2 text-center">Type the text shown below accurately</div>
-                        <div class="captcha-box">${randomCode}</div>
-                        <input type="text" id="task-input" placeholder="Enter characters..." autocomplete="off">
-                    `;
-                } else if (task.interactType === 'transcribe') {
-                    interactArea.innerHTML = `
-                        <div style="background: var(--bg-dark); padding: 1rem; font-family: monospace; border: 1px solid var(--border-color); margin-bottom: 1rem; border-radius: 4px;">
-                            *** TARGET DATA ***<br>
-                            Extract the specific data requested in the instructions above.<br>
-                            Data Value: 45.50
-                        </div>
-                        <input type="text" id="task-input" placeholder="Enter transcribed data here...">
-                    `;
-                } else if (task.interactType === 'sentiment') {
-                    interactArea.innerHTML = `
-                        <div style="font-style: italic; padding: 1rem; border-left: 3px solid var(--border-color); background: var(--bg-surface-hover); margin-bottom: 1rem;">
-                            "The battery life is amazing, but the software is incredibly buggy."
-                        </div>
-                        <div class="flex gap-2">
-                            <div class="survey-option" style="flex:1; text-align:center; padding: 0.75rem;" onclick="app.selectSurveyOption(this)">Positive</div>
-                            <div class="survey-option" style="flex:1; text-align:center; padding: 0.75rem;" onclick="app.selectSurveyOption(this)">Neutral</div>
-                            <div class="survey-option" style="flex:1; text-align:center; padding: 0.75rem;" onclick="app.selectSurveyOption(this)">Negative</div>
-                        </div>
-                    `;
-                } else if (task.interactType === 'write_review' || task.interactType === 'write_article') {
-                    interactArea.innerHTML = `
-                        <div class="text-muted mb-2" style="font-size: 0.9rem;">Please write original content (Min 20 words). Plagiarism is strictly monitored.</div>
-                        <textarea id="task-input" rows="6" placeholder="Start writing your content here..." style="resize: vertical;"></textarea>
-                    `;
-                }
-
-                // Reset button state
-                const submitBtn = document.getElementById('submit-task-btn');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit Work & Claim Reward';
-
-                this.navigate('task-execution-section');
-            }
-
-            selectSurveyOption(element) {
-                document.querySelectorAll('.survey-option').forEach(el => el.classList.remove('selected'));
-                element.classList.add('selected');
-            }
-
-            async submitActiveTask() {
-                if (!this.activeTask) return;
-
-                // Basic validation
-                if (this.activeTask.interactType === 'survey' || this.activeTask.interactType === 'sentiment') {
-                    const selected = document.querySelector('.survey-option.selected');
-                    if (!selected) return this.showToast("Please select an option.", "error");
-                } else {
-                    const input = document.getElementById('task-input').value;
-                    if (!input) return this.showToast("Please enter the required information.", "error");
-                }
-
-                const btn = document.getElementById('submit-task-btn');
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loader"></div> Submitting...';
-
-                // Simulate network latency & verification
-                await new Promise(r => setTimeout(r, 1500));
-
-                // Process Reward
-                const reward = this.activeTask.reward;
-                this.db.updateWallet(reward, true);
-                
-                // Match the exact phrasing from the reference image for Hotel Reviews
-                let txDescription = `Task Reward: ${this.activeTask.title}`;
-                if (this.activeTask.type === 'Hotel Reviews') {
-                    txDescription = `Reward for reviewing ${this.activeTask.title.replace('Review ', '')}`;
-                }
-                
-                this.db.addTransaction(txDescription, reward, 'CREDIT', 'COMPLETED');
-                
-                // Mark task as CLOSED instead of removing it
-                let tasks = this.db.getTasks();
-                const taskIndex = tasks.findIndex(t => t.id === this.activeTask.id);
-                tasks[taskIndex].status = 'CLOSED';
-                this.db.set('tasks', tasks);
-
-                this.showToast(`Task Approved! Earned ${this.formatCurrency(reward)}`, "success");
-                
-                this.activeTask = null;
-                this.updateWalletUI();
-                this.navigate('tasks-section');
-            }
-
-            // --- Wallet Operations ---
-            async handleWithdraw(e) {
-                e.preventDefault();
-                const amount = parseFloat(document.getElementById('withdraw-amount').value);
-                const btn = document.getElementById('withdraw-btn');
-                const wallet = this.db.getWallet();
-
-                if (isNaN(amount) || amount < 100) {
-                    return this.showToast("Minimum withdrawal is KES 100.", "error");
-                }
-
-                // Amount + Network Fee
-                const totalDeduction = amount + 20;
-
-                if (totalDeduction > wallet.balance) {
-                    return this.showToast("Insufficient balance (including KES 20 network fee).", "error");
-                }
-
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loader"></div> Processing...';
-
-                // Simulate API call to M-Pesa Gateway
-                await new Promise(r => setTimeout(r, 2000));
-
-                // Execute local transaction
-                this.db.updateWallet(totalDeduction, false);
-                this.db.addTransaction('Withdrawal to M-Pesa', amount, 'DEBIT', 'COMPLETED');
-                this.db.addTransaction('Network Fee', 20, 'DEBIT', 'COMPLETED');
-
-                this.showToast(`Withdrawal of ${this.formatCurrency(amount)} successful! Sent to ${this.currentUser.phone}`, "success");
-                
-                document.getElementById('withdraw-amount').value = '';
-                btn.disabled = false;
-                btn.innerHTML = 'Request Withdrawal';
-                
-                this.updateWalletUI();
-                this.renderTransactions(false); // Update list
-            }
-        }
-
-        // Initialize App on DOM Load
-        let app;
-        document.addEventListener('DOMContentLoaded', () => {
-            app = new EarnWaveApp();
-            window.app = app; // Expose to global scope for HTML onclick attributes
-        });
-    </script>
+  <!-- App Bootstrap JS -->
+  <script type="module" src="/js/app.js"></script>
 </body>
 </html>
