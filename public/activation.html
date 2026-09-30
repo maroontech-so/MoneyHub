@@ -1,58 +1,452 @@
-@@
--    <script type="module">
--        import { setupAuthListener, logoutUser } from '/js/auth.js';
-+    <script type="module">
-+        import { setupAuthListener, logoutUser } from '/js/auth.js';
-+        import { db } from '/js/firebase-init.js';
-+        import { doc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-@@
-                 if (payment.status === 'COMPLETED' || payment.activated) {
-                     stopPolling();
-                     showMessage('🎉 Payment confirmed! Activating your account...', 'success');
-                     const btn = document.getElementById('btnPayMpesa');
-                     if (btn) {
-                         btn.disabled = true;
-                         btn.textContent = 'Account Activated';
-                     }
--                    setTimeout(() => window.location.href = '/index.html', 1200);
-+
-+                    // Best-effort: confirm the activation server-side and sync the local user state
-+                    try {
-+                        await fetch('/api/payhero/confirm-activation', {
-+                            method: 'POST',
-+                            headers: {
-+                                'Content-Type': 'application/json',
-+                                'x-user-id': currentUid
-+                            },
-+                            body: JSON.stringify({
-+                                mpesaReceipt: payment.mpesaReceipt || null,
-+                                reference: payment.reference || payment.id || activePaymentRef,
-+                                phone: document.getElementById('stkPhoneInput')?.value || null
-+                            })
-+                        });
-+                    } catch (e) {
-+                        console.warn('confirm-activation failed:', e && e.message);
-+                    }
-+
-+                    try {
-+                        if (currentUid) {
-+                            const userRef = doc(db, 'users', currentUid);
-+                            await updateDoc(userRef, {
-+                                status: 'ACTIVE',
-+                                activated: true,
-+                                activatedAt: serverTimestamp(),
-+                                updatedAt: serverTimestamp()
-+                            });
-+                        }
-+                        localStorage.setItem('earnwave_user_status', 'ACTIVE');
-+                    } catch (e) {
-+                        console.warn('Could not update Firestore user doc locally:', e && e.message);
-+                    }
-+
-+                    setTimeout(() => window.location.replace('/index.html'), 900);
-                 } else if (payment.status === 'FAILED') {
-                     stopPolling();
-                     const reason = payment.failureReason || 'Payment was cancelled.';
-                     showMessage(`Payment failed: ${reason}`, 'error');
-                     resetPayButton();
-                 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation - PesaWave</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-dark, #0d1117);
+            color: var(--text-primary, #fff);
+            padding: 1.5rem 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .activation-card {
+            background: var(--bg-card, #161b22);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid var(--border, #30363d);
+        }
+        .brand-logo-wrap {
+            margin-bottom: 1.25rem;
+        }
+        .brand-logo-wrap img {
+            height: 52px;
+            width: auto;
+            max-width: 180px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            background: rgba(0, 212, 170, 0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--accent-green, #00ff88);
+        }
+        h1 { margin-bottom: 0.35rem; font-size: 1.5rem; color: #fff; font-weight: 700; }
+        .subtitle { color: #8b949e; font-size: 0.88rem; margin-bottom: 1.25rem; }
+        
+        .fee-badge {
+            background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,212,170,0.12));
+            border: 1px solid rgba(0,255,136,0.25);
+            border-radius: 12px;
+            padding: 1.1rem;
+            margin-bottom: 1.25rem;
+        }
+        .fee-amount {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-green, #00ff88);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        .fee-label {
+            font-size: 0.8rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.3rem;
+        }
+
+        .benefits {
+            text-align: left;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 1.1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .benefits ul { list-style: none; padding: 0; margin: 0; }
+        .benefits li { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #c9d1d9; }
+        .benefits li:last-child { margin-bottom: 0; }
+        .benefits li::before { content: "✓"; color: #00ff88; font-weight: bold; }
+
+        .payment-form-section {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-size: 0.85rem;
+            color: #c9d1d9;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+        .input-phone-wrap {
+            position: relative;
+            margin-bottom: 0.85rem;
+        }
+        .input-phone-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b949e;
+        }
+        .phone-input {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 2.6rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 9px;
+            color: #fff;
+            font-size: 1rem;
+            letter-spacing: 0.03em;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
+        .phone-input:focus {
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0,212,170,0.15);
+        }
+
+        .btn-pay-mpesa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.95rem 1rem;
+            background: linear-gradient(135deg, #00d4aa, #00b386);
+            color: #0d1117;
+            font-weight: 700;
+            font-size: 1.05rem;
+            border-radius: 9px;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .btn-pay-mpesa:hover:not(:disabled) {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        .btn-pay-mpesa:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .status-info { background: rgba(0, 212, 170, 0.1); color: #00d4aa; border: 1px solid rgba(0, 212, 170, 0.3); }
+        .status-error { background: rgba(248, 81, 73, 0.12); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.35); }
+        .status-success { background: rgba(48, 209, 88, 0.12); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.35); }
+
+        .footer-info {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #8b949e;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1rem;
+        }
+        .system-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: #00d4aa;
+            border-radius: 50%;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #f85149;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="activation-card">
+        <div class="brand-logo-wrap">
+            <img src="/logo.png" alt="PesaWave Logo">
+        </div>
+
+        <div class="icon-circle">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 9.5h20"/>
+            </svg>
+        </div>
+
+        <h1>Activate Your Account</h1>
+        <p class="subtitle" id="userGreeting">Pay KES 5.00 once to unlock all earning opportunities.</p>
+
+        <div id="statusAlert" class="status-message"></div>
+
+        <div class="fee-badge">
+            <div class="fee-amount">KES 5.00</div>
+            <div class="fee-label">One-Time Payment</div>
+        </div>
+
+        <div class="benefits">
+            <ul>
+                <li>Instant access to Microtasks, Surveys & Hotel Reviews</li>
+                <li>AI Training evaluations & Content writing tasks</li>
+                <li>Instant M-Pesa payouts to your phone</li>
+                <li>100% genuine earnings from day one</li>
+            </ul>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="payment-form-section" id="paymentFormSection">
+            <label class="form-label" for="stkPhoneInput">Your M-Pesa Phone Number</label>
+            <div class="input-phone-wrap">
+                <svg class="input-phone-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+                <input type="tel" id="stkPhoneInput" class="phone-input" placeholder="07XXXXXXXX or 254XXXXXXXX" required>
+            </div>
+
+            <button type="button" class="btn-pay-mpesa" id="btnPayMpesa">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <span id="btnPayText">Pay KES 5.00</span>
+            </button>
+            <small style="font-size:0.75rem; color:#8b949e; display:block; margin-top:0.5rem; text-align:center;">
+                You'll receive a payment prompt on your phone.
+            </small>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-info">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>Ready</span>
+            </div>
+            <button type="button" id="btnLogoutBtn" class="logout-btn">Log Out</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { setupAuthListener, logoutUser } from '/js/auth.js';
+        import { db } from '/js/firebase-init.js';
+        import { doc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        let currentUid = localStorage.getItem('earnwave_user_uid') || '';
+        let activePaymentRef = null;
+        let pollTimer = null;
+        let isProcessing = false;
+
+        function showMessage(msg, type = 'info') {
+            const el = document.getElementById('statusAlert');
+            if (!el) return;
+            el.className = `status-message status-${type}`;
+            el.innerHTML = msg;
+            el.style.display = 'block';
+        }
+
+        function hideMessage() {
+            const el = document.getElementById('statusAlert');
+            if (el) el.style.display = 'none';
+        }
+
+        async function checkInitialUserStatus() {
+            if (!currentUid) return;
+            try {
+                const res = await fetch('/api/auth/user-status', {
+                    headers: { 'x-user-id': currentUid }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.activated || data.status === 'ACTIVE') {
+                        showMessage('🎉 Account activated! Redirecting...', 'success');
+                        setTimeout(() => window.location.href = '/index.html', 800);
+                    }
+                }
+            } catch(e) {
+                console.warn('Status check failed:', e.message);
+            }
+        }
+
+        async function pollPaymentStatus() {
+            if (!activePaymentRef) return;
+            try {
+                const res = await fetch(`/api/payhero/status/${encodeURIComponent(activePaymentRef)}`);
+                if (!res.ok) return;
+                const result = await res.json();
+                if (!result.success || !result.payment) return;
+                const payment = result.payment;
+
+                if (payment.status === 'COMPLETED' || payment.activated) {
+                    stopPolling();
+                    showMessage('🎉 Payment confirmed! Activating your account...', 'success');
+                    const btn = document.getElementById('btnPayMpesa');
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.textContent = 'Account Activated';
+                    }
+
+                    // Best-effort: confirm the activation server-side and sync the local user state
+                    try {
+                        await fetch('/api/payhero/confirm-activation', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-user-id': currentUid
+                            },
+                            body: JSON.stringify({
+                                mpesaReceipt: payment.mpesaReceipt || null,
+                                reference: payment.reference || payment.id || activePaymentRef,
+                                phone: document.getElementById('stkPhoneInput')?.value || null
+                            })
+                        });
+                    } catch (e) {
+                        console.warn('confirm-activation failed:', e && e.message);
+                    }
+
+                    try {
+                        if (currentUid) {
+                            const userRef = doc(db, 'users', currentUid);
+                            await updateDoc(userRef, {
+                                status: 'ACTIVE',
+                                activated: true,
+                                activatedAt: serverTimestamp(),
+                                updatedAt: serverTimestamp()
+                            });
+                        }
+                        localStorage.setItem('earnwave_user_status', 'ACTIVE');
+                    } catch (e) {
+                        console.warn('Could not update Firestore user doc locally:', e && e.message);
+                    }
+
+                    // Use replace so history doesn't allow back to activation and to avoid race with SW caching
+                    setTimeout(() => window.location.replace('/index.html'), 900);
+                } else if (payment.status === 'FAILED') {
+                    stopPolling();
+                    const reason = payment.failureReason || 'Payment was cancelled.';
+                    showMessage(`Payment failed: ${reason}`, 'error');
+                    resetPayButton();
+                }
+            } catch (err) {
+                console.warn('Poll error:', err.message);
+            }
+        }
+
+        function startPolling(ref) {
+            stopPolling();
+            activePaymentRef = ref;
+            pollTimer = setInterval(pollPaymentStatus, 2000);
+        }
+
+        function stopPolling() {
+            if (pollTimer) clearInterval(pollTimer);
+            pollTimer = null;
+            isProcessing = false;
+        }
+
+        function resetPayButton() {
+            const btn = document.getElementById('btnPayMpesa');
+            const btnText = document.getElementById('btnPayText');
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.textContent = 'Pay KES 5.00';
+            isProcessing = false;
+        }
+
+        setupAuthListener((user) => {
+            if (user) {
+                currentUid = user.uid;
+                localStorage.setItem('earnwave_user_uid', user.uid);
+                const greeting = document.getElementById('userGreeting');
+                if (greeting) {
+                    greeting.textContent = `Welcome ${user.displayName || user.email}! Complete payment to start earning.`;
+                }
+                const savedPhone = localStorage.getItem('earnwave_user_phone');
+                const phoneInput = document.getElementById('stkPhoneInput');
+                if (savedPhone && phoneInput && !phoneInput.value) {
+                    phoneInput.value = savedPhone;
+                }
+                checkInitialUserStatus();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+
+        document.getElementById('btnPayMpesa')?.addEventListener('click', async () => {
+            if (isProcessing) return;
+            const phoneInput = document.getElementById('stkPhoneInput');
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+
+            if (!phone) {
+                showMessage('Please enter your phone number.', 'error');
+                phoneInput?.focus();
+                return;
+            }
+
+            hideMessage();
+            isProcessing = true;
+            const btn = document.getElementById('btnPayMpesa');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Sending payment prompt...';
+            }
+
+            try {
+                const res = await fetch('/api/payhero/stk-push', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-user-id': currentUid },
+                    body: JSON.stringify({ phone, amount: 5, userId: currentUid })
+                });
+
+                const data = await res.json();
+                if (data.success && data.reference) {
+                    showMessage(`📲 Payment prompt sent to ${phone}. Check your phone and enter your M-Pesa PIN.`, 'info');
+                    startPolling(data.reference);
+                } else {
+                    showMessage(`Payment failed: ${data.error || 'Please try again.'}`, 'error');
+                    resetPayButton();
+                }
+            } catch (err) {
+                showMessage(`Connection error: ${err.message}`, 'error');
+                resetPayButton();
+            }
+        });
+
+        document.getElementById('btnLogoutBtn')?.addEventListener('click', () => {
+            stopPolling();
+            logoutUser();
+        });
+    </script>
+</body>
+</html>
